@@ -12,15 +12,11 @@ export async function POST() {
   }
 
   try {
-    const response = await fetch("https://api.assemblyai.com/v2/realtime/token", {
-      method: "POST",
+    const response = await fetch("https://streaming.assemblyai.com/v3/token?expires_in_seconds=600", {
+      method: "GET",
       headers: {
         Authorization: apiKey,
-        "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        expires_in_seconds: 600, // 10 minutes
-      }),
     });
 
     if (!response.ok) {
