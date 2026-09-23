@@ -127,11 +127,18 @@ export class VoiceAgentClient {
       session: {
         system_prompt: SPAIN_CAFE_SCENARIO.systemPrompt,
         greeting: SPAIN_CAFE_SCENARIO.initialGreeting,
-        voice: SPAIN_CAFE_SCENARIO.voice,
+        output: {
+          voice: SPAIN_CAFE_SCENARIO.voice,
+        },
+        input: {
+          turn_detection: {
+            vad_threshold: 0.5,
+            min_silence: 300,
+            max_silence: 2000,
+            interrupt_response: true,
+          },
+        },
         tools: CAFE_TOOLS,
-        vad_threshold: 0.5,
-        min_silence: 300,
-        max_silence: 2000,
       },
     };
 

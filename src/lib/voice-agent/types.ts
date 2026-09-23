@@ -26,11 +26,24 @@ export interface SessionUpdateConfig {
   session?: {
     system_prompt?: string;
     greeting?: string;
-    voice?: string;
+    output?: {
+      voice?: string;
+      format?: {
+        encoding?: string;
+      };
+    };
+    input?: {
+      turn_detection?: {
+        vad_threshold?: number;
+        min_silence?: number;
+        max_silence?: number;
+        interrupt_response?: boolean;
+      };
+      format?: {
+        encoding?: string;
+      };
+    };
     tools?: ToolDefinition[];
-    vad_threshold?: number;
-    min_silence?: number;
-    max_silence?: number;
   };
   agent_id?: string;
 }
