@@ -115,6 +115,10 @@ test("TDD: findActiveHotspot returns nearby interactive café zones", () => {
 test("TDD: MADRID_CAFE_HOTSPOTS contains full language learning curricula", () => {
   const requiredHotspots = ["barista_mateo", "pastry_case", "coffee_board", "pos_register", "terrace_table"];
   
+  assert.ok(CAFE_BOUNDS.maxX > CAFE_BOUNDS.minX, "Bounds maxX must be greater than minX");
+  assert.ok(CAFE_BOUNDS.maxZ > CAFE_BOUNDS.minZ, "Bounds maxZ must be greater than minZ");
+  assert.ok(CAFE_OBSTACLES.length >= 3, "Café must have at least 3 obstacles (counter, vitrine, tables)");
+
   for (const id of requiredHotspots) {
     const spot = MADRID_CAFE_HOTSPOTS.find((h) => h.id === id);
     assert.ok(spot, `Hotspot '${id}' must be configured in Madrid café`);

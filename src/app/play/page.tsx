@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useVoiceAgent } from "@/lib/voice-agent/useVoiceAgent";
 import { useGameStore } from "@/lib/game/store";
 import { Header } from "@/components/navigation/Header";
 import { CafeVisual } from "@/components/cafe/CafeVisual";
+import { Cafe3DWorld } from "@/components/world/Cafe3DWorld";
 import { VoiceControls } from "@/components/voice/VoiceControls";
 import { ObjectivesHUD } from "@/components/hud/ObjectivesHUD";
 import { OrderReceipt } from "@/components/hud/OrderReceipt";
 import { TranscriptHUD } from "@/components/hud/TranscriptHUD";
 import { FeedbackModal } from "@/components/hud/FeedbackModal";
-import { MapPin, Compass } from "lucide-react";
+import { MapPin, Compass, Box, Image as ImageIcon } from "lucide-react";
 import { SPAIN_CAFE_SCENARIO } from "@/scenarios/spain-cafe";
 
 export default function PlayPage() {
@@ -25,6 +26,7 @@ export default function PlayPage() {
   } = useVoiceAgent();
 
   const { resetGame, level } = useGameStore();
+  const [viewMode, setViewMode] = useState<"3d" | "2d">("3d");
 
   // Auto-prompt to connect on mount
   useEffect(() => {
@@ -50,8 +52,49 @@ export default function PlayPage() {
       <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Stage & Voice Controls (7 cols on lg) */}
         <div className="lg:col-span-7 flex flex-col gap-5">
-          {/* Visual Café Scene */}
-          <CafeVisual />
+          {/* View Mode Selector Tabs */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 bg-stone-900 border border-stone-800 p-1 rounded-xl">
+              <button
+                onClick={() => setViewMode("3d")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  viewMode === "3d"
+                    ? "bg-amber-500 text-stone-950 shadow-sm"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                <Box className="w-3.5 h-3.5" />
+                <span>Mundo 3D (WASD)</span>
+              </button>
+              <button
+                onClick={() => setViewMode("2d")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  viewMode === "2d"
+                    ? "bg-amber-500 text-stone-950 shadow-sm"
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>Escena 2D</span>
+              </button>
+            </div>
+
+            <span className="text-[11px] text-stone-400 hidden sm:inline-block">
+              {viewMode === "3d" ? "Usa W,A,S,D para explorar el café" : "Modo clásico 2D"}
+            </span>
+          </div>
+
+          {/* Visual Café Scene: 3D or 2D */}
+          {viewMode === "3d" ? (
+            <Cafe3DWorld
+              onStartTalk={startTalk}
+              onStopTalk={stopTalk}
+              onSimulateSpeech={simulateSpeech}
+              isVoiceActive={status === "connected" || status === "ready"}
+            />
+          ) : (
+            <CafeVisual />
+          )}
 
           {/* Voice Controls with Push-To-Talk */}
           <VoiceControls

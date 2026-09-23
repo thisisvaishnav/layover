@@ -62,7 +62,7 @@ export function resolveMovement(
 
   // 2. Obstacle collision with axis-sliding
   // Try X movement first
-  let testPosX: Position3D = { x: finalX, y: current.y, z: current.z };
+  const testPosX: Position3D = { x: finalX, y: current.y, z: current.z };
   let collidesX = false;
   for (const obs of obstacles) {
     if (checkAABBCollision(testPosX, obs, radius)) {
@@ -75,7 +75,7 @@ export function resolveMovement(
   }
 
   // Try Z movement
-  let testPosZ: Position3D = { x: finalX, y: current.y, z: finalZ };
+  const testPosZ: Position3D = { x: finalX, y: current.y, z: finalZ };
   let collidesZ = false;
   for (const obs of obstacles) {
     if (checkAABBCollision(testPosZ, obs, radius)) {
