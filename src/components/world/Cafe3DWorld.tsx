@@ -30,6 +30,9 @@ interface Cafe3DWorldProps {
   onStopTalk?: () => void;
   onSimulateSpeech?: (text: string) => void;
   isVoiceActive?: boolean;
+  className?: string;
+  scenarioName?: string;
+  hideControlsOverlay?: boolean;
 }
 
 export function Cafe3DWorld({
@@ -37,6 +40,9 @@ export function Cafe3DWorld({
   onStopTalk,
   onSimulateSpeech,
   isVoiceActive,
+  className,
+  scenarioName = "Café de la Luna · Madrid 3D",
+  hideControlsOverlay = false,
 }: Cafe3DWorldProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sceneRef = useRef<Cafe3DScene | null>(null);
@@ -135,7 +141,11 @@ export function Cafe3DWorld({
   }, [baristaAction]);
 
   return (
-    <div className="relative w-full h-[460px] md:h-[540px] rounded-3xl overflow-hidden bg-stone-950 border border-stone-800 shadow-2xl select-none group">
+    <div
+      className={`relative w-full h-full overflow-hidden bg-stone-950 select-none group ${
+        className || "h-[460px] md:h-[540px] rounded-3xl border border-stone-800 shadow-2xl"
+      }`}
+    >
       {/* 3D WebGL Canvas */}
       <canvas
         ref={canvasRef}
@@ -144,26 +154,28 @@ export function Cafe3DWorld({
       />
 
       {/* Top Left: Controls & Context Overlay */}
-      <div className="absolute top-4 left-4 z-10 pointer-events-none flex flex-col gap-2">
-        <div className="bg-stone-950/80 backdrop-blur-md border border-stone-800 rounded-2xl px-3.5 py-2 shadow-lg flex items-center gap-2.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs font-bold text-stone-200">
-            Café de la Luna · Madrid 3D
-          </span>
-        </div>
+      {!hideControlsOverlay && (
+        <div className="absolute top-4 left-4 z-10 pointer-events-none flex flex-col gap-2">
+          <div className="bg-stone-950/80 backdrop-blur-md border border-stone-800 rounded-2xl px-3.5 py-2 shadow-lg flex items-center gap-2.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-bold text-stone-200">
+              {scenarioName}
+            </span>
+          </div>
 
-        <div className="hidden sm:flex items-center gap-1.5 bg-stone-900/80 backdrop-blur-sm border border-stone-800/80 rounded-xl px-3 py-1.5 text-[11px] text-stone-300">
-          <span className="px-1.5 py-0.5 rounded bg-stone-800 font-mono font-bold text-amber-400">
-            W A S D
-          </span>
-          <span className="text-stone-400">moverse</span>
-          <span className="mx-1 text-stone-600">·</span>
-          <span className="px-1.5 py-0.5 rounded bg-stone-800 font-mono font-bold text-amber-400">
-            E
-          </span>
-          <span className="text-stone-400">inspeccionar</span>
+          <div className="hidden sm:flex items-center gap-1.5 bg-stone-900/80 backdrop-blur-sm border border-stone-800/80 rounded-xl px-3 py-1.5 text-[11px] text-stone-300">
+            <span className="px-1.5 py-0.5 rounded bg-stone-800 font-mono font-bold text-amber-400">
+              W A S D
+            </span>
+            <span className="text-stone-400">moverse</span>
+            <span className="mx-1 text-stone-600">·</span>
+            <span className="px-1.5 py-0.5 rounded bg-stone-800 font-mono font-bold text-amber-400">
+              E
+            </span>
+            <span className="text-stone-400">inspeccionar</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Top Right: Status indicators */}
       <div className="absolute top-4 right-4 z-10 flex items-center gap-2">

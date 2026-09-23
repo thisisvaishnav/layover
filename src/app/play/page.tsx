@@ -1,20 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useVoiceAgent } from "@/lib/voice-agent/useVoiceAgent";
 import { useGameStore } from "@/lib/game/store";
-import { Header } from "@/components/navigation/Header";
-import { CafeVisual } from "@/components/cafe/CafeVisual";
 import { Cafe3DWorld } from "@/components/world/Cafe3DWorld";
 import { VoiceControls } from "@/components/voice/VoiceControls";
 import { ObjectivesHUD } from "@/components/hud/ObjectivesHUD";
 import { OrderReceipt } from "@/components/hud/OrderReceipt";
 import { TranscriptHUD } from "@/components/hud/TranscriptHUD";
 import { FeedbackModal } from "@/components/hud/FeedbackModal";
-import { MapPin, Compass, Box, Image as ImageIcon } from "lucide-react";
-import { SPAIN_CAFE_SCENARIO } from "@/scenarios/spain-cafe";
+import {
+  ArrowLeft,
+  Trophy,
+  Receipt,
+  MessageSquare,
+  Maximize2,
+  Minimize2,
+  RefreshCw,
+  X,
+} from "lucide-react";
+import { DESTINATIONS } from "@/scenarios/catalog";
 
-export default function PlayPage() {
+function PlayGameContent() {
+  const searchParams = useSearchParams();
+
+  const destId = searchParams.get("destination") || "spain-madrid-cafe";
+  const matchedDest = DESTINATIONS.find((d) => d.id === destId) || DESTINATIONS[0];
+
   const {
     status,
     audioLevel,
@@ -26,77 +40,191 @@ export default function PlayPage() {
   } = useVoiceAgent();
 
   const { resetGame, level } = useGameStore();
-  const [viewMode, setViewMode] = useState<"3d" | "2d">("3d");
 
-  // Auto-prompt to connect on mount
+  // Floating HUD panel states
+  const [activePanel, setActivePanel] = useState<"none" | "objectives" | "receipt" | "transcript">(
+    "none"
+  );
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Auto-connect voice agent on mount
   useEffect(() => {
     connect();
   }, [connect]);
 
-  const currentLevelInfo = SPAIN_CAFE_SCENARIO.levels[level];
+  // Fullscreen toggle handler
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen().catch(() => {});
+      setIsFullscreen(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100 flex flex-col">
-      {/* Top Navigation */}
-      <Header
-        status={status}
-        onConnect={connect}
-        onReset={() => {
-          resetGame();
-          disconnect();
-          connect();
-        }}
-      />
+    <div className="relative w-screen h-screen overflow-hidden bg-stone-950 text-stone-100 select-none">
+      {/* 1. Full-Screen 3D WebGL Canvas Layer */}
+      <div className="absolute inset-0 z-0">
+        <Cafe3DWorld
+          onStartTalk={startTalk}
+          onStopTalk={stopTalk}
+          onSimulateSpeech={simulateSpeech}
+          isVoiceActive={status === "connected" || status === "ready"}
+          className="w-full h-full"
+          scenarioName={`${matchedDest.name} · ${matchedDest.city} 3D`}
+        />
+      </div>
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Stage & Voice Controls (7 cols on lg) */}
-        <div className="lg:col-span-7 flex flex-col gap-5">
-          {/* View Mode Selector Tabs */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1 bg-stone-900 border border-stone-800 p-1 rounded-xl">
-              <button
-                onClick={() => setViewMode("3d")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  viewMode === "3d"
-                    ? "bg-amber-500 text-stone-950 shadow-sm"
-                    : "text-stone-400 hover:text-stone-200"
-                }`}
-              >
-                <Box className="w-3.5 h-3.5" />
-                <span>Mundo 3D (WASD)</span>
-              </button>
-              <button
-                onClick={() => setViewMode("2d")}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  viewMode === "2d"
-                    ? "bg-amber-500 text-stone-950 shadow-sm"
-                    : "text-stone-400 hover:text-stone-200"
-                }`}
-              >
-                <ImageIcon className="w-3.5 h-3.5" />
-                <span>Escena 2D</span>
-              </button>
-            </div>
+      {/* 2. Top Floating Navigation Bar */}
+      <header className="absolute top-4 inset-x-4 z-20 pointer-events-none flex items-center justify-between gap-3">
+        {/* Left: Back to Dashboard & Destination Identity */}
+        <div className="pointer-events-auto flex items-center gap-2">
+          <Link
+            href="/"
+            className="px-3.5 py-2 rounded-2xl bg-stone-950/80 hover:bg-stone-900 border border-stone-800 backdrop-blur-md text-stone-300 hover:text-stone-100 text-xs font-bold transition-all flex items-center gap-2 shadow-xl active:scale-95"
+            title="Volver al Tablero de Salidas"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Tablero de Salidas</span>
+          </Link>
 
-            <span className="text-[11px] text-stone-400 hidden sm:inline-block">
-              {viewMode === "3d" ? "Usa W,A,S,D para explorar el café" : "Modo clásico 2D"}
+          <div className="bg-stone-950/80 backdrop-blur-md border border-stone-800 rounded-2xl px-3.5 py-2 shadow-xl flex items-center gap-2 text-xs font-semibold">
+            <span className="text-base">{matchedDest.flag}</span>
+            <span className="font-bold text-stone-100 hidden sm:inline">
+              {matchedDest.name}
+            </span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">
+              Nivel {level}
             </span>
           </div>
+        </div>
 
-          {/* Visual Café Scene: 3D or 2D */}
-          {viewMode === "3d" ? (
-            <Cafe3DWorld
-              onStartTalk={startTalk}
-              onStopTalk={stopTalk}
-              onSimulateSpeech={simulateSpeech}
-              isVoiceActive={status === "connected" || status === "ready"}
-            />
-          ) : (
-            <CafeVisual />
-          )}
+        {/* Center: Live Voice Status Pill */}
+        <div className="pointer-events-auto hidden md:flex items-center gap-2 bg-stone-950/80 backdrop-blur-md border border-stone-800/80 rounded-2xl px-3.5 py-2 shadow-xl text-xs">
+          <div
+            className={`w-2.5 h-2.5 rounded-full ${
+              status === "ready" || status === "connected"
+                ? "bg-emerald-500 animate-pulse"
+                : status === "connecting"
+                ? "bg-amber-400 animate-ping"
+                : "bg-stone-500"
+            }`}
+          />
+          <span className="font-bold text-stone-200">
+            {status === "ready"
+              ? "Voz Activa con Mateo"
+              : status === "connected"
+              ? "Conectado"
+              : status === "connecting"
+              ? "Conectando..."
+              : "Voz Desconectada"}
+          </span>
+          <span className="text-[10px] text-stone-400 font-mono">
+            AssemblyAI 24kHz
+          </span>
+        </div>
 
-          {/* Voice Controls with Push-To-Talk */}
+        {/* Right: Floating Tool Toggles (Objectives, Receipt, Transcript, Fullscreen) */}
+        <div className="pointer-events-auto flex items-center gap-2">
+          {/* Misiones / Objectives Button */}
+          <button
+            onClick={() =>
+              setActivePanel(activePanel === "objectives" ? "none" : "objectives")
+            }
+            className={`px-3 py-2 rounded-2xl border backdrop-blur-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-xl active:scale-95 cursor-pointer ${
+              activePanel === "objectives"
+                ? "bg-amber-500 text-stone-950 border-amber-400"
+                : "bg-stone-950/80 hover:bg-stone-900 border-stone-800 text-stone-300"
+            }`}
+            title="Misiones del Nivel"
+          >
+            <Trophy className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Misiones</span>
+          </button>
+
+          {/* Ticket / Order Receipt Button */}
+          <button
+            onClick={() =>
+              setActivePanel(activePanel === "receipt" ? "none" : "receipt")
+            }
+            className={`px-3 py-2 rounded-2xl border backdrop-blur-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-xl active:scale-95 cursor-pointer ${
+              activePanel === "receipt"
+                ? "bg-amber-500 text-stone-950 border-amber-400"
+                : "bg-stone-950/80 hover:bg-stone-900 border-stone-800 text-stone-300"
+            }`}
+            title="Ver Ticket de Pedido"
+          >
+            <Receipt className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Ticket</span>
+          </button>
+
+          {/* Transcript Log Button */}
+          <button
+            onClick={() =>
+              setActivePanel(activePanel === "transcript" ? "none" : "transcript")
+            }
+            className={`px-3 py-2 rounded-2xl border backdrop-blur-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-xl active:scale-95 cursor-pointer ${
+              activePanel === "transcript"
+                ? "bg-amber-500 text-stone-950 border-amber-400"
+                : "bg-stone-950/80 hover:bg-stone-900 border-stone-800 text-stone-300"
+            }`}
+            title="Transcripción de Voz"
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Chat</span>
+          </button>
+
+          {/* Reset Game Session */}
+          <button
+            onClick={() => {
+              resetGame();
+              disconnect();
+              connect();
+            }}
+            className="p-2 rounded-2xl bg-stone-950/80 hover:bg-stone-900 border border-stone-800 backdrop-blur-md text-stone-400 hover:text-stone-100 shadow-xl transition-all active:scale-95"
+            title="Reiniciar Simulación"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Fullscreen Toggle */}
+          <button
+            onClick={toggleFullscreen}
+            className="p-2 rounded-2xl bg-stone-950/80 hover:bg-stone-900 border border-stone-800 backdrop-blur-md text-stone-400 hover:text-stone-100 shadow-xl transition-all active:scale-95"
+            title="Pantalla Completa"
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-3.5 h-3.5" />
+            ) : (
+              <Maximize2 className="w-3.5 h-3.5" />
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* 3. Floating Sliding Drawer for Active Panel (Objectives / Receipt / Transcript) */}
+      {activePanel !== "none" && (
+        <div className="absolute top-20 right-4 z-30 w-80 md:w-96 max-h-[78vh] overflow-y-auto pointer-events-auto animate-in slide-in-from-right-4 duration-200">
+          <div className="relative">
+            <button
+              onClick={() => setActivePanel("none")}
+              className="absolute top-3 right-3 z-10 p-1 rounded-lg bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {activePanel === "objectives" && <ObjectivesHUD />}
+            {activePanel === "receipt" && <OrderReceipt />}
+            {activePanel === "transcript" && <TranscriptHUD />}
+          </div>
+        </div>
+      )}
+
+      {/* 4. Bottom Floating Voice & Push-To-Talk Dock */}
+      <footer className="absolute bottom-5 inset-x-4 z-20 pointer-events-none flex flex-col items-center gap-2">
+        <div className="pointer-events-auto max-w-lg w-full">
           <VoiceControls
             status={status}
             audioLevel={audioLevel}
@@ -104,52 +232,28 @@ export default function PlayPage() {
             onStopTalk={stopTalk}
             onSimulateSpeech={simulateSpeech}
           />
-
-          {/* Live Transcript Log */}
-          <TranscriptHUD />
         </div>
+      </footer>
 
-        {/* Right Column: Mission HUD & Café Receipt (5 cols on lg) */}
-        <div className="lg:col-span-5 flex flex-col gap-5">
-          {/* Location & Scenario Briefing Card */}
-          <div className="bg-stone-900/90 border border-stone-800 rounded-2xl p-4 shadow-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] uppercase font-bold text-amber-400/90 tracking-wider flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                <span>Escenario Activo</span>
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                España · Nivel {level}
-              </span>
-            </div>
-            <h2 className="text-base font-bold text-stone-100">
-              {SPAIN_CAFE_SCENARIO.name} · {SPAIN_CAFE_SCENARIO.city}
-            </h2>
-            <p className="text-xs text-stone-400 mt-1 leading-relaxed">
-              {currentLevelInfo.description}
-            </p>
-
-            {/* Travel Context Tip */}
-            <div className="mt-3 pt-2.5 border-t border-stone-800/80 flex items-start gap-2 text-[11px] text-amber-200/90">
-              <Compass className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
-              <span>
-                <strong>Dato de viaje:</strong> En los bares de Madrid es muy común
-                pedir un café con leche templado si tienes prisa, o cortado si
-                quieres menos leche.
-              </span>
-            </div>
-          </div>
-
-          {/* Objectives Checklist */}
-          <ObjectivesHUD />
-
-          {/* Real-time Order Receipt Ticket */}
-          <OrderReceipt />
-        </div>
-      </main>
-
-      {/* Completion Modal */}
+      {/* 5. Completion Modal */}
       <FeedbackModal />
     </div>
+  );
+}
+
+export default function PlayPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-stone-950 text-stone-100 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs text-stone-400">Cargando Mundo 3D...</span>
+          </div>
+        </div>
+      }
+    >
+      <PlayGameContent />
+    </Suspense>
   );
 }
