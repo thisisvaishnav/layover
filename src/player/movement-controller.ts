@@ -176,26 +176,197 @@ export function updatePlayerMovement(
   };
 }
 
+export interface AimDirection {
+  direction: Vector2D; // Normalized unit vector in world ground plane
+  angle: number;       // Facing angle in radians towards target (0 = +Z, π/2 = +X)
+  distance: number;    // Distance from player to target
+}
+
 /**
- * Updates player movement from keyboard input (Arrow keys / WASD) with smooth, responsive locomotion.
- * - ArrowUp (forward) -> +Z
- * - ArrowDown (backward) -> -Z
- * - ArrowLeft (left) -> -X
- * - ArrowRight (right) -> +X
- * - Diagonal vectors are normalized so diagonal movement is not faster than straight.
- * - Smooth rotation to face the direction of movement (cardinal & diagonal).
- * - Immediate response on key press: IDLE -> MOVING.
- * - Immediate stop on key release: MOVING -> IDLE with minimal deceleration (no sliding).
+ * Calculates facing vectors (forward, backward, right, left) for a given rotation angle.
+ */
+export function calculateFacingVectors(rotation: number): {
+  forward: Vector2D;
+  backward: Vector2D;
+  right: Vector2D;
+  left: Vector2D;
+} {
+  const fx = Math.sin(rotation);
+  const fz = Math.cos(rotation);
+  return {
+    forward: { x: fx, z: fz },
+    backward: { x: -fx, z: -fz },
+    right: { x: fz, z: -fx },
+    left: { x: -fz, z: fx },
+  };
+}
+
+/**
+ * Calculates world-space aim direction from player to cursor.
+ * Returns null if distance is within deadzone or invalid to prevent jitter and NaN.
+ */
+export function calculateAimDirection(
+  playerPos: Vector2D,
+  cursorWorldPos: Vector2D,
+  deadzone: number = 0.2
+): AimDirection | null {
+  const dx = cursorWorldPos.x - playerPos.x;
+  const dz = cursorWorldPos.z - playerPos.z;
+  const dist = Math.hypot(dx, dz);
+
+  if (Number.isNaN(dist) || dist <= deadzone) {
+    return null;
+  }
+
+  const normX = dx / dist;
+  const normZ = dz / dist;
+  const angle = Math.atan2(dx, dz);
+
+  return {
+    direction: { x: normX, z: normZ },
+    angle,
+    distance: dist,
+  };
+}
+
+/**
+ * Smoothly updates player rotation to face towards the cursor world position.
+ * Does not rotate if cursor is null or in deadzone.
+ * Mouse aiming alone does NOT move the player.
+ */
+export function updatePlayerMouseAim(
+  currentState: PlayerState,
+  cursorWorldPos: Vector2D | null,
+  deltaSeconds: number,
+  smoothingSpeed: number = 18.0
+): PlayerState {
+  if (!cursorWorldPos) {
+    return currentState;
+  }
+
+  const aim = calculateAimDirection(currentState.position, cursorWorldPos);
+  if (!aim) {
+    return currentState;
+  }
+
+  const angleDiff = shortestAngleDiff(currentState.rotation, aim.angle);
+  const rotStep = angleDiff * (1 - Math.exp(-smoothingSpeed * Math.min(deltaSeconds, 0.1)));
+  let newRotation = currentState.rotation + rotStep;
+  newRotation = ((newRotation + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+
+  return {
+    ...currentState,
+    rotation: newRotation,
+  };
+}
+
+/**
+ * Updates player movement from keyboard input (Arrow keys / WASD).
+ *
+ * In Mouse-Direction Mode (when cursorWorldPos is provided):
+ * - Mouse cursor position on screen/ground determines the player's facing direction.
+ * - Up Arrow (↑) / W: Moves forward in direction of cursor.
+ * - Down Arrow (↓) / S: Moves backward relative to cursor direction while maintaining facing toward cursor.
+ * - Left Arrow (←) / A: Strafes left relative to cursor direction.
+ * - Right Arrow (→) / D: Strafes right relative to cursor direction.
+ * - Combined inputs (diagonals): Normalized so diagonal speed is identical to straight.
+ * - Smooth rotation to track cursor without sudden snapping.
  * - Priority: Keyboard immediately overrides and cancels any click-to-move destination.
- *   Releasing keys does NOT resume the old destination.
+ *
+ * In Fallback/Legacy Mode (when cursorWorldPos is undefined):
+ * - Arrow keys move in cardinal world axes with rotation facing the movement direction.
  */
 export function updatePlayerKeyboard(
   currentState: PlayerState,
   input: KeyboardInput,
   deltaSeconds: number,
   bounds: MapBounds,
-  padding: number = 0.8
+  padding: number = 0.8,
+  cursorWorldPos?: Vector2D | null
 ): PlayerState {
+  const uFwd = (input.forward ? 1 : 0) - (input.backward ? 1 : 0);
+  const uStrafe = (input.right ? 1 : 0) - (input.left ? 1 : 0);
+  const isInputActive = uFwd !== 0 || uStrafe !== 0;
+
+  // Key release / no input active: stop immediately with IDLE state
+  if (!isInputActive) {
+    let idleRotation = currentState.rotation;
+    if (cursorWorldPos) {
+      const aim = calculateAimDirection(currentState.position, cursorWorldPos);
+      if (aim) {
+        const angleDiff = shortestAngleDiff(idleRotation, aim.angle);
+        const rotStep = angleDiff * (1 - Math.exp(-18.0 * Math.min(deltaSeconds, 0.1)));
+        idleRotation = ((idleRotation + rotStep + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+      }
+    }
+    return {
+      ...currentState,
+      rotation: idleRotation,
+      movementState: "IDLE",
+      isMoving: false,
+      target: null, // Do not resume old destination
+    };
+  }
+
+  // 1. Mouse-Direction Locomotion Mode (cursorWorldPos is provided)
+  if (cursorWorldPos !== undefined) {
+    let currentRot = currentState.rotation;
+    let forwardDir: Vector2D;
+    let rightDir: Vector2D;
+
+    if (cursorWorldPos) {
+      const aim = calculateAimDirection(currentState.position, cursorWorldPos);
+      if (aim) {
+        // Smooth shortest-path rotation toward cursor
+        const angleDiff = shortestAngleDiff(currentRot, aim.angle);
+        const rotStep = angleDiff * (1 - Math.exp(-18.0 * Math.min(deltaSeconds, 0.1)));
+        currentRot = ((currentRot + rotStep + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+
+        // Move forward along cursor aim direction
+        forwardDir = aim.direction;
+        rightDir = { x: aim.direction.z, z: -aim.direction.x };
+      } else {
+        // Inside deadzone: maintain current facing
+        const vectors = calculateFacingVectors(currentRot);
+        forwardDir = vectors.forward;
+        rightDir = vectors.right;
+      }
+    } else {
+      // cursorWorldPos was null (e.g. outside playable bounds or sky)
+      const vectors = calculateFacingVectors(currentRot);
+      forwardDir = vectors.forward;
+      rightDir = vectors.right;
+    }
+
+    // Combined movement vector: forwardDir * uFwd + rightDir * uStrafe
+    const moveX = forwardDir.x * uFwd + rightDir.x * uStrafe;
+    const moveZ = forwardDir.z * uFwd + rightDir.z * uStrafe;
+    const moveMag = Math.hypot(moveX, moveZ);
+    let normX = 0;
+    let normZ = 0;
+    if (moveMag > 1e-5) {
+      normX = moveX / moveMag;
+      normZ = moveZ / moveMag;
+    }
+
+    const moveDist = currentState.speed * deltaSeconds;
+    const posX = currentState.position.x + normX * moveDist;
+    const posZ = currentState.position.z + normZ * moveDist;
+
+    // Clamp safely inside map boundaries
+    const clamped = clampPositionToBounds({ x: posX, z: posZ }, bounds, padding);
+
+    return {
+      ...currentState,
+      position: clamped,
+      rotation: currentRot,
+      target: null, // Keyboard immediately cancels click-to-move target
+      movementState: "MOVING",
+      isMoving: true,
+    };
+  }
+
+  // 2. Legacy / Fallback Mode (cursorWorldPos is omitted)
   let dirX = 0;
   let dirZ = 0;
   if (input.forward) dirZ += 1;
@@ -203,19 +374,6 @@ export function updatePlayerKeyboard(
   if (input.left) dirX -= 1;
   if (input.right) dirX += 1;
 
-  const isInputActive = dirX !== 0 || dirZ !== 0;
-
-  // Key release / no input active: stop immediately with IDLE state
-  if (!isInputActive) {
-    return {
-      ...currentState,
-      movementState: "IDLE",
-      isMoving: false,
-      target: null, // Do not resume old destination
-    };
-  }
-
-  // Normalize input vector so diagonals move at exactly the same speed
   const inputMag = Math.hypot(dirX, dirZ);
   const normX = dirX / inputMag;
   const normZ = dirZ / inputMag;
@@ -223,7 +381,6 @@ export function updatePlayerKeyboard(
   // Smooth rotation to face the exact movement direction
   const targetAngle = Math.atan2(normX, normZ);
   const angleDiff = shortestAngleDiff(currentState.rotation, targetAngle);
-  // Snappy yet smooth angular easing (16 rad/s)
   const rotStep = angleDiff * (1 - Math.exp(-18.0 * deltaSeconds));
   let newRotation = currentState.rotation + rotStep;
   newRotation = ((newRotation + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
@@ -239,8 +396,9 @@ export function updatePlayerKeyboard(
     ...currentState,
     position: clamped,
     rotation: newRotation,
-    target: null, // Keyboard immediately cancels click-to-move target
+    target: null,
     movementState: "MOVING",
     isMoving: true,
   };
 }
+

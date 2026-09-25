@@ -9,6 +9,7 @@ import {
   setPlayerDestination,
   updatePlayerMovement,
   updatePlayerKeyboard,
+  updatePlayerMouseAim,
   type PlayerState,
   type KeyboardInput,
   type Vector2D,
@@ -18,7 +19,9 @@ import { createCameraController, type CameraController } from "../../camera/came
 import {
   createRaycastHandler,
   createDestinationIndicator,
+  createCursorAimIndicator,
   type DestinationIndicator,
+  type CursorAimIndicator,
   type RaycastHandler,
 } from "../../interaction/raycast-handler";
 import MinimapHUD from "./MinimapHUD";
@@ -152,9 +155,11 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     );
     cameraControllerRef.current = cameraController;
 
-    // 7. Destination Feedback Marker & Raycaster
+    // 7. Destination Feedback Marker, Cursor Direction Indicator & Raycaster
     const destinationIndicator: DestinationIndicator = createDestinationIndicator();
     scene.add(destinationIndicator.mesh);
+    const cursorAimIndicator: CursorAimIndicator = createCursorAimIndicator();
+    scene.add(cursorAimIndicator.mesh);
     const raycastHandler: RaycastHandler = createRaycastHandler();
 
     // 8. Input State (Keyboard + Pointer)
@@ -168,6 +173,9 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     let isDragging = false;
     let startPointerX = 0;
     let startPointerY = 0;
+    let currentPointerX = 0;
+    let currentPointerY = 0;
+    let hasPointer = false;
     let isRightDrag = false;
 
     const handlePointerDown = (event: MouseEvent) => {
@@ -175,6 +183,9 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
 
       startPointerX = event.clientX;
       startPointerY = event.clientY;
+      currentPointerX = event.clientX;
+      currentPointerY = event.clientY;
+      hasPointer = true;
       isDragging = false;
 
       // Right-click or middle-click or Shift+Click triggers camera orbit
@@ -186,6 +197,10 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     };
 
     const handlePointerMove = (event: MouseEvent) => {
+      currentPointerX = event.clientX;
+      currentPointerY = event.clientY;
+      hasPointer = true;
+
       const dx = event.clientX - startPointerX;
       const dy = event.clientY - startPointerY;
       if (Math.hypot(dx, dy) > 6) {
@@ -368,17 +383,51 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
         keyboardInput.left ||
         keyboardInput.right;
 
-      // Update movement: keyboard controller takes highest priority
+      // Project mouse screen position onto ground plane for aiming & direction
+      let cursorGroundPos: Vector2D | null = null;
+      if (hasPointer && renderer.domElement) {
+        const canvasRect = renderer.domElement.getBoundingClientRect();
+        cursorGroundPos = raycastHandler.getGroundIntersection(
+          currentPointerX,
+          currentPointerY,
+          canvasRect,
+          cameraController.camera,
+          mapData.bounds
+        );
+      }
+
+      // Update subtle ground direction indicator
+      if (cursorGroundPos) {
+        cursorAimIndicator.show(cursorGroundPos);
+      } else {
+        cursorAimIndicator.hide();
+      }
+      cursorAimIndicator.update(deltaSeconds);
+
+      // Update movement: keyboard controller takes highest priority and uses mouse-direction
       if (hasKeyboardActive) {
-        playerState = updatePlayerKeyboard(playerState, keyboardInput, deltaSeconds, mapData.bounds);
+        playerState = updatePlayerKeyboard(
+          playerState,
+          keyboardInput,
+          deltaSeconds,
+          mapData.bounds,
+          0.8,
+          cursorGroundPos
+        );
         destinationIndicator.hide();
       } else if (playerState.isMoving && playerState.target) {
         playerState = updatePlayerMovement(playerState, deltaSeconds, mapData.bounds);
         if (!playerState.isMoving) {
           destinationIndicator.hide();
         }
-      } else if (playerState.isMoving && !playerState.target) {
-        playerState = { ...playerState, movementState: "IDLE", isMoving: false };
+      } else {
+        // When not moving via keyboard or click, mouse continuously controls player facing direction
+        if (cursorGroundPos) {
+          playerState = updatePlayerMouseAim(playerState, cursorGroundPos, deltaSeconds);
+        }
+        if (playerState.isMoving && !playerState.target) {
+          playerState = { ...playerState, movementState: "IDLE", isMoving: false };
+        }
       }
 
       // Sync position to ref for silky-smooth 60fps minimap rendering
@@ -435,11 +484,19 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
 
     animationFrameId = requestAnimationFrame(animate);
 
+    const handlePointerLeave = () => {
+      hasPointer = false;
+      cursorAimIndicator.hide();
+    };
+
+    renderer.domElement.addEventListener("pointerleave", handlePointerLeave);
+
     // 11. Cleanup
     return () => {
       cancelAnimationFrame(animationFrameId);
       resizeObserver.disconnect();
       renderer.domElement.removeEventListener("pointerdown", handlePointerDown);
+      renderer.domElement.removeEventListener("pointerleave", handlePointerLeave);
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
       renderer.domElement.removeEventListener("wheel", handleWheel);
@@ -451,6 +508,7 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       mapMeshes.dispose();
       playerChar.dispose();
       destinationIndicator.dispose();
+      cursorAimIndicator.dispose();
 
       scene.clear();
       renderer.dispose();
@@ -525,7 +583,7 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       <div className="absolute bottom-6 left-6 pointer-events-none z-20 flex flex-col gap-2">
         <div className="pointer-events-auto bg-white/95 backdrop-blur border border-black/20 px-4 py-3 shadow-md max-w-md flex flex-col gap-2">
           <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wide text-black border-b border-black/10 pb-1.5">
-            <span>GTA V Player Controls</span>
+            <span>Mouse-Direction Controls</span>
             <span
               className={`px-2 py-0.5 text-[10px] font-mono uppercase ${
                 hudState.movementState === "MOVING"
@@ -538,12 +596,12 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
           </div>
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-black/80 font-mono">
-            <div><strong className="text-black font-bold">▲ / W</strong> Move Forward</div>
-            <div><strong className="text-black font-bold">▼ / S</strong> Move Backward</div>
-            <div><strong className="text-black font-bold">◄ / A</strong> Turn Left</div>
-            <div><strong className="text-black font-bold">► / D</strong> Turn Right</div>
+            <div><strong className="text-black font-bold">▲ / W</strong> Toward Cursor</div>
+            <div><strong className="text-black font-bold">▼ / S</strong> Away From Cursor</div>
+            <div><strong className="text-black font-bold">◄ / A</strong> Strafe Left</div>
+            <div><strong className="text-black font-bold">► / D</strong> Strafe Right</div>
             <div className="col-span-2 pt-1 border-t border-black/10 text-[11px] text-black/70 font-sans">
-              <strong className="font-semibold text-black">Left Click:</strong> Move to point · <strong className="font-semibold text-black">Right Drag:</strong> Look around · <strong className="font-semibold text-black">Wheel:</strong> Zoom
+              <strong className="font-semibold text-black">Mouse:</strong> Aim / Face Direction · <strong className="font-semibold text-black">Click:</strong> Walk To Point · <strong className="font-semibold text-black">Wheel:</strong> Zoom
             </div>
           </div>
 
