@@ -4,134 +4,43 @@
   "graph": {},
   "nodes": [
     {
-      "id": "src_components_world_cafe3dworld_cafe3dworldprops",
-      "label": "Cafe3DWorldProps",
+      "id": "src_lib_world_controls_controlscallbacks",
+      "label": "ControlsCallbacks",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "cafe3dworldprops",
-      "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L30"
+      "norm_label": "controlscallbacks",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L3"
     },
     {
-      "id": "src_components_world_hotspotprompt_hotspotpromptprops",
-      "label": "HotspotPromptProps",
+      "id": "src_lib_world_controls_worldcontrolsmanager",
+      "label": "WorldControlsManager",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "hotspotpromptprops",
-      "source_file": "src/components/world/HotspotPrompt.tsx",
-      "source_location": "L6"
+      "norm_label": "worldcontrolsmanager",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L9"
     },
     {
-      "id": "src_components_world_vocabularymodal_vocabularymodalprops",
-      "label": "VocabularyModalProps",
+      "id": "src_lib_world_types_inputstate",
+      "label": "InputState",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "vocabularymodalprops",
-      "source_file": "src/components/world/VocabularyModal.tsx",
-      "source_location": "L6"
-    },
-    {
-      "id": "src_lib_world_avatar_kinematics_avatarkinematics",
-      "label": "AvatarKinematics",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "avatarkinematics",
-      "source_file": "src/lib/world/avatar-kinematics.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_scene_builder_cafescenehooks",
-      "label": "CafeSceneHooks",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "cafescenehooks",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L10"
-    },
-    {
-      "id": "src_lib_world_types_aabb",
-      "label": "AABB",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "aabb",
+      "norm_label": "inputstate",
       "source_file": "src/lib/world/types.ts",
-      "source_location": "L7"
-    },
-    {
-      "id": "src_lib_world_types_hotspot",
-      "label": "Hotspot",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "hotspot",
-      "source_file": "src/lib/world/types.ts",
-      "source_location": "L28"
-    },
-    {
-      "id": "src_lib_world_types_position3d",
-      "label": "Position3D",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "position3d",
-      "source_file": "src/lib/world/types.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_types_vocabularyitem",
-      "label": "VocabularyItem",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "vocabularyitem",
-      "source_file": "src/lib/world/types.ts",
-      "source_location": "L21"
-    },
-    {
-      "id": "src_lib_world_unified_plaza_plazazone",
-      "label": "PlazaZone",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "plazazone",
-      "source_file": "src/lib/world/unified-plaza.ts",
-      "source_location": "L17"
+      "source_location": "L14"
     },
     {
       "id": "src_lib_game_store_gamestate",
@@ -277,19 +186,6 @@
       "source_location": "L56"
     },
     {
-      "id": "src_lib_voice_agent_types_tooldefinition",
-      "label": "ToolDefinition",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "store.ts",
-      "file_type": "code",
-      "norm_label": "tooldefinition",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L11"
-    },
-    {
       "id": "src_lib_voice_agent_types_transcriptmessage",
       "label": "TranscriptMessage",
       "_callable": true,
@@ -316,43 +212,199 @@
       "source_location": "L3"
     },
     {
-      "id": "src_lib_world_controls_controlscallbacks",
-      "label": "ControlsCallbacks",
+      "id": "src_components_world_cafe3dworld_cafe3dworldprops",
+      "label": "Cafe3DWorldProps",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "controlscallbacks",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L3"
+      "norm_label": "cafe3dworldprops",
+      "source_file": "src/components/world/Cafe3DWorld.tsx",
+      "source_location": "L30"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager",
-      "label": "WorldControlsManager",
+      "id": "src_components_world_hotspotprompt_hotspotpromptprops",
+      "label": "HotspotPromptProps",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "worldcontrolsmanager",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L9"
+      "norm_label": "hotspotpromptprops",
+      "source_file": "src/components/world/HotspotPrompt.tsx",
+      "source_location": "L6"
     },
     {
-      "id": "src_lib_world_types_inputstate",
-      "label": "InputState",
+      "id": "src_components_world_minimaphud_minimaphudhandle",
+      "label": "MinimapHUDHandle",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "inputstate",
-      "source_file": "src/lib/world/types.ts",
+      "norm_label": "minimaphudhandle",
+      "source_file": "src/components/world/MinimapHUD.tsx",
       "source_location": "L14"
+    },
+    {
+      "id": "src_components_world_minimaphud_minimaphudprops",
+      "label": "MinimapHUDProps",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "minimaphudprops",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L18"
+    },
+    {
+      "id": "src_components_world_vocabularymodal_vocabularymodalprops",
+      "label": "VocabularyModalProps",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "vocabularymodalprops",
+      "source_file": "src/components/world/VocabularyModal.tsx",
+      "source_location": "L6"
+    },
+    {
+      "id": "src_lib_world_avatar_kinematics_avatarkinematics",
+      "label": "AvatarKinematics",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "avatarkinematics",
+      "source_file": "src/lib/world/avatar-kinematics.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_city_expansion_carspec",
+      "label": "CarSpec",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "carspec",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L46"
+    },
+    {
+      "id": "src_lib_world_city_expansion_streetlampspec",
+      "label": "StreetLampSpec",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "streetlampspec",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L60"
+    },
+    {
+      "id": "src_lib_world_city_expansion_trafficlightspec",
+      "label": "TrafficLightSpec",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "trafficlightspec",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L67"
+    },
+    {
+      "id": "src_lib_world_scene_builder_cafescenehooks",
+      "label": "CafeSceneHooks",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "cafescenehooks",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L17"
+    },
+    {
+      "id": "src_lib_world_types_aabb",
+      "label": "AABB",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "aabb",
+      "source_file": "src/lib/world/types.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "src_lib_world_types_hotspot",
+      "label": "Hotspot",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "hotspot",
+      "source_file": "src/lib/world/types.ts",
+      "source_location": "L28"
+    },
+    {
+      "id": "src_lib_world_types_position3d",
+      "label": "Position3D",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "position3d",
+      "source_file": "src/lib/world/types.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_types_vocabularyitem",
+      "label": "VocabularyItem",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "vocabularyitem",
+      "source_file": "src/lib/world/types.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "src_lib_world_unified_plaza_plazazone",
+      "label": "PlazaZone",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "plazazone",
+      "source_file": "src/lib/world/unified-plaza.ts",
+      "source_location": "L17"
     },
     {
       "id": "src_components_navigation_header_headerprops",
@@ -602,6 +654,19 @@
       "source_location": "L107"
     },
     {
+      "id": "src_lib_voice_agent_types_tooldefinition",
+      "label": "ToolDefinition",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "voice-agent/types.ts",
+      "file_type": "code",
+      "norm_label": "tooldefinition",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L11"
+    },
+    {
       "id": "src_lib_voice_agent_types_toolparameterproperty",
       "label": "ToolParameterProperty",
       "_callable": true,
@@ -664,7 +729,7 @@
       "file_type": "code",
       "norm_label": "cafe3dscene",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L14"
+      "source_location": "L22"
     },
     {
       "id": "src_components_world_interactivelearningmodal_interactivelearningmodalprops",
@@ -784,148 +849,88 @@
       "source_location": "L43"
     },
     {
-      "id": "src_components_world_cafe3dworld_cafe3dworld",
-      "label": "Cafe3DWorld()",
+      "id": "src_lib_world_controls_worldcontrolsmanager_attachlisteners",
+      "label": ".attachListeners()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "cafe3dworld()",
-      "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L43"
+      "norm_label": ".attachlisteners()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L110"
     },
     {
-      "id": "src_components_world_hotspotprompt_hotspotprompt",
-      "label": "HotspotPrompt()",
+      "id": "src_lib_world_controls_worldcontrolsmanager_constructor",
+      "label": ".constructor()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "hotspotprompt()",
-      "source_file": "src/components/world/HotspotPrompt.tsx",
-      "source_location": "L12"
+      "norm_label": ".constructor()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L20"
     },
     {
-      "id": "src_components_world_vocabularymodal_vocabularymodal",
-      "label": "VocabularyModal()",
+      "id": "src_lib_world_controls_worldcontrolsmanager_destroy",
+      "label": ".destroy()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "vocabularymodal()",
-      "source_file": "src/components/world/VocabularyModal.tsx",
-      "source_location": "L12"
+      "norm_label": ".destroy()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L115"
     },
     {
-      "id": "src_lib_world_avatar_kinematics_computeavatarkinematics",
-      "label": "computeAvatarKinematics()",
+      "id": "src_lib_world_controls_worldcontrolsmanager_getstate",
+      "label": ".getState()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "computeavatarkinematics()",
-      "source_file": "src/lib/world/avatar-kinematics.ts",
-      "source_location": "L13"
+      "norm_label": ".getstate()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L27"
     },
     {
-      "id": "src_lib_world_hotspots_gethotspotsforplace",
-      "label": "getHotspotsForPlace()",
+      "id": "src_lib_world_controls_worldcontrolsmanager_handlekeydown",
+      "label": ".handleKeyDown()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "gethotspotsforplace()",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L679"
-    },
-    {
-      "id": "src_lib_world_math_checkaabbcollision",
-      "label": "checkAABBCollision()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "checkaabbcollision()",
-      "source_file": "src/lib/world/math.ts",
-      "source_location": "L26"
-    },
-    {
-      "id": "src_lib_world_math_findactivehotspot",
-      "label": "findActiveHotspot()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "findactivehotspot()",
-      "source_file": "src/lib/world/math.ts",
-      "source_location": "L100"
-    },
-    {
-      "id": "src_lib_world_math_resolvemovement",
-      "label": "resolveMovement()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "resolvemovement()",
-      "source_file": "src/lib/world/math.ts",
-      "source_location": "L43"
-    },
-    {
-      "id": "src_lib_world_math_resolvevelocity",
-      "label": "resolveVelocity()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "resolvevelocity()",
-      "source_file": "src/lib/world/math.ts",
-      "source_location": "L6"
-    },
-    {
-      "id": "src_lib_world_scene_builder_cafe3dscene_updateplayerposition",
-      "label": ".updatePlayerPosition()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": ".updateplayerposition()",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L676"
-    },
-    {
-      "id": "src_lib_world_unified_plaza_getspawnpositionforzone",
-      "label": "getSpawnPositionForZone()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "getspawnpositionforzone()",
-      "source_file": "src/lib/world/unified-plaza.ts",
-      "source_location": "L26"
-    },
-    {
-      "id": "src_lib_world_unified_plaza_getzonefromposition",
-      "label": "getZoneFromPosition()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "getzonefromposition()",
-      "source_file": "src/lib/world/unified-plaza.ts",
+      "norm_label": ".handlekeydown()",
+      "source_file": "src/lib/world/controls.ts",
       "source_location": "L38"
+    },
+    {
+      "id": "src_lib_world_controls_worldcontrolsmanager_handlekeyup",
+      "label": ".handleKeyUp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "WorldControlsManager",
+      "file_type": "code",
+      "norm_label": ".handlekeyup()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L89"
+    },
+    {
+      "id": "src_lib_world_controls_worldcontrolsmanager_setdirection",
+      "label": ".setDirection()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "WorldControlsManager",
+      "file_type": "code",
+      "norm_label": ".setdirection()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L31"
     },
     {
       "id": "src_app_play_page_playgamecontent",
@@ -1048,18 +1053,6 @@
       "source_location": "L331"
     },
     {
-      "id": "src_lib_voice_agent_usevoiceagent_usevoiceagent",
-      "label": "useVoiceAgent()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "store.ts",
-      "file_type": "code",
-      "norm_label": "usevoiceagent()",
-      "source_file": "src/lib/voice-agent/useVoiceAgent.ts",
-      "source_location": "L8"
-    },
-    {
       "id": "src_app_layout_rootlayout",
       "label": "RootLayout()",
       "_callable": true,
@@ -1180,88 +1173,160 @@
       "source_location": "L137"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_attachlisteners",
-      "label": ".attachListeners()",
+      "id": "src_components_world_cafe3dworld_cafe3dworld",
+      "label": "Cafe3DWorld()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": ".attachlisteners()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L110"
+      "norm_label": "cafe3dworld()",
+      "source_file": "src/components/world/Cafe3DWorld.tsx",
+      "source_location": "L43"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_constructor",
-      "label": ".constructor()",
+      "id": "src_components_world_hotspotprompt_hotspotprompt",
+      "label": "HotspotPrompt()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L20"
+      "norm_label": "hotspotprompt()",
+      "source_file": "src/components/world/HotspotPrompt.tsx",
+      "source_location": "L12"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_destroy",
-      "label": ".destroy()",
+      "id": "src_components_world_vocabularymodal_vocabularymodal",
+      "label": "VocabularyModal()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": ".destroy()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L115"
+      "norm_label": "vocabularymodal()",
+      "source_file": "src/components/world/VocabularyModal.tsx",
+      "source_location": "L12"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_getstate",
-      "label": ".getState()",
+      "id": "src_lib_world_avatar_kinematics_computeavatarkinematics",
+      "label": "computeAvatarKinematics()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": ".getstate()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L27"
+      "norm_label": "computeavatarkinematics()",
+      "source_file": "src/lib/world/avatar-kinematics.ts",
+      "source_location": "L13"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_handlekeydown",
-      "label": ".handleKeyDown()",
+      "id": "src_lib_world_city_expansion_computecarposition",
+      "label": "computeCarPosition()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": ".handlekeydown()",
-      "source_file": "src/lib/world/controls.ts",
+      "norm_label": "computecarposition()",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L180"
+    },
+    {
+      "id": "src_lib_world_city_expansion_worldtominimapcoords",
+      "label": "worldToMinimapCoords()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "worldtominimapcoords()",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L201"
+    },
+    {
+      "id": "src_lib_world_hotspots_gethotspotsforplace",
+      "label": "getHotspotsForPlace()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "gethotspotsforplace()",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L679"
+    },
+    {
+      "id": "src_lib_world_math_checkaabbcollision",
+      "label": "checkAABBCollision()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "checkaabbcollision()",
+      "source_file": "src/lib/world/math.ts",
+      "source_location": "L26"
+    },
+    {
+      "id": "src_lib_world_math_findactivehotspot",
+      "label": "findActiveHotspot()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "findactivehotspot()",
+      "source_file": "src/lib/world/math.ts",
+      "source_location": "L100"
+    },
+    {
+      "id": "src_lib_world_math_resolvemovement",
+      "label": "resolveMovement()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "resolvemovement()",
+      "source_file": "src/lib/world/math.ts",
+      "source_location": "L43"
+    },
+    {
+      "id": "src_lib_world_math_resolvevelocity",
+      "label": "resolveVelocity()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "resolvevelocity()",
+      "source_file": "src/lib/world/math.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "src_lib_world_unified_plaza_getspawnpositionforzone",
+      "label": "getSpawnPositionForZone()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "getspawnpositionforzone()",
+      "source_file": "src/lib/world/unified-plaza.ts",
+      "source_location": "L26"
+    },
+    {
+      "id": "src_lib_world_unified_plaza_getzonefromposition",
+      "label": "getZoneFromPosition()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "getzonefromposition()",
+      "source_file": "src/lib/world/unified-plaza.ts",
       "source_location": "L38"
-    },
-    {
-      "id": "src_lib_world_controls_worldcontrolsmanager_handlekeyup",
-      "label": ".handleKeyUp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "WorldControlsManager",
-      "file_type": "code",
-      "norm_label": ".handlekeyup()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L89"
-    },
-    {
-      "id": "src_lib_world_controls_worldcontrolsmanager_setdirection",
-      "label": ".setDirection()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "WorldControlsManager",
-      "file_type": "code",
-      "norm_label": ".setdirection()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L31"
     },
     {
       "id": "src_lib_audio_pcm_audioqueueplayer_close",
@@ -1552,6 +1617,18 @@
       "source_location": "L318"
     },
     {
+      "id": "src_lib_voice_agent_usevoiceagent_usevoiceagent",
+      "label": "useVoiceAgent()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "voice-agent/types.ts",
+      "file_type": "code",
+      "norm_label": "usevoiceagent()",
+      "source_file": "src/lib/voice-agent/useVoiceAgent.ts",
+      "source_location": "L8"
+    },
+    {
       "id": "src_lib_world_scene_builder_cafe3dscene_animate",
       "label": ".animate()",
       "_callable": true,
@@ -1561,7 +1638,7 @@
       "file_type": "code",
       "norm_label": ".animate()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L693"
+      "source_location": "L1100"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildairportzone",
@@ -1573,7 +1650,7 @@
       "file_type": "code",
       "norm_label": ".buildairportzone()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L365"
+      "source_location": "L768"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildbusstopzone",
@@ -1585,7 +1662,7 @@
       "file_type": "code",
       "norm_label": ".buildbusstopzone()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L301"
+      "source_location": "L704"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildcafezone",
@@ -1597,7 +1674,7 @@
       "file_type": "code",
       "norm_label": ".buildcafezone()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L219"
+      "source_location": "L622"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildelenacharacter",
@@ -1609,7 +1686,7 @@
       "file_type": "code",
       "norm_label": ".buildelenacharacter()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L491"
+      "source_location": "L894"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildhotspotmarkers",
@@ -1621,7 +1698,7 @@
       "file_type": "code",
       "norm_label": ".buildhotspotmarkers()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L633"
+      "source_location": "L1036"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildmateocharacter",
@@ -1633,7 +1710,7 @@
       "file_type": "code",
       "norm_label": ".buildmateocharacter()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L426"
+      "source_location": "L829"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildplayeravatar",
@@ -1645,7 +1722,19 @@
       "file_type": "code",
       "norm_label": ".buildplayeravatar()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L528"
+      "source_location": "L931"
+    },
+    {
+      "id": "src_lib_world_scene_builder_cafe3dscene_buildroadandtrafficsystem",
+      "label": ".buildRoadAndTrafficSystem()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "Cafe3DScene",
+      "file_type": "code",
+      "norm_label": ".buildroadandtrafficsystem()",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L270"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildsrinivascharacter",
@@ -1657,7 +1746,7 @@
       "file_type": "code",
       "norm_label": ".buildsrinivascharacter()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L455"
+      "source_location": "L858"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildunifiedplazaarchitecture",
@@ -1669,7 +1758,7 @@
       "file_type": "code",
       "norm_label": ".buildunifiedplazaarchitecture()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L143"
+      "source_location": "L188"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_constructor",
@@ -1681,7 +1770,7 @@
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L47"
+      "source_location": "L57"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_destroy",
@@ -1693,7 +1782,7 @@
       "file_type": "code",
       "norm_label": ".destroy()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L776"
+      "source_location": "L1209"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_handleresize",
@@ -1705,7 +1794,7 @@
       "file_type": "code",
       "norm_label": ".handleresize()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L767"
+      "source_location": "L1200"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_setbaristabrewing",
@@ -1717,7 +1806,7 @@
       "file_type": "code",
       "norm_label": ".setbaristabrewing()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L689"
+      "source_location": "L1096"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_setmateotalking",
@@ -1729,7 +1818,7 @@
       "file_type": "code",
       "norm_label": ".setmateotalking()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L685"
+      "source_location": "L1092"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_setupplazalighting",
@@ -1741,7 +1830,19 @@
       "file_type": "code",
       "norm_label": ".setupplazalighting()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L108"
+      "source_location": "L140"
+    },
+    {
+      "id": "src_lib_world_scene_builder_cafe3dscene_updateplayerposition",
+      "label": ".updatePlayerPosition()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "Cafe3DScene",
+      "file_type": "code",
+      "norm_label": ".updateplayerposition()",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1079"
     },
     {
       "id": "src_app_page_unifiedflowhomepage",
@@ -1804,256 +1905,14 @@
       "source_location": "L533"
     },
     {
-      "id": "src_components_world_cafe3dworld",
-      "label": "Cafe3DWorld.tsx",
+      "id": "src_lib_world_controls",
+      "label": "controls.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
+      "community_name": "WorldControlsManager",
       "file_type": "code",
-      "norm_label": "cafe3dworld.tsx",
-      "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_components_world_hotspotprompt",
-      "label": "HotspotPrompt.tsx",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "hotspotprompt.tsx",
-      "source_file": "src/components/world/HotspotPrompt.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_components_world_vocabularymodal",
-      "label": "VocabularyModal.tsx",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "vocabularymodal.tsx",
-      "source_file": "src/components/world/VocabularyModal.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_avatar_kinematics",
-      "label": "avatar-kinematics.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "avatar-kinematics.ts",
-      "source_file": "src/lib/world/avatar-kinematics.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_hotspots",
-      "label": "hotspots.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "hotspots.ts",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_hotspots_airport_hotspots",
-      "label": "AIRPORT_HOTSPOTS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "airport_hotspots",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L363"
-    },
-    {
-      "id": "src_lib_world_hotspots_cafe_bounds",
-      "label": "CAFE_BOUNDS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "cafe_bounds",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L6"
-    },
-    {
-      "id": "src_lib_world_hotspots_cafe_obstacles",
-      "label": "CAFE_OBSTACLES",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "cafe_obstacles",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L16"
-    },
-    {
-      "id": "src_lib_world_hotspots_grocery_hotspots",
-      "label": "GROCERY_HOTSPOTS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "grocery_hotspots",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L255"
-    },
-    {
-      "id": "src_lib_world_hotspots_hotel_hotspots",
-      "label": "HOTEL_HOTSPOTS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "hotel_hotspots",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L463"
-    },
-    {
-      "id": "src_lib_world_hotspots_madrid_cafe_hotspots",
-      "label": "MADRID_CAFE_HOTSPOTS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "madrid_cafe_hotspots",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L57"
-    },
-    {
-      "id": "src_lib_world_hotspots_pharmacy_hotspots",
-      "label": "PHARMACY_HOTSPOTS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "pharmacy_hotspots",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L535"
-    },
-    {
-      "id": "src_lib_world_hotspots_restaurant_hotspots",
-      "label": "RESTAURANT_HOTSPOTS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "restaurant_hotspots",
-      "source_file": "src/lib/world/hotspots.ts",
-      "source_location": "L607"
-    },
-    {
-      "id": "src_lib_world_math",
-      "label": "math.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "math.ts",
-      "source_file": "src/lib/world/math.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_scene_builder",
-      "label": "scene-builder.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "scene-builder.ts",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_types",
-      "label": "world/types.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "world/types.ts",
-      "source_file": "src/lib/world/types.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_unified_plaza",
-      "label": "unified-plaza.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "unified-plaza.ts",
-      "source_file": "src/lib/world/unified-plaza.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_unified_plaza_plaza_spawn_points",
-      "label": "PLAZA_SPAWN_POINTS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "plaza_spawn_points",
-      "source_file": "src/lib/world/unified-plaza.ts",
-      "source_location": "L19"
-    },
-    {
-      "id": "src_lib_world_unified_plaza_unified_plaza_bounds",
-      "label": "UNIFIED_PLAZA_BOUNDS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "unified_plaza_bounds",
-      "source_file": "src/lib/world/unified-plaza.ts",
-      "source_location": "L10"
-    },
-    {
-      "id": "src_lib_world_unified_plaza_unified_plaza_hotspots",
-      "label": "UNIFIED_PLAZA_HOTSPOTS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "unified_plaza_hotspots",
-      "source_file": "src/lib/world/unified-plaza.ts",
-      "source_location": "L83"
-    },
-    {
-      "id": "src_lib_world_unified_plaza_unified_plaza_obstacles",
-      "label": "UNIFIED_PLAZA_OBSTACLES",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "unified_plaza_obstacles",
-      "source_file": "src/lib/world/unified-plaza.ts",
-      "source_location": "L47"
-    },
-    {
-      "id": "tests_spatial_world_test",
-      "label": "spatial-world.test.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "spatial-world.test.ts",
-      "source_file": "tests/spatial-world.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "tests_unified_world_test",
-      "label": "unified-world.test.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "unified-world.test.ts",
-      "source_file": "tests/unified-world.test.ts",
+      "norm_label": "controls.ts",
+      "source_file": "src/lib/world/controls.ts",
       "source_location": "L1"
     },
     {
@@ -2189,17 +2048,6 @@
       "source_location": "L1"
     },
     {
-      "id": "src_lib_voice_agent_usevoiceagent",
-      "label": "useVoiceAgent.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "store.ts",
-      "file_type": "code",
-      "norm_label": "usevoiceagent.ts",
-      "source_file": "src/lib/voice-agent/useVoiceAgent.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "src_scenarios_spain_cafe",
       "label": "spain-cafe.ts",
       "_origin": "ast",
@@ -2209,17 +2057,6 @@
       "norm_label": "spain-cafe.ts",
       "source_file": "src/scenarios/spain-cafe.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "src_scenarios_spain_cafe_cafe_tools",
-      "label": "CAFE_TOOLS",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "store.ts",
-      "file_type": "code",
-      "norm_label": "cafe_tools",
-      "source_file": "src/scenarios/spain-cafe.ts",
-      "source_location": "L132"
     },
     {
       "id": "src_scenarios_spain_cafe_spain_cafe_scenario",
@@ -3004,6 +2841,90 @@
       "source_location": "L1"
     },
     {
+      "id": "docs_testing_city_expansion_tdd",
+      "label": "city-expansion.tdd.md",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "TDD Evidence Report: 3D Grand City Expansion, Traffic Boulevard, Daytime Atmosphere & Live Minimap HUD",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "city-expansion.tdd.md",
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "docs_testing_city_expansion_tdd_1_source_intent",
+      "label": "1. Source & Intent",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "TDD Evidence Report: 3D Grand City Expansion, Traffic Boulevard, Daytime Atmosphere & Live Minimap HUD",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "1. source & intent",
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "docs_testing_city_expansion_tdd_2_user_journeys_covered",
+      "label": "2. User Journeys Covered",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "TDD Evidence Report: 3D Grand City Expansion, Traffic Boulevard, Daytime Atmosphere & Live Minimap HUD",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "2. user journeys covered",
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "docs_testing_city_expansion_tdd_3_task_report_execution_summary",
+      "label": "3. Task Report & Execution Summary",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "TDD Evidence Report: 3D Grand City Expansion, Traffic Boulevard, Daytime Atmosphere & Live Minimap HUD",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "3. task report & execution summary",
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L13"
+    },
+    {
+      "id": "docs_testing_city_expansion_tdd_4_test_specification",
+      "label": "4. Test Specification",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "TDD Evidence Report: 3D Grand City Expansion, Traffic Boulevard, Daytime Atmosphere & Live Minimap HUD",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "4. test specification",
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L24"
+    },
+    {
+      "id": "docs_testing_city_expansion_tdd_5_coverage_and_quality",
+      "label": "5. Coverage and Quality",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "TDD Evidence Report: 3D Grand City Expansion, Traffic Boulevard, Daytime Atmosphere & Live Minimap HUD",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "5. coverage and quality",
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L36"
+    },
+    {
+      "id": "docs_testing_city_expansion_tdd_tdd_evidence_report_3d_grand_city_expansion_traffic_boulevard_daytime_atmosphere_live_minimap_hud",
+      "label": "TDD Evidence Report: 3D Grand City Expansion, Traffic Boulevard, Daytime Atmosphere & Live Minimap HUD",
+      "_origin": "ast",
+      "community": 23,
+      "community_name": "TDD Evidence Report: 3D Grand City Expansion, Traffic Boulevard, Daytime Atmosphere & Live Minimap HUD",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "tdd evidence report: 3d grand city expansion, traffic boulevard, daytime atmosphere & live minimap hud",
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L1"
+    },
+    {
       "id": "package",
       "label": "package.json",
       "_origin": "ast",
@@ -3543,14 +3464,344 @@
       "source_location": "L33"
     },
     {
-      "id": "src_lib_world_controls",
-      "label": "controls.ts",
+      "id": "src_components_world_cafe3dworld",
+      "label": "Cafe3DWorld.tsx",
       "_origin": "ast",
       "community": 5,
-      "community_name": "WorldControlsManager",
+      "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "controls.ts",
-      "source_file": "src/lib/world/controls.ts",
+      "norm_label": "cafe3dworld.tsx",
+      "source_file": "src/components/world/Cafe3DWorld.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_components_world_hotspotprompt",
+      "label": "HotspotPrompt.tsx",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "hotspotprompt.tsx",
+      "source_file": "src/components/world/HotspotPrompt.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_components_world_minimaphud",
+      "label": "MinimapHUD.tsx",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "minimaphud.tsx",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_components_world_minimaphud_minimaphud",
+      "label": "MinimapHUD",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "minimaphud",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L23"
+    },
+    {
+      "id": "src_components_world_vocabularymodal",
+      "label": "VocabularyModal.tsx",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "vocabularymodal.tsx",
+      "source_file": "src/components/world/VocabularyModal.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_avatar_kinematics",
+      "label": "avatar-kinematics.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "avatar-kinematics.ts",
+      "source_file": "src/lib/world/avatar-kinematics.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_city_expansion",
+      "label": "city-expansion.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "city-expansion.ts",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_city_expansion_camera_view_config",
+      "label": "CAMERA_VIEW_CONFIG",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "camera_view_config",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L38"
+    },
+    {
+      "id": "src_lib_world_city_expansion_daylight_config",
+      "label": "DAYLIGHT_CONFIG",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "daylight_config",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L22"
+    },
+    {
+      "id": "src_lib_world_city_expansion_expanded_world_bounds",
+      "label": "EXPANDED_WORLD_BOUNDS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "expanded_world_bounds",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L12"
+    },
+    {
+      "id": "src_lib_world_city_expansion_road_system_config",
+      "label": "ROAD_SYSTEM_CONFIG",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "road_system_config",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L77"
+    },
+    {
+      "id": "src_lib_world_hotspots",
+      "label": "hotspots.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "hotspots.ts",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_hotspots_airport_hotspots",
+      "label": "AIRPORT_HOTSPOTS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "airport_hotspots",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L363"
+    },
+    {
+      "id": "src_lib_world_hotspots_cafe_bounds",
+      "label": "CAFE_BOUNDS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "cafe_bounds",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "src_lib_world_hotspots_cafe_obstacles",
+      "label": "CAFE_OBSTACLES",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "cafe_obstacles",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L16"
+    },
+    {
+      "id": "src_lib_world_hotspots_grocery_hotspots",
+      "label": "GROCERY_HOTSPOTS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "grocery_hotspots",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L255"
+    },
+    {
+      "id": "src_lib_world_hotspots_hotel_hotspots",
+      "label": "HOTEL_HOTSPOTS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "hotel_hotspots",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L463"
+    },
+    {
+      "id": "src_lib_world_hotspots_madrid_cafe_hotspots",
+      "label": "MADRID_CAFE_HOTSPOTS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "madrid_cafe_hotspots",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L57"
+    },
+    {
+      "id": "src_lib_world_hotspots_pharmacy_hotspots",
+      "label": "PHARMACY_HOTSPOTS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "pharmacy_hotspots",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L535"
+    },
+    {
+      "id": "src_lib_world_hotspots_restaurant_hotspots",
+      "label": "RESTAURANT_HOTSPOTS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "restaurant_hotspots",
+      "source_file": "src/lib/world/hotspots.ts",
+      "source_location": "L607"
+    },
+    {
+      "id": "src_lib_world_math",
+      "label": "math.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "math.ts",
+      "source_file": "src/lib/world/math.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_scene_builder",
+      "label": "scene-builder.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "scene-builder.ts",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_types",
+      "label": "world/types.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "world/types.ts",
+      "source_file": "src/lib/world/types.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_unified_plaza",
+      "label": "unified-plaza.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "unified-plaza.ts",
+      "source_file": "src/lib/world/unified-plaza.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_unified_plaza_plaza_spawn_points",
+      "label": "PLAZA_SPAWN_POINTS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "plaza_spawn_points",
+      "source_file": "src/lib/world/unified-plaza.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "src_lib_world_unified_plaza_unified_plaza_bounds",
+      "label": "UNIFIED_PLAZA_BOUNDS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "unified_plaza_bounds",
+      "source_file": "src/lib/world/unified-plaza.ts",
+      "source_location": "L10"
+    },
+    {
+      "id": "src_lib_world_unified_plaza_unified_plaza_hotspots",
+      "label": "UNIFIED_PLAZA_HOTSPOTS",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "unified_plaza_hotspots",
+      "source_file": "src/lib/world/unified-plaza.ts",
+      "source_location": "L83"
+    },
+    {
+      "id": "src_lib_world_unified_plaza_unified_plaza_obstacles",
+      "label": "UNIFIED_PLAZA_OBSTACLES",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "unified_plaza_obstacles",
+      "source_file": "src/lib/world/unified-plaza.ts",
+      "source_location": "L47"
+    },
+    {
+      "id": "tests_city_expansion_world_test",
+      "label": "city-expansion-world.test.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "city-expansion-world.test.ts",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_spatial_world_test",
+      "label": "spatial-world.test.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "spatial-world.test.ts",
+      "source_file": "tests/spatial-world.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_unified_world_test",
+      "label": "unified-world.test.ts",
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "unified-world.test.ts",
+      "source_file": "tests/unified-world.test.ts",
       "source_location": "L1"
     },
     {
@@ -3596,6 +3847,28 @@
       "norm_label": "voice-agent/types.ts",
       "source_file": "src/lib/voice-agent/types.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "src_lib_voice_agent_usevoiceagent",
+      "label": "useVoiceAgent.ts",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "voice-agent/types.ts",
+      "file_type": "code",
+      "norm_label": "usevoiceagent.ts",
+      "source_file": "src/lib/voice-agent/useVoiceAgent.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_scenarios_spain_cafe_cafe_tools",
+      "label": "CAFE_TOOLS",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "voice-agent/types.ts",
+      "file_type": "code",
+      "norm_label": "cafe_tools",
+      "source_file": "src/scenarios/spain-cafe.ts",
+      "source_location": "L132"
     },
     {
       "id": "tests_audio_pcm_test",
@@ -4057,7 +4330,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L108",
+      "source_location": "L119",
       "weight": 1.0
     },
     {
@@ -4069,7 +4342,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L113",
+      "source_location": "L124",
       "weight": 1.0
     },
     {
@@ -4081,7 +4354,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L127",
+      "source_location": "L139",
       "weight": 1.0
     },
     {
@@ -4093,7 +4366,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L131",
+      "source_location": "L143",
       "weight": 1.0
     },
     {
@@ -4105,7 +4378,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L60",
+      "source_location": "L61",
       "weight": 1.0
     },
     {
@@ -4117,7 +4390,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L66",
+      "source_location": "L73",
       "weight": 1.0
     },
     {
@@ -4129,7 +4402,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L78",
+      "source_location": "L85",
       "weight": 1.0
     },
     {
@@ -4141,7 +4414,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L82",
+      "source_location": "L93",
       "weight": 1.0
     },
     {
@@ -4154,6 +4427,30 @@
       "context": "call",
       "source_file": "src/components/world/InteractiveLearningModal.tsx",
       "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud_minimaphud",
+      "target": "src_lib_world_city_expansion_computecarposition",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L159",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud_minimaphud",
+      "target": "src_lib_world_city_expansion_worldtominimapcoords",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -4626,6 +4923,18 @@
     },
     {
       "source": "src_lib_world_scene_builder_cafe3dscene_animate",
+      "target": "src_lib_world_city_expansion_computecarposition",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1107",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_animate",
       "target": "src_lib_world_avatar_kinematics_computeavatarkinematics",
       "relation": "calls",
       "_origin": "ast",
@@ -4633,31 +4942,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L717",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_animate",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L105",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_unified_plaza_getspawnpositionforzone",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L60",
+      "source_location": "L1137",
       "weight": 1.0
     },
     {
@@ -4669,7 +4954,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L77",
+      "source_location": "L108",
       "weight": 1.0
     },
     {
@@ -4681,7 +4966,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L78",
+      "source_location": "L109",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildroadandtrafficsystem",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L110",
       "weight": 1.0
     },
     {
@@ -4693,7 +4990,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L79",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -4705,7 +5002,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L80",
+      "source_location": "L112",
       "weight": 1.0
     },
     {
@@ -4717,7 +5014,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L81",
+      "source_location": "L113",
       "weight": 1.0
     },
     {
@@ -4729,7 +5026,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L82",
+      "source_location": "L114",
       "weight": 1.0
     },
     {
@@ -4741,7 +5038,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L85",
+      "source_location": "L117",
       "weight": 1.0
     },
     {
@@ -4753,7 +5050,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L89",
+      "source_location": "L121",
       "weight": 1.0
     },
     {
@@ -4765,7 +5062,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L93",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -4777,7 +5074,31 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L97",
+      "source_location": "L129",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_animate",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L137",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_unified_plaza_getspawnpositionforzone",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L83",
       "weight": 1.0
     },
     {
@@ -4974,14 +5295,14 @@
     },
     {
       "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_types_position3d",
+      "target": "src_lib_world_city_expansion_carspec",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L41",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -5790,6 +6111,30 @@
     },
     {
       "source": "src_components_world_cafe3dworld",
+      "target": "src_components_world_minimaphud_minimaphud",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/Cafe3DWorld.tsx",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_cafe3dworld",
+      "target": "src_components_world_minimaphud_minimaphudhandle",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/Cafe3DWorld.tsx",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_cafe3dworld",
       "target": "src_lib_world_scene_builder_cafe3dscene",
       "relation": "imports",
       "_origin": "ast",
@@ -5894,6 +6239,78 @@
       "context": "import",
       "source_file": "src/components/world/InteractiveLearningModal.tsx",
       "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_unified_plaza_unified_plaza_hotspots",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_types_position3d",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_city_expansion_computecarposition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_city_expansion_expanded_world_bounds",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_city_expansion_road_system_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_city_expansion_worldtominimapcoords",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -6233,6 +6650,30 @@
       "weight": 1.0
     },
     {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_types_aabb",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_types_position3d",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
       "source": "src_lib_world_controls",
       "target": "src_lib_world_types_inputstate",
       "relation": "imports",
@@ -6354,7 +6795,7 @@
     },
     {
       "source": "src_lib_world_scene_builder",
-      "target": "src_lib_world_unified_plaza_unified_plaza_bounds",
+      "target": "src_lib_world_unified_plaza_unified_plaza_hotspots",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -6366,14 +6807,74 @@
     },
     {
       "source": "src_lib_world_scene_builder",
-      "target": "src_lib_world_unified_plaza_unified_plaza_hotspots",
+      "target": "src_lib_world_city_expansion_camera_view_config",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L4",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_city_expansion_carspec",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_city_expansion_computecarposition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_city_expansion_daylight_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_city_expansion_expanded_world_bounds",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_city_expansion_road_system_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -6505,6 +7006,102 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "tests/audio-pcm.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_unified_plaza_getzonefromposition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_unified_plaza_unified_plaza_bounds",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_city_expansion_camera_view_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_city_expansion_computecarposition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_city_expansion_daylight_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_city_expansion_expanded_world_bounds",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_city_expansion_road_system_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_city_expansion_worldtominimapcoords",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
       "source_location": "L3",
       "weight": 1.0
     },
@@ -6673,7 +7270,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "tests/unified-world.test.ts",
-      "source_location": "L11",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -6685,19 +7282,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "tests/unified-world.test.ts",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_unified_world_test",
-      "target": "src_scenarios_multilingual_supported_learner_languages",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "tests/unified-world.test.ts",
-      "source_location": "L12",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -6751,18 +7336,6 @@
     {
       "source": "tests_unified_world_test",
       "target": "src_lib_world_unified_plaza_unified_plaza_hotspots",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "tests/unified-world.test.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "tests_unified_world_test",
-      "target": "src_lib_world_unified_plaza_unified_plaza_obstacles",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7134,6 +7707,18 @@
     },
     {
       "source": "src_components_world_cafe3dworld",
+      "target": "src_components_world_minimaphud",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/Cafe3DWorld.tsx",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_cafe3dworld",
       "target": "src_lib_world_scene_builder",
       "relation": "imports_from",
       "_origin": "ast",
@@ -7202,6 +7787,42 @@
       "context": "import",
       "source_file": "src/components/world/InteractiveLearningModal.tsx",
       "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_unified_plaza",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_types",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_city_expansion",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -7361,6 +7982,18 @@
       "weight": 1.0
     },
     {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_types",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
       "source": "src_lib_world_controls",
       "target": "src_lib_world_types",
       "relation": "imports_from",
@@ -7433,6 +8066,18 @@
       "weight": 1.0
     },
     {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_city_expansion",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
       "source": "src_lib_world_unified_plaza",
       "target": "src_lib_world_types",
       "relation": "imports_from",
@@ -7477,6 +8122,30 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "tests/audio-pcm.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_unified_plaza",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_city_expansion_world_test",
+      "target": "src_lib_world_city_expansion",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/city-expansion-world.test.ts",
       "source_location": "L3",
       "weight": 1.0
     },
@@ -7561,7 +8230,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "tests/unified-world.test.ts",
-      "source_location": "L11",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -7573,7 +8242,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "tests/unified-world.test.ts",
-      "source_location": "L12",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -7646,18 +8315,6 @@
       "context": "parameter_type",
       "source_file": "src/lib/world/controls.ts",
       "source_location": "L31",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_updateplayerposition",
-      "target": "src_lib_world_types_position3d",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L676",
       "weight": 1.0
     },
     {
@@ -7913,6 +8570,72 @@
       "confidence_score": 1.0,
       "source_file": "docs/testing/3d-world.tdd.md",
       "source_location": "L71",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_testing_city_expansion_tdd",
+      "target": "docs_testing_city_expansion_tdd_tdd_evidence_report_3d_grand_city_expansion_traffic_boulevard_daytime_atmosphere_live_minimap_hud",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_testing_city_expansion_tdd_tdd_evidence_report_3d_grand_city_expansion_traffic_boulevard_daytime_atmosphere_live_minimap_hud",
+      "target": "docs_testing_city_expansion_tdd_3_task_report_execution_summary",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_testing_city_expansion_tdd_tdd_evidence_report_3d_grand_city_expansion_traffic_boulevard_daytime_atmosphere_live_minimap_hud",
+      "target": "docs_testing_city_expansion_tdd_4_test_specification",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L24",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_testing_city_expansion_tdd_tdd_evidence_report_3d_grand_city_expansion_traffic_boulevard_daytime_atmosphere_live_minimap_hud",
+      "target": "docs_testing_city_expansion_tdd_1_source_intent",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_testing_city_expansion_tdd_tdd_evidence_report_3d_grand_city_expansion_traffic_boulevard_daytime_atmosphere_live_minimap_hud",
+      "target": "docs_testing_city_expansion_tdd_5_coverage_and_quality",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L36",
+      "weight": 1.0
+    },
+    {
+      "source": "docs_testing_city_expansion_tdd_tdd_evidence_report_3d_grand_city_expansion_traffic_boulevard_daytime_atmosphere_live_minimap_hud",
+      "target": "docs_testing_city_expansion_tdd_2_user_journeys_covered",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "docs/testing/city-expansion.tdd.md",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -8653,6 +9376,39 @@
       "weight": 1.0
     },
     {
+      "source": "src_components_world_minimaphud",
+      "target": "src_components_world_minimaphud_minimaphudhandle",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_components_world_minimaphud_minimaphudprops",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_components_world_minimaphud_minimaphud",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L23",
+      "weight": 1.0
+    },
+    {
       "source": "src_components_world_vocabularymodal",
       "target": "src_components_world_vocabularymodal_vocabularymodal",
       "relation": "contains",
@@ -9214,6 +9970,105 @@
       "weight": 1.0
     },
     {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_expanded_world_bounds",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_computecarposition",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L180",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_worldtominimapcoords",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L201",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_daylight_config",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_camera_view_config",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L38",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_carspec",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L46",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_streetlampspec",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L60",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_trafficlightspec",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion",
+      "target": "src_lib_world_city_expansion_road_system_config",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L77",
+      "weight": 1.0
+    },
+    {
       "source": "src_lib_world_controls",
       "target": "src_lib_world_controls_controlscallbacks",
       "relation": "contains",
@@ -9386,7 +10241,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L10",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -9397,7 +10252,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L14",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -10315,123 +11170,13 @@
     },
     {
       "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_setupplazalighting",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L108",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildunifiedplazaarchitecture",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L143",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildcafezone",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L219",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildbusstopzone",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L301",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildairportzone",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L365",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildmateocharacter",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L426",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildsrinivascharacter",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L455",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L47",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildelenacharacter",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L491",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildplayeravatar",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L528",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
       "target": "src_lib_world_scene_builder_cafe3dscene_buildhotspotmarkers",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L633",
+      "source_location": "L1036",
       "weight": 1.0
     },
     {
@@ -10442,7 +11187,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L676",
+      "source_location": "L1079",
       "weight": 1.0
     },
     {
@@ -10453,7 +11198,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L685",
+      "source_location": "L1092",
       "weight": 1.0
     },
     {
@@ -10464,7 +11209,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L689",
+      "source_location": "L1096",
       "weight": 1.0
     },
     {
@@ -10475,7 +11220,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L693",
+      "source_location": "L1100",
       "weight": 1.0
     },
     {
@@ -10486,7 +11231,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L767",
+      "source_location": "L1200",
       "weight": 1.0
     },
     {
@@ -10497,7 +11242,128 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L776",
+      "source_location": "L1209",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_setupplazalighting",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L140",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildunifiedplazaarchitecture",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L188",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildroadandtrafficsystem",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L270",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildcafezone",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L622",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildbusstopzone",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L704",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildairportzone",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L768",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildmateocharacter",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L829",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildsrinivascharacter",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L858",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildelenacharacter",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L894",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildplayeravatar",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L931",
       "weight": 1.0
     },
     {
@@ -10509,7 +11375,7 @@
       "confidence_score": 0.8,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L103",
+      "source_location": "L114",
       "weight": 1.0
     },
     {
@@ -10521,7 +11387,7 @@
       "confidence_score": 0.8,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L107",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -10533,7 +11399,7 @@
       "confidence_score": 0.8,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L139",
+      "source_location": "L151",
       "weight": 1.0
     },
     {
@@ -10545,7 +11411,7 @@
       "confidence_score": 0.8,
       "context": "call",
       "source_file": "src/components/world/Cafe3DWorld.tsx",
-      "source_location": "L140",
+      "source_location": "L152",
       "weight": 1.0
     },
     {
@@ -10562,5 +11428,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "b375e03295b9274d00b44ac2e7ce897b8cd6c85a"
+  "built_at_commit": "57a4ea2a9670400485473eb4f6a774863d4b935d"
 }

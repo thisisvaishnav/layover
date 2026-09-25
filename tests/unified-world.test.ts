@@ -2,17 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   UNIFIED_PLAZA_BOUNDS,
-  UNIFIED_PLAZA_OBSTACLES,
   UNIFIED_PLAZA_HOTSPOTS,
   PLAZA_SPAWN_POINTS,
   getSpawnPositionForZone,
   getZoneFromPosition,
 } from "../src/lib/world/unified-plaza";
 import { computeAvatarKinematics } from "../src/lib/world/avatar-kinematics";
-import {
-  getBilingualDialogue,
-  SUPPORTED_LEARNER_LANGUAGES,
-} from "../src/scenarios/multilingual";
+import { getBilingualDialogue } from "../src/scenarios/multilingual";
 
 test("TDD [Unified Plaza]: Bounds contain all three zones (Café, Bus Stop, Airport)", () => {
   // World must span at least 40 units in X to comfortably fit all 3 walkable zones
@@ -36,12 +32,12 @@ test("TDD [Unified Plaza]: Bounds contain all three zones (Café, Bus Stop, Airp
   assert.ok(airportSpawn, "Airport spawn point must exist");
 
   // Verify cafe is to the west (negative X), bus stop central (around 0), airport to the east (positive X)
-  assert.ok(cafeSpawn!.x < -5, "Cafe should be on the West wing");
+  assert.ok(cafeSpawn.x < -5, "Cafe should be on the West wing");
   assert.ok(
-    Math.abs(busSpawn!.x) <= 4,
+    Math.abs(busSpawn.x) <= 4,
     "Bus stop should be centrally located"
   );
-  assert.ok(airportSpawn!.x > 5, "Airport should be on the East wing");
+  assert.ok(airportSpawn.x > 5, "Airport should be on the East wing");
 });
 
 test("TDD [Unified Plaza]: getZoneFromPosition returns correct zone dynamically as player walks", () => {

@@ -90,9 +90,9 @@
     "semantic_hash": "f5a6cce54c3624b44af7be97d3ac522a"
   },
   "src/components/world/Cafe3DWorld.tsx": {
-    "mtime": 1790254555.4192216,
-    "seen": 1790254618.96557,
-    "ast_hash": "904c318bdcb2387f3898a658565be652",
+    "mtime": 1790308299.9771705,
+    "seen": 1790308342.020951,
+    "ast_hash": "5a93daf2d6940281f75d48175b190c45",
     "semantic_hash": ""
   },
   "src/components/world/HotspotPrompt.tsx": {
@@ -168,9 +168,9 @@
     "semantic_hash": "1f96f0b8b9d07fe443ebd96c44811eb0"
   },
   "src/lib/world/scene-builder.ts": {
-    "mtime": 1790254543.6750567,
-    "seen": 1790254618.9656131,
-    "ast_hash": "fd0576f99bfaef84b5870bdb0ee5c70a",
+    "mtime": 1790308194.015457,
+    "seen": 1790308342.020967,
+    "ast_hash": "f0e6be778ccd393b9c3a514ce96bcf28",
     "semantic_hash": ""
   },
   "src/lib/world/types.ts": {
@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "tests/unified-world.test.ts": {
-    "mtime": 1790254633.1146572,
-    "seen": 1790254647.49992,
-    "ast_hash": "4039d360df36e28800a6e69fb6891c9a",
+    "mtime": 1790307922.8252137,
+    "seen": 1790307935.035906,
+    "ast_hash": "e0bfaada6609eebf3efa5609a4d6a5b9",
     "semantic_hash": ""
   },
   "tests/onboarding.test.ts": {
@@ -351,6 +351,30 @@
     "mtime": 1790307333.9397435,
     "seen": 1790307347.8942442,
     "ast_hash": "f126ab3e4aa0a37929893f5650253772",
+    "semantic_hash": ""
+  },
+  "tests/city-expansion-world.test.ts": {
+    "mtime": 1790308274.7533686,
+    "seen": 1790308342.020973,
+    "ast_hash": "502f086acf59a63288f9c6d191ce64dd",
+    "semantic_hash": ""
+  },
+  "src/lib/world/city-expansion.ts": {
+    "mtime": 1790308184.5967073,
+    "seen": 1790308342.0209641,
+    "ast_hash": "ce40db3bb93c5502cda6cdbf2317c848",
+    "semantic_hash": ""
+  },
+  "src/components/world/MinimapHUD.tsx": {
+    "mtime": 1790308213.9450665,
+    "seen": 1790308342.0209541,
+    "ast_hash": "9210a6eba03fbcc119f7a6be33bfcd8c",
+    "semantic_hash": ""
+  },
+  "docs/testing/city-expansion.tdd.md": {
+    "mtime": 1790307904.4314506,
+    "seen": 1790307909.088186,
+    "ast_hash": "df744187d28d2e86d9b158a3ea92c96e",
     "semantic_hash": ""
   }
 }

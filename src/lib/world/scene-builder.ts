@@ -2,13 +2,21 @@ import * as THREE from "three";
 import { Position3D } from "./types";
 import { computeAvatarKinematics } from "./avatar-kinematics";
 import {
-  UNIFIED_PLAZA_BOUNDS,
   UNIFIED_PLAZA_HOTSPOTS,
   getSpawnPositionForZone,
 } from "./unified-plaza";
+import {
+  EXPANDED_WORLD_BOUNDS,
+  DAYLIGHT_CONFIG,
+  CAMERA_VIEW_CONFIG,
+  ROAD_SYSTEM_CONFIG,
+  CarSpec,
+  computeCarPosition,
+} from "./city-expansion";
 
 export interface CafeSceneHooks {
   onHotspotClick?: (hotspotId: string) => void;
+  onPlayerMove?: (pos: Position3D, rotation: number) => void;
 }
 
 export class Cafe3DScene {
@@ -16,6 +24,7 @@ export class Cafe3DScene {
   public camera: THREE.PerspectiveCamera;
   public renderer: THREE.WebGLRenderer;
   private canvas: HTMLCanvasElement;
+  public hooks?: CafeSceneHooks;
 
   // Key entities
   public playerMesh: THREE.Group;
@@ -34,6 +43,7 @@ export class Cafe3DScene {
 
   private hotspotMarkers: Map<string, THREE.Group> = new Map();
   private steamParticles: THREE.Points | null = null;
+  private carMeshes: { mesh: THREE.Group; spec: CarSpec; wheels: THREE.Mesh[] }[] = [];
 
   // Animation & Camera state
   private animationFrameId: number | null = null;
@@ -44,23 +54,44 @@ export class Cafe3DScene {
   private isMateoTalking: boolean = false;
   private isBaristaBrewing: boolean = false;
 
-  constructor(canvas: HTMLCanvasElement, public placeType: string = "cafe") {
+  constructor(
+    canvas: HTMLCanvasElement,
+    public placeType: string = "cafe",
+    hooks?: CafeSceneHooks
+  ) {
     this.canvas = canvas;
+    this.hooks = hooks;
     this.clock = new THREE.Clock();
 
-    // 1. Scene
+    // 1. Scene - Bright Daylight Mediterranean Sky
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x111827); // Dark twilight plaza sky
-    this.scene.fog = new THREE.FogExp2(0x111827, 0.02);
+    this.scene.background = new THREE.Color(DAYLIGHT_CONFIG.skyColorHex);
+    this.scene.fog = new THREE.FogExp2(
+      DAYLIGHT_CONFIG.fogColorHex,
+      DAYLIGHT_CONFIG.fogDensity
+    );
 
-    // 2. Camera (Third-person isometric angle across wide plaza)
+    // 2. Camera - Wide Panoramic Perspective
     const aspect = canvas.clientWidth / canvas.clientHeight || 16 / 9;
-    this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 120);
+    this.camera = new THREE.PerspectiveCamera(
+      CAMERA_VIEW_CONFIG.fov,
+      aspect,
+      0.1,
+      250
+    );
 
     const initialSpawn = getSpawnPositionForZone(placeType);
     this.targetPlayerPos = { ...initialSpawn };
-    this.camera.position.set(initialSpawn.x * 0.75, 8.2, initialSpawn.z * 0.5 + 9.5);
-    this.camera.lookAt(initialSpawn.x * 0.65, 1.2, initialSpawn.z * 0.3);
+    this.camera.position.set(
+      initialSpawn.x * 0.75,
+      CAMERA_VIEW_CONFIG.height,
+      initialSpawn.z * 0.45 + CAMERA_VIEW_CONFIG.zOffset
+    );
+    this.camera.lookAt(
+      initialSpawn.x * 0.65,
+      CAMERA_VIEW_CONFIG.lookAtOffsetY,
+      initialSpawn.z * 0.25
+    );
 
     // 3. WebGL Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -76,6 +107,7 @@ export class Cafe3DScene {
     // 4. Build Environment
     this.setupPlazaLighting();
     this.buildUnifiedPlazaArchitecture();
+    this.buildRoadAndTrafficSystem();
     this.buildCafeZone();
     this.buildBusStopZone();
     this.buildAirportZone();
@@ -106,70 +138,96 @@ export class Cafe3DScene {
   }
 
   private setupPlazaLighting() {
-    // Ambient light
-    const ambientLight = new THREE.AmbientLight(0xfff7ed, 0.85);
+    // 1. Ambient daylight
+    const ambientLight = new THREE.AmbientLight(
+      DAYLIGHT_CONFIG.ambientColorHex,
+      DAYLIGHT_CONFIG.ambientIntensity
+    );
     this.scene.add(ambientLight);
 
-    // Sun / Moonlight angle
-    const sunLight = new THREE.DirectionalLight(0xffedd5, 1.4);
-    sunLight.position.set(10, 16, 12);
+    // 2. Sky & ground reflection hemisphere light
+    const hemiLight = new THREE.HemisphereLight(
+      DAYLIGHT_CONFIG.skyColorHex,
+      DAYLIGHT_CONFIG.groundHemiColorHex,
+      0.65
+    );
+    this.scene.add(hemiLight);
+
+    // 3. Sun Directional Light with re-budgeted wide shadow camera
+    const sunLight = new THREE.DirectionalLight(
+      DAYLIGHT_CONFIG.sunColorHex,
+      DAYLIGHT_CONFIG.sunIntensity
+    );
+    sunLight.position.set(
+      DAYLIGHT_CONFIG.sunPosition.x,
+      DAYLIGHT_CONFIG.sunPosition.y,
+      DAYLIGHT_CONFIG.sunPosition.z
+    );
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
-    sunLight.shadow.camera.near = 0.5;
-    sunLight.shadow.camera.far = 40;
-    sunLight.shadow.camera.left = -28;
-    sunLight.shadow.camera.right = 28;
-    sunLight.shadow.camera.top = 16;
-    sunLight.shadow.camera.bottom = -16;
+    sunLight.shadow.camera.near = 1.0;
+    sunLight.shadow.camera.far = 100;
+    sunLight.shadow.camera.left = -60;
+    sunLight.shadow.camera.right = 60;
+    sunLight.shadow.camera.top = 35;
+    sunLight.shadow.camera.bottom = -35;
+    sunLight.shadow.bias = -0.0005;
     this.scene.add(sunLight);
 
-    // Zone 1: Café warm amber lantern
-    const cafeLight = new THREE.PointLight(0xf59e0b, 1.8, 14);
+    // Subtle warm zone accent fills
+    const cafeLight = new THREE.PointLight(0xf59e0b, 1.2, 16);
     cafeLight.position.set(-14, 4.0, -2.5);
     this.scene.add(cafeLight);
 
-    // Zone 2: Bus Stop streetlamp
-    const streetLight = new THREE.PointLight(0xfef08a, 1.6, 12);
-    streetLight.position.set(0, 4.5, -2.0);
-    this.scene.add(streetLight);
-
-    // Zone 3: Airport Gate neon blue spotlight
-    const airportLight = new THREE.PointLight(0x38bdf8, 1.9, 14);
+    const airportLight = new THREE.PointLight(0x38bdf8, 1.2, 16);
     airportLight.position.set(14, 4.0, -2.5);
     this.scene.add(airportLight);
   }
 
   private buildUnifiedPlazaArchitecture() {
-    const width = UNIFIED_PLAZA_BOUNDS.maxX - UNIFIED_PLAZA_BOUNDS.minX; // 48
-    const depth = UNIFIED_PLAZA_BOUNDS.maxZ - UNIFIED_PLAZA_BOUNDS.minZ; // 24
+    const width = EXPANDED_WORLD_BOUNDS.maxX - EXPANDED_WORLD_BOUNDS.minX; // 100m
+    const depth = EXPANDED_WORLD_BOUNDS.maxZ - EXPANDED_WORLD_BOUNDS.minZ; // 44m
 
-    // 1. Master Plaza Floor
-    const floorGeo = new THREE.PlaneGeometry(width, depth);
-    const floorMat = new THREE.MeshStandardMaterial({
+    // 1. Master District Ground Surface (Vast Mediterranean city foundation)
+    const masterFloorGeo = new THREE.PlaneGeometry(width + 24, depth + 16);
+    const masterFloorMat = new THREE.MeshStandardMaterial({
+      color: 0x334155,
+      roughness: 0.85,
+    });
+    const masterFloor = new THREE.Mesh(masterFloorGeo, masterFloorMat);
+    masterFloor.rotation.x = -Math.PI / 2;
+    masterFloor.position.set(0, -0.01, 4);
+    masterFloor.receiveShadow = true;
+    this.scene.add(masterFloor);
+
+    // 2. Pedestrian Plaza Promenade Floor
+    const plazaGeo = new THREE.PlaneGeometry(width, 24);
+    const plazaMat = new THREE.MeshStandardMaterial({
       color: 0x27272a,
       roughness: 0.8,
     });
-    const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = -Math.PI / 2;
-    floor.receiveShadow = true;
-    this.scene.add(floor);
+    const plaza = new THREE.Mesh(plazaGeo, plazaMat);
+    plaza.rotation.x = -Math.PI / 2;
+    plaza.position.set(0, 0, -4);
+    plaza.receiveShadow = true;
+    this.scene.add(plaza);
 
-    // 2. Zone Floors
-    // West: Café terracotta tiles
-    const cafeTileGeo = new THREE.PlaneGeometry(16, depth - 2);
+    // Zone Floors:
+    // West: Café terracotta tiles (warm Madrid terrace)
+    const cafeTileGeo = new THREE.PlaneGeometry(30, 20);
     const cafeTileMat = new THREE.MeshStandardMaterial({
       color: 0x9a3412,
       roughness: 0.5,
     });
     const cafeFloor = new THREE.Mesh(cafeTileGeo, cafeTileMat);
     cafeFloor.rotation.x = -Math.PI / 2;
-    cafeFloor.position.set(-15, 0.01, 0);
+    cafeFloor.position.set(-20, 0.01, -4);
     cafeFloor.receiveShadow = true;
     this.scene.add(cafeFloor);
 
     // East: Airport terminal polished slate
-    const airportSlateGeo = new THREE.PlaneGeometry(16, depth - 2);
+    const airportSlateGeo = new THREE.PlaneGeometry(30, 20);
     const airportSlateMat = new THREE.MeshStandardMaterial({
       color: 0x0f172a,
       roughness: 0.3,
@@ -177,43 +235,388 @@ export class Cafe3DScene {
     });
     const airportFloor = new THREE.Mesh(airportSlateGeo, airportSlateMat);
     airportFloor.rotation.x = -Math.PI / 2;
-    airportFloor.position.set(15, 0.01, 0);
+    airportFloor.position.set(20, 0.01, -4);
     airportFloor.receiveShadow = true;
     this.scene.add(airportFloor);
 
-    // Center: Sidewalk pavement & road marking for Bus Stop
-    const streetGeo = new THREE.PlaneGeometry(14, 6);
-    const streetMat = new THREE.MeshStandardMaterial({
-      color: 0x18181b,
-      roughness: 0.9,
+    // Center: Central Bus Stop cobblestone concourse
+    const busConcourseGeo = new THREE.PlaneGeometry(16, 20);
+    const busConcourseMat = new THREE.MeshStandardMaterial({
+      color: 0x1f2937,
+      roughness: 0.7,
     });
-    const street = new THREE.Mesh(streetGeo, streetMat);
-    street.rotation.x = -Math.PI / 2;
-    street.position.set(0, 0.015, 5);
-    street.receiveShadow = true;
-    this.scene.add(street);
+    const busConcourse = new THREE.Mesh(busConcourseGeo, busConcourseMat);
+    busConcourse.rotation.x = -Math.PI / 2;
+    busConcourse.position.set(0, 0.012, -4);
+    busConcourse.receiveShadow = true;
+    this.scene.add(busConcourse);
 
-    // Yellow curb line
-    const curbGeo = new THREE.BoxGeometry(14, 0.1, 0.25);
-    const curbMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.5 });
-    const curb = new THREE.Mesh(curbGeo, curbMat);
-    curb.position.set(0, 0.05, 1.9);
-    this.scene.add(curb);
-
-    // 3. Perimeter Back Wall
-    const backWallGeo = new THREE.BoxGeometry(width, 5.0, 0.4);
+    // 3. Perimeter Back Architecture Wall
+    const backWallGeo = new THREE.BoxGeometry(width + 10, 6.0, 0.6);
     const backWallMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
     const backWall = new THREE.Mesh(backWallGeo, backWallMat);
-    backWall.position.set(0, 2.5, UNIFIED_PLAZA_BOUNDS.minZ);
+    backWall.position.set(0, 3.0, EXPANDED_WORLD_BOUNDS.minZ);
     backWall.receiveShadow = true;
     this.scene.add(backWall);
 
-    // Back wall trims
-    const trimGeo = new THREE.BoxGeometry(width, 0.2, 0.5);
-    const trimMat = new THREE.MeshStandardMaterial({ color: 0x475569 });
+    // Back wall modern architectural crown trim
+    const trimGeo = new THREE.BoxGeometry(width + 10, 0.35, 0.9);
+    const trimMat = new THREE.MeshStandardMaterial({ color: 0x64748b });
     const trim = new THREE.Mesh(trimGeo, trimMat);
-    trim.position.set(0, 5.0, UNIFIED_PLAZA_BOUNDS.minZ);
+    trim.position.set(0, 6.0, EXPANDED_WORLD_BOUNDS.minZ);
     this.scene.add(trim);
+  }
+
+  private buildRoadAndTrafficSystem() {
+    const roadGroup = new THREE.Group();
+
+    // 1. Multi-Lane Asphalt Roadway
+    const roadGeo = new THREE.PlaneGeometry(
+      ROAD_SYSTEM_CONFIG.roadLength,
+      ROAD_SYSTEM_CONFIG.roadWidth
+    );
+    const roadMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.92,
+    });
+    const road = new THREE.Mesh(roadGeo, roadMat);
+    road.rotation.x = -Math.PI / 2;
+    road.position.set(0, 0.02, ROAD_SYSTEM_CONFIG.roadCenterZ);
+    road.receiveShadow = true;
+    roadGroup.add(road);
+
+    // 2. Center Lane Divider Dashed Line (White)
+    const stripeCount = Math.floor(ROAD_SYSTEM_CONFIG.roadLength / 4.0);
+    const stripeGeo = new THREE.PlaneGeometry(2.4, 0.22);
+    const stripeMat = new THREE.MeshStandardMaterial({
+      color: 0xf8fafc,
+      roughness: 0.3,
+    });
+    for (let i = 0; i < stripeCount; i++) {
+      const stripeX = -ROAD_SYSTEM_CONFIG.roadLength / 2 + 2 + i * 4.0;
+      const stripe = new THREE.Mesh(stripeGeo, stripeMat);
+      stripe.rotation.x = -Math.PI / 2;
+      stripe.position.set(stripeX, 0.025, ROAD_SYSTEM_CONFIG.roadCenterZ);
+      stripe.receiveShadow = true;
+      roadGroup.add(stripe);
+    }
+
+    // Outer lane solid border lines
+    const lineGeo = new THREE.PlaneGeometry(ROAD_SYSTEM_CONFIG.roadLength, 0.16);
+    const lineMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4 });
+
+    const northLine = new THREE.Mesh(lineGeo, lineMat);
+    northLine.rotation.x = -Math.PI / 2;
+    northLine.position.set(0, 0.025, ROAD_SYSTEM_CONFIG.roadCenterZ - 4.3);
+    roadGroup.add(northLine);
+
+    const southLine = new THREE.Mesh(lineGeo, lineMat);
+    southLine.rotation.x = -Math.PI / 2;
+    southLine.position.set(0, 0.025, ROAD_SYSTEM_CONFIG.roadCenterZ + 4.3);
+    roadGroup.add(southLine);
+
+    // 3. Zebra Crosswalks at Pedestrian Crossing Points
+    const crosswalkLocations = [-8.0, 0.0, 8.0];
+    const zebraGeo = new THREE.PlaneGeometry(0.65, 8.5);
+    const zebraMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+    crosswalkLocations.forEach((cx) => {
+      for (let s = -2; s <= 2; s++) {
+        const zebra = new THREE.Mesh(zebraGeo, zebraMat);
+        zebra.rotation.x = -Math.PI / 2;
+        zebra.position.set(cx + s * 1.15, 0.026, ROAD_SYSTEM_CONFIG.roadCenterZ);
+        zebra.receiveShadow = true;
+        roadGroup.add(zebra);
+      }
+    });
+
+    // 4. Concrete Sidewalks and Curbs
+    const curbMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.7 });
+
+    // North curb (between plaza & road at z ~ 4.6)
+    const curbNorthGeo = new THREE.BoxGeometry(ROAD_SYSTEM_CONFIG.roadLength, 0.18, 0.35);
+    const curbNorth = new THREE.Mesh(curbNorthGeo, curbMat);
+    curbNorth.position.set(0, 0.09, ROAD_SYSTEM_CONFIG.curbNorthZ);
+    curbNorth.receiveShadow = true;
+    roadGroup.add(curbNorth);
+
+    // South curb (south side of road at z ~ 14.4)
+    const curbSouthGeo = new THREE.BoxGeometry(ROAD_SYSTEM_CONFIG.roadLength, 0.18, 0.35);
+    const curbSouth = new THREE.Mesh(curbSouthGeo, curbMat);
+    curbSouth.position.set(0, 0.09, ROAD_SYSTEM_CONFIG.curbSouthZ);
+    curbSouth.receiveShadow = true;
+    roadGroup.add(curbSouth);
+
+    // South Sidewalk Promenade
+    const southWalkGeo = new THREE.PlaneGeometry(ROAD_SYSTEM_CONFIG.roadLength, 9.0);
+    const southWalkMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.8 });
+    const southWalk = new THREE.Mesh(southWalkGeo, southWalkMat);
+    southWalk.rotation.x = -Math.PI / 2;
+    southWalk.position.set(0, 0.015, ROAD_SYSTEM_CONFIG.curbSouthZ + 4.5);
+    southWalk.receiveShadow = true;
+    roadGroup.add(southWalk);
+
+    // 5. Street Lamps (Lining both sides of the roadway)
+    ROAD_SYSTEM_CONFIG.streetLamps.forEach((lampSpec) => {
+      const lampGroup = new THREE.Group();
+      lampGroup.position.set(lampSpec.position.x, 0, lampSpec.position.z);
+
+      // Base pedestal
+      const baseGeo = new THREE.CylinderGeometry(0.24, 0.3, 0.4, 8);
+      const metalMat = new THREE.MeshStandardMaterial({
+        color: 0x1e293b,
+        metalness: 0.85,
+        roughness: 0.3,
+      });
+      const base = new THREE.Mesh(baseGeo, metalMat);
+      base.position.y = 0.2;
+      lampGroup.add(base);
+
+      // Vertical Pole
+      const poleGeo = new THREE.CylinderGeometry(0.08, 0.1, lampSpec.height, 8);
+      const pole = new THREE.Mesh(poleGeo, metalMat);
+      pole.position.y = lampSpec.height / 2;
+      lampGroup.add(pole);
+
+      // Curved Gooseneck Arm pointing toward the road
+      const armDirection = lampSpec.position.z < ROAD_SYSTEM_CONFIG.roadCenterZ ? 1 : -1;
+      const armGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.4, 8);
+      const arm = new THREE.Mesh(armGeo, metalMat);
+      arm.rotation.x = (Math.PI / 2.8) * armDirection;
+      arm.position.set(0, lampSpec.height - 0.2, armDirection * 0.55);
+      lampGroup.add(arm);
+
+      // Lantern Hood
+      const hoodGeo = new THREE.ConeGeometry(0.36, 0.2, 8);
+      const hood = new THREE.Mesh(hoodGeo, metalMat);
+      hood.position.set(0, lampSpec.height + 0.15, armDirection * 1.1);
+      lampGroup.add(hood);
+
+      // Emissive Glowing Lantern Bulb (Hardware-safe emissive mesh without pointlight)
+      const bulbGeo = new THREE.SphereGeometry(0.2, 12, 12);
+      const bulbMat = new THREE.MeshStandardMaterial({
+        color: lampSpec.lanternColorHex,
+        emissive: lampSpec.lanternColorHex,
+        emissiveIntensity: 0.95,
+        roughness: 0.1,
+      });
+      const bulb = new THREE.Mesh(bulbGeo, bulbMat);
+      bulb.position.set(0, lampSpec.height, armDirection * 1.1);
+      lampGroup.add(bulb);
+
+      roadGroup.add(lampGroup);
+    });
+
+    // 6. Traffic Lights (at crosswalks)
+    ROAD_SYSTEM_CONFIG.trafficLights.forEach((tlSpec) => {
+      const tlGroup = new THREE.Group();
+      tlGroup.position.set(tlSpec.position.x, 0, tlSpec.position.z);
+
+      // Pole
+      const tlPoleGeo = new THREE.CylinderGeometry(0.09, 0.11, tlSpec.poleHeight, 8);
+      const tlPoleMat = new THREE.MeshStandardMaterial({
+        color: 0x0f172a,
+        metalness: 0.7,
+        roughness: 0.4,
+      });
+      const tlPole = new THREE.Mesh(tlPoleGeo, tlPoleMat);
+      tlPole.position.y = tlSpec.poleHeight / 2;
+      tlGroup.add(tlPole);
+
+      // Signal Housing Box
+      const boxGeo = new THREE.BoxGeometry(0.45, 1.35, 0.4);
+      const boxMat = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.5 });
+      const box = new THREE.Mesh(boxGeo, boxMat);
+      box.position.set(0, tlSpec.poleHeight - 0.4, 0);
+      tlGroup.add(box);
+
+      // 3 Lenses: Red, Yellow, Green
+      const lensGeo = new THREE.SphereGeometry(0.12, 12, 12);
+
+      // Red lens
+      const redMat = new THREE.MeshStandardMaterial({
+        color: 0xef4444,
+        emissive: tlSpec.initialState === "red" ? 0xef4444 : 0x450a0a,
+        emissiveIntensity: tlSpec.initialState === "red" ? 0.95 : 0.2,
+      });
+      const redLens = new THREE.Mesh(lensGeo, redMat);
+      redLens.position.set(0, tlSpec.poleHeight - 0.05, 0.2);
+      tlGroup.add(redLens);
+
+      // Yellow lens
+      const yellowMat = new THREE.MeshStandardMaterial({
+        color: 0xf59e0b,
+        emissive: tlSpec.initialState === "yellow" ? 0xf59e0b : 0x451a03,
+        emissiveIntensity: tlSpec.initialState === "yellow" ? 0.95 : 0.2,
+      });
+      const yellowLens = new THREE.Mesh(lensGeo, yellowMat);
+      yellowLens.position.set(0, tlSpec.poleHeight - 0.4, 0.2);
+      tlGroup.add(yellowLens);
+
+      // Green lens
+      const greenMat = new THREE.MeshStandardMaterial({
+        color: 0x22c55e,
+        emissive: tlSpec.initialState === "green" ? 0x22c55e : 0x052e16,
+        emissiveIntensity: tlSpec.initialState === "green" ? 0.95 : 0.2,
+      });
+      const greenLens = new THREE.Mesh(lensGeo, greenMat);
+      greenLens.position.set(0, tlSpec.poleHeight - 0.75, 0.2);
+      tlGroup.add(greenLens);
+
+      roadGroup.add(tlGroup);
+    });
+
+    // 7. Moving 3D Cars
+    this.carMeshes = [];
+    ROAD_SYSTEM_CONFIG.cars.forEach((carSpec) => {
+      const carGroup = new THREE.Group();
+      const wheels: THREE.Mesh[] = [];
+
+      // Car Body / Chassis
+      const bodyGeo = new THREE.BoxGeometry(
+        carSpec.length,
+        carSpec.height * 0.55,
+        carSpec.width
+      );
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color: carSpec.colorHex,
+        roughness: 0.2,
+        metalness: 0.4,
+      });
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.position.y = carSpec.height * 0.45;
+      body.castShadow = true;
+      body.receiveShadow = true;
+      carGroup.add(body);
+
+      // Cabin / Roof
+      const cabinLength =
+        carSpec.carType === "bus" ? carSpec.length * 0.88 : carSpec.length * 0.55;
+      const cabinGeo = new THREE.BoxGeometry(
+        cabinLength,
+        carSpec.height * 0.48,
+        carSpec.width * 0.88
+      );
+      const cabinMat = new THREE.MeshStandardMaterial({
+        color: carSpec.carType === "bus" ? carSpec.colorHex : 0x0f172a,
+        roughness: 0.3,
+      });
+      const cabin = new THREE.Mesh(cabinGeo, cabinMat);
+      cabin.position.set(
+        carSpec.carType === "bus" ? 0 : -carSpec.length * 0.08,
+        carSpec.height * 0.82,
+        0
+      );
+      cabin.castShadow = true;
+      carGroup.add(cabin);
+
+      // Windows (front, rear, sides)
+      const windowMat = new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        roughness: 0.1,
+        metalness: 0.8,
+      });
+      const frontWinGeo = new THREE.PlaneGeometry(
+        carSpec.width * 0.75,
+        carSpec.height * 0.35
+      );
+      const frontWin = new THREE.Mesh(frontWinGeo, windowMat);
+      frontWin.rotation.y = Math.PI / 2;
+      frontWin.position.set(
+        cabin.position.x + cabinLength / 2 + 0.01,
+        cabin.position.y,
+        0
+      );
+      carGroup.add(frontWin);
+
+      // Taxi roof sign if taxi
+      if (carSpec.carType === "taxi") {
+        const signGeo = new THREE.BoxGeometry(0.65, 0.2, 0.32);
+        const signMat = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          emissive: 0xfef08a,
+          emissiveIntensity: 0.85,
+        });
+        const sign = new THREE.Mesh(signGeo, signMat);
+        sign.position.set(cabin.position.x, cabin.position.y + carSpec.height * 0.35, 0);
+        carGroup.add(sign);
+      }
+
+      // Headlights (White glow facing front)
+      const headMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        emissive: 0xffffff,
+        emissiveIntensity: 0.95,
+      });
+      const headGeo = new THREE.BoxGeometry(0.1, 0.18, 0.25);
+      const headLeft = new THREE.Mesh(headGeo, headMat);
+      headLeft.position.set(
+        carSpec.length / 2 + 0.01,
+        carSpec.height * 0.4,
+        carSpec.width * 0.35
+      );
+      carGroup.add(headLeft);
+
+      const headRight = new THREE.Mesh(headGeo, headMat);
+      headRight.position.set(
+        carSpec.length / 2 + 0.01,
+        carSpec.height * 0.4,
+        -carSpec.width * 0.35
+      );
+      carGroup.add(headRight);
+
+      // Taillights (Red glow facing rear)
+      const tailMat = new THREE.MeshStandardMaterial({
+        color: 0xef4444,
+        emissive: 0xef4444,
+        emissiveIntensity: 0.95,
+      });
+      const tailGeo = new THREE.BoxGeometry(0.1, 0.18, 0.25);
+      const tailLeft = new THREE.Mesh(tailGeo, tailMat);
+      tailLeft.position.set(
+        -carSpec.length / 2 - 0.01,
+        carSpec.height * 0.4,
+        carSpec.width * 0.35
+      );
+      carGroup.add(tailLeft);
+
+      const tailRight = new THREE.Mesh(tailGeo, tailMat);
+      tailRight.position.set(
+        -carSpec.length / 2 - 0.01,
+        carSpec.height * 0.4,
+        -carSpec.width * 0.35
+      );
+      carGroup.add(tailRight);
+
+      // 4 Wheels
+      const wheelGeo = new THREE.CylinderGeometry(0.32, 0.32, 0.24, 14);
+      const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 });
+      const wheelOffsets = [
+        { x: carSpec.length * 0.3, z: carSpec.width * 0.52 },
+        { x: carSpec.length * 0.3, z: -carSpec.width * 0.52 },
+        { x: -carSpec.length * 0.3, z: carSpec.width * 0.52 },
+        { x: -carSpec.length * 0.3, z: -carSpec.width * 0.52 },
+      ];
+
+      wheelOffsets.forEach((wo) => {
+        const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+        wheel.rotation.x = Math.PI / 2;
+        wheel.position.set(wo.x, 0.32, wo.z);
+        wheel.castShadow = true;
+        carGroup.add(wheel);
+        wheels.push(wheel);
+      });
+
+      // Orient car in direction of travel
+      if (carSpec.direction < 0) {
+        carGroup.rotation.y = Math.PI; // Face west
+      }
+
+      carGroup.position.set(carSpec.initialX, 0, carSpec.laneZ);
+      roadGroup.add(carGroup);
+      this.carMeshes.push({ mesh: carGroup, spec: carSpec, wheels });
+    });
+
+    this.scene.add(roadGroup);
   }
 
   private buildCafeZone() {
@@ -680,6 +1083,10 @@ export class Cafe3DScene {
     if (dx !== 0 || dz !== 0) {
       this.playerRotation = Math.atan2(dx, dz);
     }
+
+    if (this.hooks?.onPlayerMove) {
+      this.hooks.onPlayerMove(pos, this.playerRotation);
+    }
   }
 
   public setMateoTalking(talking: boolean) {
@@ -692,7 +1099,20 @@ export class Cafe3DScene {
 
   private animate = () => {
     this.animationFrameId = requestAnimationFrame(this.animate);
-    const elapsed = this.clock.getElapsedTime();
+    const elapsed = performance.now() / 1000;
+    const delta = Math.min(this.clock.getDelta(), 0.05);
+
+    // 0. Update Moving Traffic Kinematics on Boulevard
+    this.carMeshes.forEach(({ mesh, spec, wheels }) => {
+      const updatedPos = computeCarPosition(spec, elapsed);
+      mesh.position.x = updatedPos.x;
+      mesh.position.z = updatedPos.z;
+
+      // Framerate-independent wheel spin in travel direction
+      wheels.forEach((w) => {
+        w.rotation.x += spec.direction * spec.speed * delta * 2.5;
+      });
+    });
 
     // 1. Smoothly interpolate player mesh to target position
     this.playerMesh.position.x = THREE.MathUtils.lerp(
@@ -721,15 +1141,28 @@ export class Cafe3DScene {
     if (this.rightArmPivot) this.rightArmPivot.rotation.x = kin.rightArmRotX;
     this.playerMesh.position.y = kin.bounceY;
 
-    // 3. Smooth Dynamic Camera Follow across whole 48m plaza
+    // 3. Wide Panoramic Camera Follow across 100m grand district
     const targetCamX = this.playerMesh.position.x * 0.75;
-    const targetCamZ = this.playerMesh.position.z * 0.5 + 9.5;
-    this.camera.position.x = THREE.MathUtils.lerp(this.camera.position.x, targetCamX, 0.05);
-    this.camera.position.z = THREE.MathUtils.lerp(this.camera.position.z, targetCamZ, 0.05);
+    const targetCamZ = this.playerMesh.position.z * 0.45 + CAMERA_VIEW_CONFIG.zOffset;
+    this.camera.position.x = THREE.MathUtils.lerp(
+      this.camera.position.x,
+      targetCamX,
+      CAMERA_VIEW_CONFIG.smoothLerp
+    );
+    this.camera.position.y = THREE.MathUtils.lerp(
+      this.camera.position.y,
+      CAMERA_VIEW_CONFIG.height,
+      0.05
+    );
+    this.camera.position.z = THREE.MathUtils.lerp(
+      this.camera.position.z,
+      targetCamZ,
+      CAMERA_VIEW_CONFIG.smoothLerp
+    );
     this.camera.lookAt(
       this.playerMesh.position.x * 0.65,
-      1.2,
-      this.playerMesh.position.z * 0.3
+      CAMERA_VIEW_CONFIG.lookAtOffsetY,
+      this.playerMesh.position.z * 0.25
     );
 
     // 4. NPC Look-At Behaviors
