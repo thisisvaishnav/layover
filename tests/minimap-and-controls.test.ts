@@ -19,6 +19,7 @@ import {
   isInsideMinimapCircle,
   clampToMinimapCircle,
   MINIMAP_DEFAULT_CONFIG,
+  type MinimapPoint2D,
 } from "../src/map/minimap-math";
 import {
   createCameraController,
