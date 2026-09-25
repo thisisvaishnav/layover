@@ -4,43 +4,160 @@
   "graph": {},
   "nodes": [
     {
-      "id": "src_lib_world_controls_controlscallbacks",
-      "label": "ControlsCallbacks",
+      "id": "src_components_world_minimaphud_minimaphudprops",
+      "label": "MinimapHUDProps",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "WorldControlsManager",
+      "community_name": "scene-builder.ts",
       "file_type": "code",
-      "norm_label": "controlscallbacks",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L3"
+      "norm_label": "minimaphudprops",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L26"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager",
-      "label": "WorldControlsManager",
+      "id": "src_lib_world_city_expansion_carspec",
+      "label": "CarSpec",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "WorldControlsManager",
+      "community_name": "scene-builder.ts",
       "file_type": "code",
-      "norm_label": "worldcontrolsmanager",
-      "source_file": "src/lib/world/controls.ts",
+      "norm_label": "carspec",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L46"
+    },
+    {
+      "id": "src_lib_world_city_expansion_streetlampspec",
+      "label": "StreetLampSpec",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "streetlampspec",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L60"
+    },
+    {
+      "id": "src_lib_world_city_expansion_trafficlightspec",
+      "label": "TrafficLightSpec",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "trafficlightspec",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L67"
+    },
+    {
+      "id": "src_lib_world_scene_builder_cafescenehooks",
+      "label": "CafeSceneHooks",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "cafescenehooks",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L25"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_apartmenttowerfacility",
+      "label": "ApartmentTowerFacility",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "apartmenttowerfacility",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L91"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_busstopfacility",
+      "label": "BusStopFacility",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "busstopfacility",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L82"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_districtblockspec",
+      "label": "DistrictBlockSpec",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "districtblockspec",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L481"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_humankinematics",
+      "label": "HumanKinematics",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "humankinematics",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L407"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_pedestrianspec",
+      "label": "PedestrianSpec",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "pedestrianspec",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L291"
+    },
+    {
+      "id": "src_components_navigation_header_headerprops",
+      "label": "HeaderProps",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "headerprops",
+      "source_file": "src/components/navigation/Header.tsx",
+      "source_location": "L15"
+    },
+    {
+      "id": "src_components_voice_voicecontrols_voicecontrolsprops",
+      "label": "VoiceControlsProps",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "voicecontrolsprops",
+      "source_file": "src/components/voice/VoiceControls.tsx",
       "source_location": "L9"
-    },
-    {
-      "id": "src_lib_world_types_inputstate",
-      "label": "InputState",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "WorldControlsManager",
-      "file_type": "code",
-      "norm_label": "inputstate",
-      "source_file": "src/lib/world/types.ts",
-      "source_location": "L14"
     },
     {
       "id": "src_lib_game_store_gamestate",
@@ -54,32 +171,6 @@
       "norm_label": "gamestate",
       "source_file": "src/lib/game/store.ts",
       "source_location": "L48"
-    },
-    {
-      "id": "src_lib_game_tool_handler_toolcallpayload",
-      "label": "ToolCallPayload",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "store.ts",
-      "file_type": "code",
-      "norm_label": "toolcallpayload",
-      "source_file": "src/lib/game/tool-handler.ts",
-      "source_location": "L3"
-    },
-    {
-      "id": "src_lib_game_tool_handler_toolresult",
-      "label": "ToolResult",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "store.ts",
-      "file_type": "code",
-      "norm_label": "toolresult",
-      "source_file": "src/lib/game/tool-handler.ts",
-      "source_location": "L9"
     },
     {
       "id": "src_lib_game_types_baristaaction",
@@ -186,6 +277,201 @@
       "source_location": "L56"
     },
     {
+      "id": "src_lib_voice_agent_client_voiceagentclientoptions",
+      "label": "VoiceAgentClientOptions",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "voiceagentclientoptions",
+      "source_file": "src/lib/voice-agent/client.ts",
+      "source_location": "L20"
+    },
+    {
+      "id": "src_lib_voice_agent_types_connectionstatus",
+      "label": "ConnectionStatus",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "connectionstatus",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L136"
+    },
+    {
+      "id": "src_lib_voice_agent_types_inputaudioevent",
+      "label": "InputAudioEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "inputaudioevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L51"
+    },
+    {
+      "id": "src_lib_voice_agent_types_replyaudioevent",
+      "label": "ReplyAudioEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "replyaudioevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L97"
+    },
+    {
+      "id": "src_lib_voice_agent_types_replydoneevent",
+      "label": "ReplyDoneEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "replydoneevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L102"
+    },
+    {
+      "id": "src_lib_voice_agent_types_sessionendedevent",
+      "label": "SessionEndedEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "sessionendedevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L114"
+    },
+    {
+      "id": "src_lib_voice_agent_types_sessionendevent",
+      "label": "SessionEndEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "sessionendevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L62"
+    },
+    {
+      "id": "src_lib_voice_agent_types_sessionerrorevent",
+      "label": "SessionErrorEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "sessionerrorevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L118"
+    },
+    {
+      "id": "src_lib_voice_agent_types_sessionreadyevent",
+      "label": "SessionReadyEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "sessionreadyevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L72"
+    },
+    {
+      "id": "src_lib_voice_agent_types_speechstartedevent",
+      "label": "SpeechStartedEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "speechstartedevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L77"
+    },
+    {
+      "id": "src_lib_voice_agent_types_speechstoppedevent",
+      "label": "SpeechStoppedEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "speechstoppedevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L81"
+    },
+    {
+      "id": "src_lib_voice_agent_types_tooldefinition",
+      "label": "ToolDefinition",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "tooldefinition",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L11"
+    },
+    {
+      "id": "src_lib_voice_agent_types_toolparameterproperty",
+      "label": "ToolParameterProperty",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "toolparameterproperty",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_voice_agent_types_toolresultevent",
+      "label": "ToolResultEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "toolresultevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L56"
+    },
+    {
+      "id": "src_lib_voice_agent_types_transcriptagentevent",
+      "label": "TranscriptAgentEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "transcriptagentevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L91"
+    },
+    {
       "id": "src_lib_voice_agent_types_transcriptmessage",
       "label": "TranscriptMessage",
       "_callable": true,
@@ -197,6 +483,19 @@
       "norm_label": "transcriptmessage",
       "source_file": "src/lib/voice-agent/types.ts",
       "source_location": "L143"
+    },
+    {
+      "id": "src_lib_voice_agent_types_transcriptuserevent",
+      "label": "TranscriptUserEvent",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "transcriptuserevent",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L85"
     },
     {
       "id": "src_lib_audio_retro_audio_retroaudiomanager",
@@ -248,20 +547,7 @@
       "file_type": "code",
       "norm_label": "minimaphudhandle",
       "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L14"
-    },
-    {
-      "id": "src_components_world_minimaphud_minimaphudprops",
-      "label": "MinimapHUDProps",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "minimaphudprops",
-      "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L18"
+      "source_location": "L22"
     },
     {
       "id": "src_components_world_vocabularymodal_vocabularymodalprops",
@@ -290,56 +576,30 @@
       "source_location": "L1"
     },
     {
-      "id": "src_lib_world_city_expansion_carspec",
-      "label": "CarSpec",
+      "id": "src_lib_world_controls_controlscallbacks",
+      "label": "ControlsCallbacks",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "carspec",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L46"
+      "norm_label": "controlscallbacks",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L3"
     },
     {
-      "id": "src_lib_world_city_expansion_streetlampspec",
-      "label": "StreetLampSpec",
+      "id": "src_lib_world_controls_worldcontrolsmanager",
+      "label": "WorldControlsManager",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "streetlampspec",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L60"
-    },
-    {
-      "id": "src_lib_world_city_expansion_trafficlightspec",
-      "label": "TrafficLightSpec",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "trafficlightspec",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L67"
-    },
-    {
-      "id": "src_lib_world_scene_builder_cafescenehooks",
-      "label": "CafeSceneHooks",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "cafescenehooks",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L17"
+      "norm_label": "worldcontrolsmanager",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L9"
     },
     {
       "id": "src_lib_world_types_aabb",
@@ -366,6 +626,19 @@
       "norm_label": "hotspot",
       "source_file": "src/lib/world/types.ts",
       "source_location": "L28"
+    },
+    {
+      "id": "src_lib_world_types_inputstate",
+      "label": "InputState",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": "inputstate",
+      "source_file": "src/lib/world/types.ts",
+      "source_location": "L14"
     },
     {
       "id": "src_lib_world_types_position3d",
@@ -407,43 +680,43 @@
       "source_location": "L17"
     },
     {
-      "id": "src_components_navigation_header_headerprops",
-      "label": "HeaderProps",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "headerprops",
-      "source_file": "src/components/navigation/Header.tsx",
-      "source_location": "L15"
-    },
-    {
-      "id": "src_components_voice_voicecontrols_voicecontrolsprops",
-      "label": "VoiceControlsProps",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "voicecontrolsprops",
-      "source_file": "src/components/voice/VoiceControls.tsx",
-      "source_location": "L9"
-    },
-    {
       "id": "src_lib_audio_pcm_audioqueueplayer",
       "label": "AudioQueuePlayer",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "audioqueueplayer",
       "source_file": "src/lib/audio/pcm.ts",
       "source_location": "L96"
+    },
+    {
+      "id": "src_lib_game_tool_handler_toolcallpayload",
+      "label": "ToolCallPayload",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "client.ts",
+      "file_type": "code",
+      "norm_label": "toolcallpayload",
+      "source_file": "src/lib/game/tool-handler.ts",
+      "source_location": "L3"
+    },
+    {
+      "id": "src_lib_game_tool_handler_toolresult",
+      "label": "ToolResult",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "client.ts",
+      "file_type": "code",
+      "norm_label": "toolresult",
+      "source_file": "src/lib/game/tool-handler.ts",
+      "source_location": "L9"
     },
     {
       "id": "src_lib_voice_agent_client_voiceagentclient",
@@ -452,24 +725,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "voiceagentclient",
       "source_file": "src/lib/voice-agent/client.ts",
       "source_location": "L26"
-    },
-    {
-      "id": "src_lib_voice_agent_client_voiceagentclientoptions",
-      "label": "VoiceAgentClientOptions",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "voiceagentclientoptions",
-      "source_file": "src/lib/voice-agent/client.ts",
-      "source_location": "L20"
     },
     {
       "id": "src_lib_voice_agent_types_clientevent",
@@ -478,63 +738,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "clientevent",
       "source_file": "src/lib/voice-agent/types.ts",
       "source_location": "L66"
-    },
-    {
-      "id": "src_lib_voice_agent_types_connectionstatus",
-      "label": "ConnectionStatus",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "connectionstatus",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L136"
-    },
-    {
-      "id": "src_lib_voice_agent_types_inputaudioevent",
-      "label": "InputAudioEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "inputaudioevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L51"
-    },
-    {
-      "id": "src_lib_voice_agent_types_replyaudioevent",
-      "label": "ReplyAudioEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "replyaudioevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L97"
-    },
-    {
-      "id": "src_lib_voice_agent_types_replydoneevent",
-      "label": "ReplyDoneEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "replydoneevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L102"
     },
     {
       "id": "src_lib_voice_agent_types_serverevent",
@@ -543,63 +751,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "serverevent",
       "source_file": "src/lib/voice-agent/types.ts",
       "source_location": "L124"
-    },
-    {
-      "id": "src_lib_voice_agent_types_sessionendedevent",
-      "label": "SessionEndedEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "sessionendedevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L114"
-    },
-    {
-      "id": "src_lib_voice_agent_types_sessionendevent",
-      "label": "SessionEndEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "sessionendevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L62"
-    },
-    {
-      "id": "src_lib_voice_agent_types_sessionerrorevent",
-      "label": "SessionErrorEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "sessionerrorevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L118"
-    },
-    {
-      "id": "src_lib_voice_agent_types_sessionreadyevent",
-      "label": "SessionReadyEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "sessionreadyevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L72"
     },
     {
       "id": "src_lib_voice_agent_types_sessionupdateconfig",
@@ -608,37 +764,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "sessionupdateconfig",
       "source_file": "src/lib/voice-agent/types.ts",
       "source_location": "L24"
-    },
-    {
-      "id": "src_lib_voice_agent_types_speechstartedevent",
-      "label": "SpeechStartedEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "speechstartedevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L77"
-    },
-    {
-      "id": "src_lib_voice_agent_types_speechstoppedevent",
-      "label": "SpeechStoppedEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "speechstoppedevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L81"
     },
     {
       "id": "src_lib_voice_agent_types_toolcallevent",
@@ -647,76 +777,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "toolcallevent",
       "source_file": "src/lib/voice-agent/types.ts",
       "source_location": "L107"
-    },
-    {
-      "id": "src_lib_voice_agent_types_tooldefinition",
-      "label": "ToolDefinition",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "tooldefinition",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L11"
-    },
-    {
-      "id": "src_lib_voice_agent_types_toolparameterproperty",
-      "label": "ToolParameterProperty",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "toolparameterproperty",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_voice_agent_types_toolresultevent",
-      "label": "ToolResultEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "toolresultevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L56"
-    },
-    {
-      "id": "src_lib_voice_agent_types_transcriptagentevent",
-      "label": "TranscriptAgentEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "transcriptagentevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L91"
-    },
-    {
-      "id": "src_lib_voice_agent_types_transcriptuserevent",
-      "label": "TranscriptUserEvent",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "transcriptuserevent",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L85"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene",
@@ -729,7 +794,7 @@
       "file_type": "code",
       "norm_label": "cafe3dscene",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L22"
+      "source_location": "L30"
     },
     {
       "id": "src_components_world_interactivelearningmodal_interactivelearningmodalprops",
@@ -849,88 +914,52 @@
       "source_location": "L43"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_attachlisteners",
-      "label": ".attachListeners()",
+      "id": "src_lib_world_city_expansion_computecarposition",
+      "label": "computeCarPosition()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "WorldControlsManager",
+      "community_name": "scene-builder.ts",
       "file_type": "code",
-      "norm_label": ".attachlisteners()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L110"
+      "norm_label": "computecarposition()",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L180"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_constructor",
-      "label": ".constructor()",
+      "id": "src_lib_world_city_expansion_worldtominimapcoords",
+      "label": "worldToMinimapCoords()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "WorldControlsManager",
+      "community_name": "scene-builder.ts",
       "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L20"
+      "norm_label": "worldtominimapcoords()",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L201"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_destroy",
-      "label": ".destroy()",
+      "id": "src_lib_world_town_park_expansion_computehumanavatarkinematics",
+      "label": "computeHumanAvatarKinematics()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "WorldControlsManager",
+      "community_name": "scene-builder.ts",
       "file_type": "code",
-      "norm_label": ".destroy()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L115"
+      "norm_label": "computehumanavatarkinematics()",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L427"
     },
     {
-      "id": "src_lib_world_controls_worldcontrolsmanager_getstate",
-      "label": ".getState()",
+      "id": "src_lib_world_town_park_expansion_computepedestrianposition",
+      "label": "computePedestrianPosition()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "WorldControlsManager",
+      "community_name": "scene-builder.ts",
       "file_type": "code",
-      "norm_label": ".getstate()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L27"
-    },
-    {
-      "id": "src_lib_world_controls_worldcontrolsmanager_handlekeydown",
-      "label": ".handleKeyDown()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "WorldControlsManager",
-      "file_type": "code",
-      "norm_label": ".handlekeydown()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L38"
-    },
-    {
-      "id": "src_lib_world_controls_worldcontrolsmanager_handlekeyup",
-      "label": ".handleKeyUp()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "WorldControlsManager",
-      "file_type": "code",
-      "norm_label": ".handlekeyup()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L89"
-    },
-    {
-      "id": "src_lib_world_controls_worldcontrolsmanager_setdirection",
-      "label": ".setDirection()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "WorldControlsManager",
-      "file_type": "code",
-      "norm_label": ".setdirection()",
-      "source_file": "src/lib/world/controls.ts",
-      "source_location": "L31"
+      "norm_label": "computepedestrianposition()",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L375"
     },
     {
       "id": "src_app_play_page_playgamecontent",
@@ -1029,28 +1058,28 @@
       "source_location": "L17"
     },
     {
-      "id": "src_lib_game_tool_handler_handletoolcall",
-      "label": "handleToolCall()",
+      "id": "src_lib_voice_agent_client_voiceagentclient_getstatus",
+      "label": ".getStatus()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "store.ts",
       "file_type": "code",
-      "norm_label": "handletoolcall()",
-      "source_file": "src/lib/game/tool-handler.ts",
-      "source_location": "L14"
+      "norm_label": ".getstatus()",
+      "source_file": "src/lib/voice-agent/client.ts",
+      "source_location": "L44"
     },
     {
-      "id": "src_lib_voice_agent_client_voiceagentclient_simulateuserutterance",
-      "label": ".simulateUserUtterance()",
+      "id": "src_lib_voice_agent_usevoiceagent_usevoiceagent",
+      "label": "useVoiceAgent()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "store.ts",
       "file_type": "code",
-      "norm_label": ".simulateuserutterance()",
-      "source_file": "src/lib/voice-agent/client.ts",
-      "source_location": "L331"
+      "norm_label": "usevoiceagent()",
+      "source_file": "src/lib/voice-agent/useVoiceAgent.ts",
+      "source_location": "L8"
     },
     {
       "id": "src_app_layout_rootlayout",
@@ -1221,28 +1250,88 @@
       "source_location": "L13"
     },
     {
-      "id": "src_lib_world_city_expansion_computecarposition",
-      "label": "computeCarPosition()",
+      "id": "src_lib_world_controls_worldcontrolsmanager_attachlisteners",
+      "label": ".attachListeners()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "computecarposition()",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L180"
+      "norm_label": ".attachlisteners()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L110"
     },
     {
-      "id": "src_lib_world_city_expansion_worldtominimapcoords",
-      "label": "worldToMinimapCoords()",
+      "id": "src_lib_world_controls_worldcontrolsmanager_constructor",
+      "label": ".constructor()",
       "_callable": true,
       "_origin": "ast",
       "community": 5,
       "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "worldtominimapcoords()",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L201"
+      "norm_label": ".constructor()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L20"
+    },
+    {
+      "id": "src_lib_world_controls_worldcontrolsmanager_destroy",
+      "label": ".destroy()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": ".destroy()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L115"
+    },
+    {
+      "id": "src_lib_world_controls_worldcontrolsmanager_getstate",
+      "label": ".getState()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": ".getstate()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L27"
+    },
+    {
+      "id": "src_lib_world_controls_worldcontrolsmanager_handlekeydown",
+      "label": ".handleKeyDown()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": ".handlekeydown()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L38"
+    },
+    {
+      "id": "src_lib_world_controls_worldcontrolsmanager_handlekeyup",
+      "label": ".handleKeyUp()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": ".handlekeyup()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L89"
+    },
+    {
+      "id": "src_lib_world_controls_worldcontrolsmanager_setdirection",
+      "label": ".setDirection()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": ".setdirection()",
+      "source_file": "src/lib/world/controls.ts",
+      "source_location": "L31"
     },
     {
       "id": "src_lib_world_hotspots_gethotspotsforplace",
@@ -1305,6 +1394,18 @@
       "source_location": "L6"
     },
     {
+      "id": "src_lib_world_scene_builder_cafe3dscene_updateplayerposition",
+      "label": ".updatePlayerPosition()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 5,
+      "community_name": "Cafe3DWorld.tsx",
+      "file_type": "code",
+      "norm_label": ".updateplayerposition()",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1666"
+    },
+    {
       "id": "src_lib_world_unified_plaza_getspawnpositionforzone",
       "label": "getSpawnPositionForZone()",
       "_callable": true,
@@ -1334,7 +1435,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".close()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1346,7 +1447,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1358,7 +1459,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".enqueuepcmbase64()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1370,7 +1471,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".flush()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1382,7 +1483,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".init()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1394,7 +1495,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".setmute()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1406,7 +1507,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "base64toint16()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1418,7 +1519,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "calculaterms()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1430,7 +1531,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "float32toint16()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1442,7 +1543,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "int16tobase64()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1454,7 +1555,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "int16tofloat32()",
       "source_file": "src/lib/audio/pcm.ts",
@@ -1466,11 +1567,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "resampleaudio()",
       "source_file": "src/lib/audio/pcm.ts",
       "source_location": "L56"
+    },
+    {
+      "id": "src_lib_game_tool_handler_handletoolcall",
+      "label": "handleToolCall()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "client.ts",
+      "file_type": "code",
+      "norm_label": "handletoolcall()",
+      "source_file": "src/lib/game/tool-handler.ts",
+      "source_location": "L14"
     },
     {
       "id": "src_lib_voice_agent_client_voiceagentclient_connect",
@@ -1478,7 +1591,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".connect()",
       "source_file": "src/lib/voice-agent/client.ts",
@@ -1490,7 +1603,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "src/lib/voice-agent/client.ts",
@@ -1502,7 +1615,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".disconnect()",
       "source_file": "src/lib/voice-agent/client.ts",
@@ -1514,23 +1627,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".executetool()",
       "source_file": "src/lib/voice-agent/client.ts",
       "source_location": "L221"
-    },
-    {
-      "id": "src_lib_voice_agent_client_voiceagentclient_getstatus",
-      "label": ".getStatus()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": ".getstatus()",
-      "source_file": "src/lib/voice-agent/client.ts",
-      "source_location": "L44"
     },
     {
       "id": "src_lib_voice_agent_client_voiceagentclient_handleserverevent",
@@ -1538,7 +1639,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".handleserverevent()",
       "source_file": "src/lib/voice-agent/client.ts",
@@ -1550,7 +1651,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".send()",
       "source_file": "src/lib/voice-agent/client.ts",
@@ -1562,7 +1663,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".sendsessionupdate()",
       "source_file": "src/lib/voice-agent/client.ts",
@@ -1574,7 +1675,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".setpushtotalk()",
       "source_file": "src/lib/voice-agent/client.ts",
@@ -1586,11 +1687,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".setstatus()",
       "source_file": "src/lib/voice-agent/client.ts",
       "source_location": "L48"
+    },
+    {
+      "id": "src_lib_voice_agent_client_voiceagentclient_simulateuserutterance",
+      "label": ".simulateUserUtterance()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "client.ts",
+      "file_type": "code",
+      "norm_label": ".simulateuserutterance()",
+      "source_file": "src/lib/voice-agent/client.ts",
+      "source_location": "L331"
     },
     {
       "id": "src_lib_voice_agent_client_voiceagentclient_startmicrophone",
@@ -1598,7 +1711,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".startmicrophone()",
       "source_file": "src/lib/voice-agent/client.ts",
@@ -1610,23 +1723,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": ".startsimulationmode()",
       "source_file": "src/lib/voice-agent/client.ts",
       "source_location": "L318"
-    },
-    {
-      "id": "src_lib_voice_agent_usevoiceagent_usevoiceagent",
-      "label": "useVoiceAgent()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "usevoiceagent()",
-      "source_file": "src/lib/voice-agent/useVoiceAgent.ts",
-      "source_location": "L8"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_animate",
@@ -1638,7 +1739,7 @@
       "file_type": "code",
       "norm_label": ".animate()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1100"
+      "source_location": "L1687"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildairportzone",
@@ -1650,7 +1751,19 @@
       "file_type": "code",
       "norm_label": ".buildairportzone()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L768"
+      "source_location": "L1355"
+    },
+    {
+      "id": "src_lib_world_scene_builder_cafe3dscene_buildapartmenttowers",
+      "label": ".buildApartmentTowers()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "Cafe3DScene",
+      "file_type": "code",
+      "norm_label": ".buildapartmenttowers()",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L900"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildbusstopzone",
@@ -1662,7 +1775,7 @@
       "file_type": "code",
       "norm_label": ".buildbusstopzone()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L704"
+      "source_location": "L1291"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildcafezone",
@@ -1674,7 +1787,19 @@
       "file_type": "code",
       "norm_label": ".buildcafezone()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L622"
+      "source_location": "L1209"
+    },
+    {
+      "id": "src_lib_world_scene_builder_cafe3dscene_buildcentralpark",
+      "label": ".buildCentralPark()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "Cafe3DScene",
+      "file_type": "code",
+      "norm_label": ".buildcentralpark()",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L652"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildelenacharacter",
@@ -1686,7 +1811,7 @@
       "file_type": "code",
       "norm_label": ".buildelenacharacter()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L894"
+      "source_location": "L1481"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildhotspotmarkers",
@@ -1698,7 +1823,7 @@
       "file_type": "code",
       "norm_label": ".buildhotspotmarkers()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1036"
+      "source_location": "L1623"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildmateocharacter",
@@ -1710,7 +1835,19 @@
       "file_type": "code",
       "norm_label": ".buildmateocharacter()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L829"
+      "source_location": "L1416"
+    },
+    {
+      "id": "src_lib_world_scene_builder_cafe3dscene_buildmultiplebusstops",
+      "label": ".buildMultipleBusStops()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "Cafe3DScene",
+      "file_type": "code",
+      "norm_label": ".buildmultiplebusstops()",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1031"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildplayeravatar",
@@ -1722,7 +1859,7 @@
       "file_type": "code",
       "norm_label": ".buildplayeravatar()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L931"
+      "source_location": "L1518"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildroadandtrafficsystem",
@@ -1734,7 +1871,19 @@
       "file_type": "code",
       "norm_label": ".buildroadandtrafficsystem()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L270"
+      "source_location": "L300"
+    },
+    {
+      "id": "src_lib_world_scene_builder_cafe3dscene_buildsidewalkpedestrians",
+      "label": ".buildSidewalkPedestrians()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 8,
+      "community_name": "Cafe3DScene",
+      "file_type": "code",
+      "norm_label": ".buildsidewalkpedestrians()",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1104"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildsrinivascharacter",
@@ -1746,7 +1895,7 @@
       "file_type": "code",
       "norm_label": ".buildsrinivascharacter()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L858"
+      "source_location": "L1445"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_buildunifiedplazaarchitecture",
@@ -1758,7 +1907,7 @@
       "file_type": "code",
       "norm_label": ".buildunifiedplazaarchitecture()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L188"
+      "source_location": "L218"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_constructor",
@@ -1770,7 +1919,7 @@
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L57"
+      "source_location": "L75"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_destroy",
@@ -1782,7 +1931,7 @@
       "file_type": "code",
       "norm_label": ".destroy()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1209"
+      "source_location": "L1845"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_handleresize",
@@ -1794,7 +1943,7 @@
       "file_type": "code",
       "norm_label": ".handleresize()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1200"
+      "source_location": "L1836"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_setbaristabrewing",
@@ -1806,7 +1955,7 @@
       "file_type": "code",
       "norm_label": ".setbaristabrewing()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1096"
+      "source_location": "L1683"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_setmateotalking",
@@ -1818,7 +1967,7 @@
       "file_type": "code",
       "norm_label": ".setmateotalking()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1092"
+      "source_location": "L1679"
     },
     {
       "id": "src_lib_world_scene_builder_cafe3dscene_setupplazalighting",
@@ -1830,19 +1979,7 @@
       "file_type": "code",
       "norm_label": ".setupplazalighting()",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L140"
-    },
-    {
-      "id": "src_lib_world_scene_builder_cafe3dscene_updateplayerposition",
-      "label": ".updatePlayerPosition()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 8,
-      "community_name": "Cafe3DScene",
-      "file_type": "code",
-      "norm_label": ".updateplayerposition()",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1079"
+      "source_location": "L170"
     },
     {
       "id": "src_app_page_unifiedflowhomepage",
@@ -1905,14 +2042,190 @@
       "source_location": "L533"
     },
     {
-      "id": "src_lib_world_controls",
-      "label": "controls.ts",
+      "id": "src_components_world_minimaphud",
+      "label": "MinimapHUD.tsx",
       "_origin": "ast",
       "community": 0,
-      "community_name": "WorldControlsManager",
+      "community_name": "scene-builder.ts",
       "file_type": "code",
-      "norm_label": "controls.ts",
-      "source_file": "src/lib/world/controls.ts",
+      "norm_label": "minimaphud.tsx",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_components_world_minimaphud_minimaphud",
+      "label": "MinimapHUD",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "minimaphud",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L31"
+    },
+    {
+      "id": "src_lib_world_city_expansion",
+      "label": "city-expansion.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "city-expansion.ts",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_city_expansion_camera_view_config",
+      "label": "CAMERA_VIEW_CONFIG",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "camera_view_config",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L38"
+    },
+    {
+      "id": "src_lib_world_city_expansion_daylight_config",
+      "label": "DAYLIGHT_CONFIG",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "daylight_config",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L22"
+    },
+    {
+      "id": "src_lib_world_city_expansion_expanded_world_bounds",
+      "label": "EXPANDED_WORLD_BOUNDS",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "expanded_world_bounds",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L12"
+    },
+    {
+      "id": "src_lib_world_city_expansion_road_system_config",
+      "label": "ROAD_SYSTEM_CONFIG",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "road_system_config",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L77"
+    },
+    {
+      "id": "src_lib_world_scene_builder",
+      "label": "scene-builder.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "scene-builder.ts",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion",
+      "label": "town-park-expansion.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "town-park-expansion.ts",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_central_park_config",
+      "label": "CENTRAL_PARK_CONFIG",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "central_park_config",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L37"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_chase_camera_config",
+      "label": "CHASE_CAMERA_CONFIG",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "chase_camera_config",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L16"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_dense_traffic_config",
+      "label": "DENSE_TRAFFIC_CONFIG",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "dense_traffic_config",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L169"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_maple_hollow_district_blocks",
+      "label": "MAPLE_HOLLOW_DISTRICT_BLOCKS",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "maple_hollow_district_blocks",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L499"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_pedestrian_config",
+      "label": "PEDESTRIAN_CONFIG",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "pedestrian_config",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L307"
+    },
+    {
+      "id": "src_lib_world_town_park_expansion_town_facilities_config",
+      "label": "TOWN_FACILITIES_CONFIG",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "town_facilities_config",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L108"
+    },
+    {
+      "id": "tests_city_expansion_world_test",
+      "label": "city-expansion-world.test.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "city-expansion-world.test.ts",
+      "source_file": "tests/city-expansion-world.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_town_park_camera_test",
+      "label": "town-park-camera.test.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "scene-builder.ts",
+      "file_type": "code",
+      "norm_label": "town-park-camera.test.ts",
+      "source_file": "tests/town-park-camera.test.ts",
       "source_location": "L1"
     },
     {
@@ -2026,17 +2339,6 @@
       "source_location": "L89"
     },
     {
-      "id": "src_lib_game_tool_handler",
-      "label": "tool-handler.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "store.ts",
-      "file_type": "code",
-      "norm_label": "tool-handler.ts",
-      "source_file": "src/lib/game/tool-handler.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "src_lib_game_types",
       "label": "game/types.ts",
       "_origin": "ast",
@@ -2045,6 +2347,28 @@
       "file_type": "code",
       "norm_label": "game/types.ts",
       "source_file": "src/lib/game/types.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_voice_agent_types",
+      "label": "voice-agent/types.ts",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "voice-agent/types.ts",
+      "source_file": "src/lib/voice-agent/types.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_lib_voice_agent_usevoiceagent",
+      "label": "useVoiceAgent.ts",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "usevoiceagent.ts",
+      "source_file": "src/lib/voice-agent/useVoiceAgent.ts",
       "source_location": "L1"
     },
     {
@@ -2059,6 +2383,17 @@
       "source_location": "L1"
     },
     {
+      "id": "src_scenarios_spain_cafe_cafe_tools",
+      "label": "CAFE_TOOLS",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "store.ts",
+      "file_type": "code",
+      "norm_label": "cafe_tools",
+      "source_file": "src/scenarios/spain-cafe.ts",
+      "source_location": "L132"
+    },
+    {
       "id": "src_scenarios_spain_cafe_spain_cafe_scenario",
       "label": "SPAIN_CAFE_SCENARIO",
       "_origin": "ast",
@@ -2068,17 +2403,6 @@
       "norm_label": "spain_cafe_scenario",
       "source_file": "src/scenarios/spain-cafe.ts",
       "source_location": "L4"
-    },
-    {
-      "id": "tests_tool_handler_test",
-      "label": "tool-handler.test.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "store.ts",
-      "file_type": "code",
-      "norm_label": "tool-handler.test.ts",
-      "source_file": "tests/tool-handler.test.ts",
-      "source_location": "L1"
     },
     {
       "id": "src_app_layout",
@@ -3486,28 +3810,6 @@
       "source_location": "L1"
     },
     {
-      "id": "src_components_world_minimaphud",
-      "label": "MinimapHUD.tsx",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "minimaphud.tsx",
-      "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_components_world_minimaphud_minimaphud",
-      "label": "MinimapHUD",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "minimaphud",
-      "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L23"
-    },
-    {
       "id": "src_components_world_vocabularymodal",
       "label": "VocabularyModal.tsx",
       "_origin": "ast",
@@ -3530,59 +3832,15 @@
       "source_location": "L1"
     },
     {
-      "id": "src_lib_world_city_expansion",
-      "label": "city-expansion.ts",
+      "id": "src_lib_world_controls",
+      "label": "controls.ts",
       "_origin": "ast",
       "community": 5,
       "community_name": "Cafe3DWorld.tsx",
       "file_type": "code",
-      "norm_label": "city-expansion.ts",
-      "source_file": "src/lib/world/city-expansion.ts",
+      "norm_label": "controls.ts",
+      "source_file": "src/lib/world/controls.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "src_lib_world_city_expansion_camera_view_config",
-      "label": "CAMERA_VIEW_CONFIG",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "camera_view_config",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L38"
-    },
-    {
-      "id": "src_lib_world_city_expansion_daylight_config",
-      "label": "DAYLIGHT_CONFIG",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "daylight_config",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L22"
-    },
-    {
-      "id": "src_lib_world_city_expansion_expanded_world_bounds",
-      "label": "EXPANDED_WORLD_BOUNDS",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "expanded_world_bounds",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L12"
-    },
-    {
-      "id": "src_lib_world_city_expansion_road_system_config",
-      "label": "ROAD_SYSTEM_CONFIG",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "road_system_config",
-      "source_file": "src/lib/world/city-expansion.ts",
-      "source_location": "L77"
     },
     {
       "id": "src_lib_world_hotspots",
@@ -3695,17 +3953,6 @@
       "source_location": "L1"
     },
     {
-      "id": "src_lib_world_scene_builder",
-      "label": "scene-builder.ts",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "scene-builder.ts",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "src_lib_world_types",
       "label": "world/types.ts",
       "_origin": "ast",
@@ -3772,17 +4019,6 @@
       "source_location": "L47"
     },
     {
-      "id": "tests_city_expansion_world_test",
-      "label": "city-expansion-world.test.ts",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "Cafe3DWorld.tsx",
-      "file_type": "code",
-      "norm_label": "city-expansion-world.test.ts",
-      "source_file": "tests/city-expansion-world.test.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "tests_spatial_world_test",
       "label": "spatial-world.test.ts",
       "_origin": "ast",
@@ -3809,7 +4045,7 @@
       "label": "pcm.ts",
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "pcm.ts",
       "source_file": "src/lib/audio/pcm.ts",
@@ -3820,65 +4056,54 @@
       "label": "TARGET_SAMPLE_RATE",
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "target_sample_rate",
       "source_file": "src/lib/audio/pcm.ts",
       "source_location": "L2"
     },
     {
+      "id": "src_lib_game_tool_handler",
+      "label": "tool-handler.ts",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "client.ts",
+      "file_type": "code",
+      "norm_label": "tool-handler.ts",
+      "source_file": "src/lib/game/tool-handler.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "src_lib_voice_agent_client",
       "label": "client.ts",
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "client.ts",
       "source_file": "src/lib/voice-agent/client.ts",
       "source_location": "L1"
     },
     {
-      "id": "src_lib_voice_agent_types",
-      "label": "voice-agent/types.ts",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "voice-agent/types.ts",
-      "source_file": "src/lib/voice-agent/types.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_lib_voice_agent_usevoiceagent",
-      "label": "useVoiceAgent.ts",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "usevoiceagent.ts",
-      "source_file": "src/lib/voice-agent/useVoiceAgent.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_scenarios_spain_cafe_cafe_tools",
-      "label": "CAFE_TOOLS",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "voice-agent/types.ts",
-      "file_type": "code",
-      "norm_label": "cafe_tools",
-      "source_file": "src/scenarios/spain-cafe.ts",
-      "source_location": "L132"
-    },
-    {
       "id": "tests_audio_pcm_test",
       "label": "audio-pcm.test.ts",
       "_origin": "ast",
       "community": 6,
-      "community_name": "voice-agent/types.ts",
+      "community_name": "client.ts",
       "file_type": "code",
       "norm_label": "audio-pcm.test.ts",
       "source_file": "tests/audio-pcm.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "tests_tool_handler_test",
+      "label": "tool-handler.test.ts",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "client.ts",
+      "file_type": "code",
+      "norm_label": "tool-handler.test.ts",
+      "source_file": "tests/tool-handler.test.ts",
       "source_location": "L1"
     },
     {
@@ -4438,7 +4663,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L159",
+      "source_location": "L246",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud_minimaphud",
+      "target": "src_lib_world_town_park_expansion_computepedestrianposition",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L265",
       "weight": 1.0
     },
     {
@@ -4450,7 +4687,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L91",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -4930,163 +5167,31 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1107",
+      "source_location": "L1694",
       "weight": 1.0
     },
     {
       "source": "src_lib_world_scene_builder_cafe3dscene_animate",
-      "target": "src_lib_world_avatar_kinematics_computeavatarkinematics",
+      "target": "src_lib_world_town_park_expansion_computepedestrianposition",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1137",
+      "source_location": "L1706",
       "weight": 1.0
     },
     {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_setupplazalighting",
+      "source": "src_lib_world_scene_builder_cafe3dscene_animate",
+      "target": "src_lib_world_town_park_expansion_computehumanavatarkinematics",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L108",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildunifiedplazaarchitecture",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L109",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildroadandtrafficsystem",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L110",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildcafezone",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L111",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildbusstopzone",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L112",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildairportzone",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L113",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildhotspotmarkers",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L114",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildmateocharacter",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L117",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildsrinivascharacter",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L121",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildelenacharacter",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L125",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildplayeravatar",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L129",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "target": "src_lib_world_scene_builder_cafe3dscene_animate",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L137",
+      "source_location": "L1739",
       "weight": 1.0
     },
     {
@@ -5098,7 +5203,199 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L83",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_setupplazalighting",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L127",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildunifiedplazaarchitecture",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L128",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildcentralpark",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L129",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildapartmenttowers",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L130",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildmultiplebusstops",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L131",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildroadandtrafficsystem",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L132",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildsidewalkpedestrians",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L133",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildcafezone",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L134",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildbusstopzone",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L135",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildairportzone",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L136",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildhotspotmarkers",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L137",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildmateocharacter",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L140",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildsrinivascharacter",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L144",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildelenacharacter",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L148",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildplayeravatar",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L152",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "target": "src_lib_world_scene_builder_cafe3dscene_animate",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L167",
       "weight": 1.0
     },
     {
@@ -5147,6 +5444,18 @@
       "context": "field",
       "source_file": "src/components/world/HotspotPrompt.tsx",
       "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud_minimaphudhandle",
+      "target": "src_lib_world_types_position3d",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -5270,6 +5579,30 @@
       "weight": 1.0
     },
     {
+      "source": "src_lib_world_city_expansion_streetlampspec",
+      "target": "src_lib_world_types_position3d",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L62",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_city_expansion_trafficlightspec",
+      "target": "src_lib_world_types_position3d",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "src/lib/world/city-expansion.ts",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
       "source": "src_lib_world_controls_controlscallbacks",
       "target": "src_lib_world_types_inputstate",
       "relation": "references",
@@ -5302,7 +5635,55 @@
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L46",
+      "source_location": "L54",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_town_park_expansion_pedestrianspec",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_types_position3d",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafescenehooks",
+      "target": "src_lib_world_types_position3d",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion_districtblockspec",
+      "target": "src_lib_world_types_aabb",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L487",
       "weight": 1.0
     },
     {
@@ -6243,7 +6624,7 @@
     },
     {
       "source": "src_components_world_minimaphud",
-      "target": "src_lib_world_unified_plaza_unified_plaza_hotspots",
+      "target": "src_lib_world_town_park_expansion_central_park_config",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -6251,6 +6632,78 @@
       "context": "import",
       "source_file": "src/components/world/MinimapHUD.tsx",
       "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_town_park_expansion_computepedestrianposition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_town_park_expansion_dense_traffic_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_town_park_expansion_maple_hollow_district_blocks",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_town_park_expansion_pedestrian_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_town_park_expansion_town_facilities_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_unified_plaza_unified_plaza_hotspots",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -6759,6 +7212,102 @@
     },
     {
       "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion_central_park_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion_chase_camera_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion_computehumanavatarkinematics",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion_computepedestrianposition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion_dense_traffic_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion_pedestrian_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion_pedestrianspec",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion_town_facilities_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
       "target": "src_lib_world_types_position3d",
       "relation": "imports",
       "_origin": "ast",
@@ -6771,7 +7320,7 @@
     },
     {
       "source": "src_lib_world_scene_builder",
-      "target": "src_lib_world_avatar_kinematics_computeavatarkinematics",
+      "target": "src_lib_world_unified_plaza_getspawnpositionforzone",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -6783,18 +7332,6 @@
     },
     {
       "source": "src_lib_world_scene_builder",
-      "target": "src_lib_world_unified_plaza_getspawnpositionforzone",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder",
       "target": "src_lib_world_unified_plaza_unified_plaza_hotspots",
       "relation": "imports",
       "_origin": "ast",
@@ -6802,19 +7339,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder",
-      "target": "src_lib_world_city_expansion_camera_view_config",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L8",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -6826,7 +7351,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -6838,7 +7363,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -6850,7 +7375,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -6862,7 +7387,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L8",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -6874,7 +7399,31 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L8",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_types_aabb",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_city_expansion_carspec",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L2",
       "weight": 1.0
     },
     {
@@ -7259,6 +7808,114 @@
       "context": "import",
       "source_file": "tests/tool-handler.test.ts",
       "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_unified_plaza_getzonefromposition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion_central_park_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion_chase_camera_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion_computehumanavatarkinematics",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion_computepedestrianposition",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion_dense_traffic_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion_maple_hollow_district_blocks",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion_pedestrian_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion_town_facilities_config",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -7791,7 +8448,7 @@
     },
     {
       "source": "src_components_world_minimaphud",
-      "target": "src_lib_world_unified_plaza",
+      "target": "src_lib_world_town_park_expansion",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -7799,6 +8456,18 @@
       "context": "import",
       "source_file": "src/components/world/MinimapHUD.tsx",
       "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "src_components_world_minimaphud",
+      "target": "src_lib_world_unified_plaza",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/components/world/MinimapHUD.tsx",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -8031,6 +8700,18 @@
     },
     {
       "source": "src_lib_world_scene_builder",
+      "target": "src_lib_world_town_park_expansion",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder",
       "target": "src_lib_world_types",
       "relation": "imports_from",
       "_origin": "ast",
@@ -8043,7 +8724,7 @@
     },
     {
       "source": "src_lib_world_scene_builder",
-      "target": "src_lib_world_avatar_kinematics",
+      "target": "src_lib_world_unified_plaza",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -8055,18 +8736,6 @@
     },
     {
       "source": "src_lib_world_scene_builder",
-      "target": "src_lib_world_unified_plaza",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder",
       "target": "src_lib_world_city_expansion",
       "relation": "imports_from",
       "_origin": "ast",
@@ -8074,7 +8743,31 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L8",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_types",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_city_expansion",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L2",
       "weight": 1.0
     },
     {
@@ -8222,6 +8915,30 @@
       "weight": 1.0
     },
     {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_unified_plaza",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "tests_town_park_camera_test",
+      "target": "src_lib_world_town_park_expansion",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "tests/town-park-camera.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
       "source": "tests_unified_world_test",
       "target": "src_lib_world_avatar_kinematics",
       "relation": "imports_from",
@@ -8315,6 +9032,18 @@
       "context": "parameter_type",
       "source_file": "src/lib/world/controls.ts",
       "source_location": "L31",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene_updateplayerposition",
+      "target": "src_lib_world_types_position3d",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1666",
       "weight": 1.0
     },
     {
@@ -9383,7 +10112,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L14",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -9394,7 +10123,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L18",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -9405,7 +10134,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/components/world/MinimapHUD.tsx",
-      "source_location": "L23",
+      "source_location": "L31",
       "weight": 1.0
     },
     {
@@ -10241,7 +10970,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L17",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
@@ -10252,7 +10981,150 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L22",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_town_facilities_config",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L108",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_chase_camera_config",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_dense_traffic_config",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L169",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_pedestrianspec",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L291",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_pedestrian_config",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L307",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_central_park_config",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_computepedestrianposition",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L375",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_humankinematics",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L407",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_computehumanavatarkinematics",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L427",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_districtblockspec",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L481",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_maple_hollow_district_blocks",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L499",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_busstopfacility",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_town_park_expansion",
+      "target": "src_lib_world_town_park_expansion_apartmenttowerfacility",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/town-park-expansion.ts",
+      "source_location": "L91",
       "weight": 1.0
     },
     {
@@ -11170,123 +12042,24 @@
     },
     {
       "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildhotspotmarkers",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildmultiplebusstops",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1036",
+      "source_location": "L1031",
       "weight": 1.0
     },
     {
       "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_updateplayerposition",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildsidewalkpedestrians",
       "relation": "method",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1079",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_setmateotalking",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1092",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_setbaristabrewing",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1096",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_animate",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1100",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_handleresize",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1200",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_destroy",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L1209",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_setupplazalighting",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L140",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildunifiedplazaarchitecture",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L188",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_buildroadandtrafficsystem",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L270",
-      "weight": 1.0
-    },
-    {
-      "source": "src_lib_world_scene_builder_cafe3dscene",
-      "target": "src_lib_world_scene_builder_cafe3dscene_constructor",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L57",
+      "source_location": "L1104",
       "weight": 1.0
     },
     {
@@ -11297,7 +12070,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L622",
+      "source_location": "L1209",
       "weight": 1.0
     },
     {
@@ -11308,7 +12081,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L704",
+      "source_location": "L1291",
       "weight": 1.0
     },
     {
@@ -11319,7 +12092,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L768",
+      "source_location": "L1355",
       "weight": 1.0
     },
     {
@@ -11330,7 +12103,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L829",
+      "source_location": "L1416",
       "weight": 1.0
     },
     {
@@ -11341,7 +12114,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L858",
+      "source_location": "L1445",
       "weight": 1.0
     },
     {
@@ -11352,7 +12125,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L894",
+      "source_location": "L1481",
       "weight": 1.0
     },
     {
@@ -11363,7 +12136,150 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/world/scene-builder.ts",
-      "source_location": "L931",
+      "source_location": "L1518",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildhotspotmarkers",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1623",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_updateplayerposition",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1666",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_setmateotalking",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1679",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_setbaristabrewing",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1683",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_animate",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1687",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_setupplazalighting",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L170",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_handleresize",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1836",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_destroy",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L1845",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildunifiedplazaarchitecture",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L218",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildroadandtrafficsystem",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L300",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildcentralpark",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L652",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_constructor",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "src_lib_world_scene_builder_cafe3dscene",
+      "target": "src_lib_world_scene_builder_cafe3dscene_buildapartmenttowers",
+      "relation": "method",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/world/scene-builder.ts",
+      "source_location": "L900",
       "weight": 1.0
     },
     {
@@ -11428,5 +12344,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "57a4ea2a9670400485473eb4f6a774863d4b935d"
+  "built_at_commit": "7acf362df26bf1dcdd3962cdf33a8cf649eb300d"
 }

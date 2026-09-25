@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { Position3D } from "./types";
-import { computeAvatarKinematics } from "./avatar-kinematics";
 import {
   UNIFIED_PLAZA_HOTSPOTS,
   getSpawnPositionForZone,
@@ -8,11 +7,20 @@ import {
 import {
   EXPANDED_WORLD_BOUNDS,
   DAYLIGHT_CONFIG,
-  CAMERA_VIEW_CONFIG,
   ROAD_SYSTEM_CONFIG,
   CarSpec,
   computeCarPosition,
 } from "./city-expansion";
+import {
+  CHASE_CAMERA_CONFIG,
+  CENTRAL_PARK_CONFIG,
+  TOWN_FACILITIES_CONFIG,
+  DENSE_TRAFFIC_CONFIG,
+  PEDESTRIAN_CONFIG,
+  computePedestrianPosition,
+  computeHumanAvatarKinematics,
+  PedestrianSpec,
+} from "./town-park-expansion";
 
 export interface CafeSceneHooks {
   onHotspotClick?: (hotspotId: string) => void;
@@ -44,6 +52,16 @@ export class Cafe3DScene {
   private hotspotMarkers: Map<string, THREE.Group> = new Map();
   private steamParticles: THREE.Points | null = null;
   private carMeshes: { mesh: THREE.Group; spec: CarSpec; wheels: THREE.Mesh[] }[] = [];
+  private pedestrianMeshes: {
+    mesh: THREE.Group;
+    spec: PedestrianSpec;
+    leftLeg: THREE.Group;
+    rightLeg: THREE.Group;
+    leftArm: THREE.Group;
+    rightArm: THREE.Group;
+  }[] = [];
+  private cameraTargetLookAt: THREE.Vector3 = new THREE.Vector3();
+  private npcs: { mesh: THREE.Group; head: THREE.Mesh }[] = [];
 
   // Animation & Camera state
   private animationFrameId: number | null = null;
@@ -71,10 +89,10 @@ export class Cafe3DScene {
       DAYLIGHT_CONFIG.fogDensity
     );
 
-    // 2. Camera - Wide Panoramic Perspective
+    // 2. Camera - Over-The-Shoulder Chase Camera Perspective
     const aspect = canvas.clientWidth / canvas.clientHeight || 16 / 9;
     this.camera = new THREE.PerspectiveCamera(
-      CAMERA_VIEW_CONFIG.fov,
+      CHASE_CAMERA_CONFIG.fov,
       aspect,
       0.1,
       250
@@ -83,15 +101,16 @@ export class Cafe3DScene {
     const initialSpawn = getSpawnPositionForZone(placeType);
     this.targetPlayerPos = { ...initialSpawn };
     this.camera.position.set(
-      initialSpawn.x * 0.75,
-      CAMERA_VIEW_CONFIG.height,
-      initialSpawn.z * 0.45 + CAMERA_VIEW_CONFIG.zOffset
+      initialSpawn.x + CHASE_CAMERA_CONFIG.shoulderOffsetX,
+      CHASE_CAMERA_CONFIG.height,
+      initialSpawn.z - CHASE_CAMERA_CONFIG.followDistance
     );
-    this.camera.lookAt(
-      initialSpawn.x * 0.65,
-      CAMERA_VIEW_CONFIG.lookAtOffsetY,
-      initialSpawn.z * 0.25
+    this.cameraTargetLookAt.set(
+      initialSpawn.x,
+      CHASE_CAMERA_CONFIG.lookAtTargetOffsetY,
+      initialSpawn.z + CHASE_CAMERA_CONFIG.lookAtAheadDistance
     );
+    this.camera.lookAt(this.cameraTargetLookAt);
 
     // 3. WebGL Renderer
     this.renderer = new THREE.WebGLRenderer({
@@ -107,7 +126,11 @@ export class Cafe3DScene {
     // 4. Build Environment
     this.setupPlazaLighting();
     this.buildUnifiedPlazaArchitecture();
+    this.buildCentralPark();
+    this.buildApartmentTowers();
+    this.buildMultipleBusStops();
     this.buildRoadAndTrafficSystem();
+    this.buildSidewalkPedestrians();
     this.buildCafeZone();
     this.buildBusStopZone();
     this.buildAirportZone();
@@ -129,6 +152,13 @@ export class Cafe3DScene {
     this.playerMesh = this.buildPlayerAvatar();
     this.playerMesh.position.set(initialSpawn.x, 0, initialSpawn.z);
     this.scene.add(this.playerMesh);
+
+    // Persistent NPC cache to eliminate per-frame allocations in animate()
+    this.npcs = [
+      { mesh: this.mateoMesh, head: this.mateoHead },
+      { mesh: this.srinivasMesh, head: this.srinivasHead },
+      { mesh: this.elenaMesh, head: this.elenaHead },
+    ];
 
     // 6. Handle Resize
     window.addEventListener("resize", this.handleResize);
@@ -465,9 +495,9 @@ export class Cafe3DScene {
       roadGroup.add(tlGroup);
     });
 
-    // 7. Moving 3D Cars
+    // 7. Moving 3D Cars (Dense multi-vehicle fleet)
     this.carMeshes = [];
-    ROAD_SYSTEM_CONFIG.cars.forEach((carSpec) => {
+    DENSE_TRAFFIC_CONFIG.cars.forEach((carSpec) => {
       const carGroup = new THREE.Group();
       const wheels: THREE.Mesh[] = [];
 
@@ -617,6 +647,563 @@ export class Cafe3DScene {
     });
 
     this.scene.add(roadGroup);
+  }
+
+  private buildCentralPark() {
+    const parkGroup = new THREE.Group();
+    const bounds = CENTRAL_PARK_CONFIG.bounds;
+    const parkWidth = bounds.maxX - bounds.minX; // 26m
+    const parkDepth = bounds.maxZ - bounds.minZ; // 14m
+    const centerX = (bounds.minX + bounds.maxX) / 2; // 0m
+    const centerZ = (bounds.minZ + bounds.maxZ) / 2; // -2m
+
+    // 1. Lush Green Park Lawn
+    const lawnGeo = new THREE.PlaneGeometry(parkWidth, parkDepth);
+    const lawnMat = new THREE.MeshStandardMaterial({
+      color: 0x15803d, // Vibrant grass green
+      roughness: 0.85,
+    });
+    const lawn = new THREE.Mesh(lawnGeo, lawnMat);
+    lawn.rotation.x = -Math.PI / 2;
+    lawn.position.set(centerX, 0.015, centerZ);
+    lawn.receiveShadow = true;
+    parkGroup.add(lawn);
+
+    // 2. 4 Paved Crosswalk / Entrance Walkways to universal blocks
+    const pathMat = new THREE.MeshStandardMaterial({
+      color: 0x94a3b8, // Slate cobblestone paver
+      roughness: 0.75,
+    });
+
+    // North Entrance Path (to Cedar Court Apartments)
+    const northPathGeo = new THREE.PlaneGeometry(3.0, parkDepth / 2 - 1.0);
+    const northPath = new THREE.Mesh(northPathGeo, pathMat);
+    northPath.rotation.x = -Math.PI / 2;
+    northPath.position.set(centerX, 0.018, centerZ - parkDepth / 4 - 0.5);
+    northPath.receiveShadow = true;
+    parkGroup.add(northPath);
+
+    // South Entrance Path (to Transit Boulevard Crosswalk)
+    const southPathGeo = new THREE.PlaneGeometry(3.0, parkDepth / 2 - 1.0);
+    const southPath = new THREE.Mesh(southPathGeo, pathMat);
+    southPath.rotation.x = -Math.PI / 2;
+    southPath.position.set(centerX, 0.018, centerZ + parkDepth / 4 + 0.5);
+    southPath.receiveShadow = true;
+    parkGroup.add(southPath);
+
+    // West Entrance Path (to High Street & Café)
+    const westPathGeo = new THREE.PlaneGeometry(parkWidth / 2 - 1.5, 3.0);
+    const westPath = new THREE.Mesh(westPathGeo, pathMat);
+    westPath.rotation.x = -Math.PI / 2;
+    westPath.position.set(centerX - parkWidth / 4 - 0.75, 0.018, centerZ);
+    westPath.receiveShadow = true;
+    parkGroup.add(westPath);
+
+    // East Entrance Path (to Airport Terminal & Gates)
+    const eastPathGeo = new THREE.PlaneGeometry(parkWidth / 2 - 1.5, 3.0);
+    const eastPath = new THREE.Mesh(eastPathGeo, pathMat);
+    eastPath.rotation.x = -Math.PI / 2;
+    eastPath.position.set(centerX + parkWidth / 4 + 0.75, 0.018, centerZ);
+    eastPath.receiveShadow = true;
+    parkGroup.add(eastPath);
+
+    // 3. Central Pond
+    const pondSpec = CENTRAL_PARK_CONFIG.pond;
+    const pondGeo = new THREE.CircleGeometry(pondSpec.radius, 32);
+    const pondMat = new THREE.MeshStandardMaterial({
+      color: pondSpec.colorHex,
+      roughness: 0.1,
+      metalness: 0.25,
+    });
+    const pond = new THREE.Mesh(pondGeo, pondMat);
+    pond.rotation.x = -Math.PI / 2;
+    pond.position.set(pondSpec.x, 0.022, pondSpec.z);
+    pond.receiveShadow = true;
+    parkGroup.add(pond);
+
+    // Stone Rim around Pond
+    const rimGeo = new THREE.RingGeometry(pondSpec.radius, pondSpec.radius + 0.35, 32);
+    const rimMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.9 });
+    const rim = new THREE.Mesh(rimGeo, rimMat);
+    rim.rotation.x = -Math.PI / 2;
+    rim.position.set(pondSpec.x, 0.023, pondSpec.z);
+    rim.receiveShadow = true;
+    parkGroup.add(rim);
+
+    // Decorative water fountain nozzle in pond center
+    const nozzleGeo = new THREE.CylinderGeometry(0.12, 0.18, 0.45, 8);
+    const nozzleMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8 });
+    const nozzle = new THREE.Mesh(nozzleGeo, nozzleMat);
+    nozzle.position.set(pondSpec.x, 0.22, pondSpec.z);
+    parkGroup.add(nozzle);
+
+    // 4. Park Trees
+    CENTRAL_PARK_CONFIG.trees.forEach((tree) => {
+      const treeGroup = new THREE.Group();
+      treeGroup.position.set(tree.x, 0, tree.z);
+
+      // Trunk
+      const trunkHeight = tree.height * 0.45;
+      const trunkGeo = new THREE.CylinderGeometry(0.18, 0.26, trunkHeight, 8);
+      const trunkMat = new THREE.MeshStandardMaterial({ color: 0x451a03, roughness: 0.9 });
+      const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+      trunk.position.y = trunkHeight / 2;
+      trunk.castShadow = true;
+      treeGroup.add(trunk);
+
+      // Tier 1 Foliage
+      const fol1Height = tree.height * 0.55;
+      const fol1Geo = new THREE.ConeGeometry(tree.radius, fol1Height, 8);
+      const fol1Mat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.8 });
+      const fol1 = new THREE.Mesh(fol1Geo, fol1Mat);
+      fol1.position.y = trunkHeight + fol1Height * 0.4;
+      fol1.castShadow = true;
+      treeGroup.add(fol1);
+
+      // Tier 2 Foliage
+      const fol2Height = tree.height * 0.45;
+      const fol2Geo = new THREE.ConeGeometry(tree.radius * 0.72, fol2Height, 8);
+      const fol2Mat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.8 });
+      const fol2 = new THREE.Mesh(fol2Geo, fol2Mat);
+      fol2.position.y = trunkHeight + fol1Height * 0.75;
+      fol2.castShadow = true;
+      treeGroup.add(fol2);
+
+      parkGroup.add(treeGroup);
+    });
+
+    // 5. Playground Structures (Swings & Slide)
+    const playSpec = CENTRAL_PARK_CONFIG.playground;
+    const playGroup = new THREE.Group();
+    playGroup.position.set(playSpec.x, 0, playSpec.z);
+
+    const swingMetalMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.7 });
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.7 });
+
+    // A-frame side posts
+    const postGeo = new THREE.CylinderGeometry(0.06, 0.06, 2.5, 8);
+    const postL1 = new THREE.Mesh(postGeo, swingMetalMat);
+    postL1.position.set(-1.4, 1.2, 0.4);
+    postL1.rotation.z = -0.15;
+    playGroup.add(postL1);
+
+    const postL2 = new THREE.Mesh(postGeo, swingMetalMat);
+    postL2.position.set(-1.4, 1.2, -0.4);
+    postL2.rotation.z = -0.15;
+    playGroup.add(postL2);
+
+    const postR1 = new THREE.Mesh(postGeo, swingMetalMat);
+    postR1.position.set(1.4, 1.2, 0.4);
+    postR1.rotation.z = 0.15;
+    playGroup.add(postR1);
+
+    const postR2 = new THREE.Mesh(postGeo, swingMetalMat);
+    postR2.position.set(1.4, 1.2, -0.4);
+    postR2.rotation.z = 0.15;
+    playGroup.add(postR2);
+
+    // Crossbar
+    const crossbarGeo = new THREE.CylinderGeometry(0.06, 0.06, 3.2, 8);
+    const crossbar = new THREE.Mesh(crossbarGeo, swingMetalMat);
+    crossbar.rotation.z = Math.PI / 2;
+    crossbar.position.set(0, 2.4, 0);
+    playGroup.add(crossbar);
+
+    // Two hanging seats
+    [-0.6, 0.6].forEach((sx) => {
+      const seatRopeGeo = new THREE.CylinderGeometry(0.015, 0.015, 1.6, 6);
+      const ropeMat = new THREE.MeshStandardMaterial({ color: 0xd4d4d8 });
+      const ropeL = new THREE.Mesh(seatRopeGeo, ropeMat);
+      ropeL.position.set(sx - 0.15, 1.5, 0);
+      playGroup.add(ropeL);
+
+      const ropeR = new THREE.Mesh(seatRopeGeo, ropeMat);
+      ropeR.position.set(sx + 0.15, 1.5, 0);
+      playGroup.add(ropeR);
+
+      const seatGeo = new THREE.BoxGeometry(0.4, 0.05, 0.2);
+      const seat = new THREE.Mesh(seatGeo, woodMat);
+      seat.position.set(sx, 0.68, 0);
+      playGroup.add(seat);
+    });
+
+    // Playground Slide
+    const slideGroup = new THREE.Group();
+    slideGroup.position.set(3.2, 0, 0);
+
+    const platGeo = new THREE.BoxGeometry(1.0, 0.1, 1.0);
+    const platMat = new THREE.MeshStandardMaterial({ color: 0x0284c7 });
+    const platform = new THREE.Mesh(platGeo, platMat);
+    platform.position.set(0, 1.5, 0);
+    slideGroup.add(platform);
+
+    [-0.45, 0.45].forEach((lx) => {
+      [-0.45, 0.45].forEach((lz) => {
+        const legPGeo = new THREE.CylinderGeometry(0.04, 0.04, 1.5, 8);
+        const legP = new THREE.Mesh(legPGeo, swingMetalMat);
+        legP.position.set(lx, 0.75, lz);
+        slideGroup.add(legP);
+      });
+    });
+
+    const chuteGeo = new THREE.BoxGeometry(0.65, 0.06, 2.4);
+    const chuteMat = new THREE.MeshStandardMaterial({
+      color: 0xef4444, // Red Madrid slide
+      roughness: 0.2,
+      metalness: 0.3,
+    });
+    const chute = new THREE.Mesh(chuteGeo, chuteMat);
+    chute.rotation.x = Math.PI / 4.8;
+    chute.position.set(0, 0.75, 1.2);
+    slideGroup.add(chute);
+
+    const ladderGeo = new THREE.BoxGeometry(0.5, 1.6, 0.08);
+    const ladder = new THREE.Mesh(ladderGeo, woodMat);
+    ladder.rotation.x = -Math.PI / 8;
+    ladder.position.set(0, 0.75, -0.7);
+    slideGroup.add(ladder);
+
+    playGroup.add(slideGroup);
+    parkGroup.add(playGroup);
+
+    // 6. Park Benches
+    CENTRAL_PARK_CONFIG.benches.forEach((benchSpec) => {
+      const benchGroup = new THREE.Group();
+      benchGroup.position.set(benchSpec.x, 0, benchSpec.z);
+      benchGroup.rotation.y = benchSpec.rotationY;
+
+      const benchSeatGeo = new THREE.BoxGeometry(1.6, 0.08, 0.45);
+      const benchSeat = new THREE.Mesh(benchSeatGeo, woodMat);
+      benchSeat.position.set(0, 0.45, 0);
+      benchSeat.castShadow = true;
+      benchGroup.add(benchSeat);
+
+      const backGeo = new THREE.BoxGeometry(1.6, 0.35, 0.06);
+      const back = new THREE.Mesh(backGeo, woodMat);
+      back.position.set(0, 0.72, -0.2);
+      back.castShadow = true;
+      benchGroup.add(back);
+
+      [-0.7, 0.7].forEach((bx) => {
+        const blegGeo = new THREE.BoxGeometry(0.06, 0.45, 0.4);
+        const bleg = new THREE.Mesh(blegGeo, swingMetalMat);
+        bleg.position.set(bx, 0.22, 0);
+        benchGroup.add(bleg);
+      });
+
+      parkGroup.add(benchGroup);
+    });
+
+    this.scene.add(parkGroup);
+  }
+
+  private buildApartmentTowers() {
+    const towersGroup = new THREE.Group();
+
+    TOWN_FACILITIES_CONFIG.apartmentTowers.forEach((towerSpec) => {
+      const tower = new THREE.Group();
+      tower.position.set(towerSpec.x, 0, towerSpec.z);
+
+      // 1. Tower Body
+      const bodyGeo = new THREE.BoxGeometry(
+        towerSpec.width,
+        towerSpec.height,
+        towerSpec.depth
+      );
+      const bodyMat = new THREE.MeshStandardMaterial({
+        color: towerSpec.facadeColorHex,
+        roughness: 0.7,
+        metalness: 0.2,
+      });
+      const body = new THREE.Mesh(bodyGeo, bodyMat);
+      body.position.y = towerSpec.height / 2;
+      body.castShadow = true;
+      body.receiveShadow = true;
+      tower.add(body);
+
+      // 2. Architectural Floor Belts / Slabs
+      const slabMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.5 });
+      for (let f = 1; f < towerSpec.floors; f++) {
+        const floorY = (f * towerSpec.height) / towerSpec.floors;
+        const slabGeo = new THREE.BoxGeometry(
+          towerSpec.width + 0.4,
+          0.25,
+          towerSpec.depth + 0.4
+        );
+        const slab = new THREE.Mesh(slabGeo, slabMat);
+        slab.position.y = floorY;
+        slab.castShadow = true;
+        tower.add(slab);
+      }
+
+      // 3. Window Grid across Front Facade
+      const winGeo = new THREE.PlaneGeometry(1.1, 1.2);
+      const winMat = new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        emissive: 0xfef08a,
+        emissiveIntensity: 0.45,
+        roughness: 0.1,
+      });
+
+      for (let row = 1; row <= towerSpec.windowGridRows; row++) {
+        const rowY = ((row - 0.5) * towerSpec.height) / towerSpec.floors;
+        for (let col = 0; col < towerSpec.windowGridCols; col++) {
+          const colX =
+            -towerSpec.width / 2 +
+            (towerSpec.width / (towerSpec.windowGridCols + 1)) * (col + 1);
+
+          const win = new THREE.Mesh(winGeo, winMat);
+          win.position.set(colX, rowY, towerSpec.depth / 2 + 0.02);
+          tower.add(win);
+        }
+      }
+
+      // 4. Balconies with Railings
+      const balconyMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8 });
+      for (let f = 2; f < towerSpec.floors; f += 2) {
+        const balcY = (f * towerSpec.height) / towerSpec.floors;
+        const balcGeo = new THREE.BoxGeometry(towerSpec.width * 0.65, 0.15, 1.2);
+        const balc = new THREE.Mesh(balcGeo, slabMat);
+        balc.position.set(0, balcY, towerSpec.depth / 2 + 0.6);
+        tower.add(balc);
+
+        const railGeo = new THREE.BoxGeometry(towerSpec.width * 0.65, 0.65, 0.05);
+        const rail = new THREE.Mesh(railGeo, balconyMat);
+        rail.position.set(0, balcY + 0.35, towerSpec.depth / 2 + 1.2);
+        tower.add(rail);
+      }
+
+      // 5. Grand Ground-Floor Lobby Entrance
+      const lobbyCanopyGeo = new THREE.BoxGeometry(4.2, 0.2, 2.0);
+      const canopy = new THREE.Mesh(lobbyCanopyGeo, balconyMat);
+      canopy.position.set(0, 3.2, towerSpec.depth / 2 + 1.0);
+      tower.add(canopy);
+
+      const doorGeo = new THREE.PlaneGeometry(2.4, 2.8);
+      const doorMat = new THREE.MeshStandardMaterial({
+        color: 0x0284c7,
+        roughness: 0.1,
+        metalness: 0.5,
+      });
+      const door = new THREE.Mesh(doorGeo, doorMat);
+      door.position.set(0, 1.4, towerSpec.depth / 2 + 0.03);
+      tower.add(door);
+
+      // Lobby Entrance Warm Light
+      const lobbyLightGeo = new THREE.SphereGeometry(0.18, 8, 8);
+      const lobbyLightMat = new THREE.MeshStandardMaterial({
+        color: 0xfef08a,
+        emissive: 0xfef08a,
+        emissiveIntensity: 0.95,
+      });
+      const lobbyLight = new THREE.Mesh(lobbyLightGeo, lobbyLightMat);
+      lobbyLight.position.set(0, 3.0, towerSpec.depth / 2 + 0.9);
+      tower.add(lobbyLight);
+
+      // 6. Rooftop Parapet and Architectural Trim
+      const roofParapetGeo = new THREE.BoxGeometry(
+        towerSpec.width + 0.2,
+        0.8,
+        towerSpec.depth + 0.2
+      );
+      const roofParapet = new THREE.Mesh(roofParapetGeo, slabMat);
+      roofParapet.position.y = towerSpec.height + 0.4;
+      tower.add(roofParapet);
+
+      // Rooftop Utility / Elevator Penthouse
+      const penthouseGeo = new THREE.BoxGeometry(4.0, 2.2, 3.5);
+      const penthouse = new THREE.Mesh(penthouseGeo, bodyMat);
+      penthouse.position.set(0, towerSpec.height + 1.1, 0);
+      tower.add(penthouse);
+
+      // Roof Antenna Mast
+      const antennaGeo = new THREE.CylinderGeometry(0.04, 0.08, 4.5, 6);
+      const antenna = new THREE.Mesh(antennaGeo, balconyMat);
+      antenna.position.set(1.2, towerSpec.height + 3.2, 0);
+      tower.add(antenna);
+
+      towersGroup.add(tower);
+    });
+
+    this.scene.add(towersGroup);
+  }
+
+  private buildMultipleBusStops() {
+    const busStopsGroup = new THREE.Group();
+
+    TOWN_FACILITIES_CONFIG.busStops.forEach((stopSpec) => {
+      if (stopSpec.x === 0) return; // avoid duplicating central shelter
+
+      const stop = new THREE.Group();
+      stop.position.set(stopSpec.x, 0, stopSpec.z);
+
+      const steelMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8 });
+      const glassMat = new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.4,
+        roughness: 0.1,
+      });
+      const canopyMat = new THREE.MeshStandardMaterial({
+        color: stopSpec.shelterColorHex,
+        roughness: 0.4,
+      });
+
+      // 2 Pillars
+      [-1.8, 1.8].forEach((px) => {
+        const pillarGeo = new THREE.CylinderGeometry(0.06, 0.06, 2.8, 8);
+        const pillar = new THREE.Mesh(pillarGeo, steelMat);
+        pillar.position.set(px, 1.4, -0.9);
+        pillar.castShadow = true;
+        stop.add(pillar);
+      });
+
+      // Glass Back Panel
+      const backGlassGeo = new THREE.BoxGeometry(3.6, 2.2, 0.05);
+      const backGlass = new THREE.Mesh(backGlassGeo, glassMat);
+      backGlass.position.set(0, 1.3, -0.9);
+      stop.add(backGlass);
+
+      // Curved Canopy
+      const roofGeo = new THREE.BoxGeometry(4.2, 0.12, 2.2);
+      const roof = new THREE.Mesh(roofGeo, canopyMat);
+      roof.position.set(0, 2.8, 0);
+      roof.castShadow = true;
+      stop.add(roof);
+
+      // Waiting Bench
+      const benchGeo = new THREE.BoxGeometry(2.8, 0.08, 0.5);
+      const benchMat = new THREE.MeshStandardMaterial({ color: 0x78350f, roughness: 0.7 });
+      const bench = new THREE.Mesh(benchGeo, benchMat);
+      bench.position.set(0, 0.45, -0.5);
+      bench.castShadow = true;
+      stop.add(bench);
+
+      // Totem Signpost with Route badge
+      const totemGeo = new THREE.BoxGeometry(0.3, 2.6, 0.08);
+      const totem = new THREE.Mesh(totemGeo, steelMat);
+      totem.position.set(2.4, 1.3, -0.2);
+      stop.add(totem);
+
+      const signGeo = new THREE.BoxGeometry(0.8, 0.5, 0.1);
+      const signMat = new THREE.MeshStandardMaterial({
+        color: stopSpec.shelterColorHex,
+        emissive: stopSpec.shelterColorHex,
+        emissiveIntensity: 0.25,
+      });
+      const sign = new THREE.Mesh(signGeo, signMat);
+      sign.position.set(2.4, 2.3, -0.2);
+      stop.add(sign);
+
+      busStopsGroup.add(stop);
+    });
+
+    this.scene.add(busStopsGroup);
+  }
+
+  private buildSidewalkPedestrians() {
+    const pedGroup = new THREE.Group();
+
+    PEDESTRIAN_CONFIG.pedestrians.forEach((pedSpec) => {
+      const ped = new THREE.Group();
+
+      const shirtMat = new THREE.MeshStandardMaterial({
+        color: pedSpec.shirtColorHex,
+        roughness: 0.6,
+      });
+      const pantsMat = new THREE.MeshStandardMaterial({
+        color: pedSpec.pantsColorHex,
+        roughness: 0.8,
+      });
+      const skinMat = new THREE.MeshStandardMaterial({
+        color: 0xfcd34d,
+        roughness: 0.5,
+      });
+      const shoeMat = new THREE.MeshStandardMaterial({
+        color: 0x0f172a,
+        roughness: 0.9,
+      });
+
+      // Torso
+      const torsoGeo = new THREE.CylinderGeometry(0.24, 0.2, 0.65, 12);
+      const torso = new THREE.Mesh(torsoGeo, shirtMat);
+      torso.position.y = 0.92;
+      torso.castShadow = true;
+      ped.add(torso);
+
+      // Head
+      const headGeo = new THREE.SphereGeometry(0.18, 12, 12);
+      const head = new THREE.Mesh(headGeo, skinMat);
+      head.position.y = 1.45;
+      head.castShadow = true;
+      ped.add(head);
+
+      // Hair / Hat
+      const hairGeo = new THREE.SphereGeometry(0.19, 12, 12);
+      const hairMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
+      const hair = new THREE.Mesh(hairGeo, hairMat);
+      hair.position.set(0, 1.5, -0.02);
+      ped.add(hair);
+
+      // Left Leg Pivot
+      const leftLegPivot = new THREE.Group();
+      leftLegPivot.position.set(-0.12, 0.6, 0);
+      const legGeo = new THREE.CylinderGeometry(0.08, 0.07, 0.55, 8);
+      const leftLeg = new THREE.Mesh(legGeo, pantsMat);
+      leftLeg.position.y = -0.27;
+      leftLeg.castShadow = true;
+      leftLegPivot.add(leftLeg);
+
+      const footGeo = new THREE.BoxGeometry(0.12, 0.08, 0.2);
+      const leftFoot = new THREE.Mesh(footGeo, shoeMat);
+      leftFoot.position.set(0, -0.52, 0.05);
+      leftLegPivot.add(leftFoot);
+      ped.add(leftLegPivot);
+
+      // Right Leg Pivot
+      const rightLegPivot = new THREE.Group();
+      rightLegPivot.position.set(0.12, 0.6, 0);
+      const rightLeg = new THREE.Mesh(legGeo, pantsMat);
+      rightLeg.position.y = -0.27;
+      rightLeg.castShadow = true;
+      rightLegPivot.add(rightLeg);
+
+      const rightFoot = new THREE.Mesh(footGeo, shoeMat);
+      rightFoot.position.set(0, -0.52, 0.05);
+      rightLegPivot.add(rightFoot);
+      ped.add(rightLegPivot);
+
+      // Left Arm Pivot
+      const leftArmPivot = new THREE.Group();
+      leftArmPivot.position.set(-0.3, 1.15, 0);
+      const armGeo = new THREE.CylinderGeometry(0.06, 0.05, 0.45, 8);
+      const leftArm = new THREE.Mesh(armGeo, shirtMat);
+      leftArm.position.y = -0.22;
+      leftArmPivot.add(leftArm);
+      ped.add(leftArmPivot);
+
+      // Right Arm Pivot
+      const rightArmPivot = new THREE.Group();
+      rightArmPivot.position.set(0.3, 1.15, 0);
+      const rightArm = new THREE.Mesh(armGeo, shirtMat);
+      rightArm.position.y = -0.22;
+      rightArmPivot.add(rightArm);
+      ped.add(rightArmPivot);
+
+      ped.position.set(pedSpec.startX, 0, pedSpec.z);
+      pedGroup.add(ped);
+
+      this.pedestrianMeshes.push({
+        mesh: ped,
+        spec: pedSpec,
+        leftLeg: leftLegPivot,
+        rightLeg: rightLegPivot,
+        leftArm: leftArmPivot,
+        rightArm: rightArmPivot,
+      });
+    });
+
+    this.scene.add(pedGroup);
   }
 
   private buildCafeZone() {
@@ -1114,7 +1701,24 @@ export class Cafe3DScene {
       });
     });
 
-    // 1. Smoothly interpolate player mesh to target position
+    // 1. Update Sidewalk Footpath Pedestrians
+    this.pedestrianMeshes.forEach(({ mesh, spec, leftLeg, rightLeg, leftArm, rightArm }) => {
+      const pPos = computePedestrianPosition(spec, elapsed);
+      mesh.position.x = pPos.x;
+      mesh.position.z = pPos.z;
+      mesh.rotation.y = pPos.rotationY;
+
+      // Reciprocal walking limb swings
+      const walkCycle = elapsed * spec.speed * 4.5;
+      const legSwing = Math.sin(walkCycle) * 0.45;
+      leftLeg.rotation.x = legSwing;
+      rightLeg.rotation.x = -legSwing;
+      leftArm.rotation.x = -legSwing * 0.7;
+      rightArm.rotation.x = legSwing * 0.7;
+      mesh.position.y = Math.abs(Math.sin(walkCycle)) * 0.03;
+    });
+
+    // 2. Smoothly interpolate player mesh to target position
     this.playerMesh.position.x = THREE.MathUtils.lerp(
       this.playerMesh.position.x,
       this.targetPlayerPos.x,
@@ -1126,53 +1730,85 @@ export class Cafe3DScene {
       0.25
     );
 
-    // Smooth rotation
-    this.playerMesh.rotation.y = THREE.MathUtils.lerp(
-      this.playerMesh.rotation.y,
-      this.playerRotation,
-      0.2
-    );
+    // Smooth shortest-arc rotation
+    let rotDiff = this.playerRotation - this.playerMesh.rotation.y;
+    rotDiff = Math.atan2(Math.sin(rotDiff), Math.cos(rotDiff));
+    this.playerMesh.rotation.y += rotDiff * 0.2;
 
-    // 2. Kinematic limb animations (swings legs & arms in opposition + stride bob)
-    const kin = computeAvatarKinematics(this.isPlayerWalking, elapsed, 4.0);
+    // 3. Natural Human Avatar Kinematics (stride bounce, lateral weight-transfer sway, breathing bob)
+    const kin = computeHumanAvatarKinematics(this.isPlayerWalking, 1.0, elapsed);
     if (this.leftLegPivot) this.leftLegPivot.rotation.x = kin.leftLegRotX;
     if (this.rightLegPivot) this.rightLegPivot.rotation.x = kin.rightLegRotX;
     if (this.leftArmPivot) this.leftArmPivot.rotation.x = kin.leftArmRotX;
     if (this.rightArmPivot) this.rightArmPivot.rotation.x = kin.rightArmRotX;
-    this.playerMesh.position.y = kin.bounceY;
+    this.playerMesh.rotation.z = THREE.MathUtils.lerp(
+      this.playerMesh.rotation.z,
+      kin.torsoRollSway,
+      0.2
+    );
+    this.playerMesh.position.y = kin.strideBounceY + kin.breathingY;
 
-    // 3. Wide Panoramic Camera Follow across 100m grand district
-    const targetCamX = this.playerMesh.position.x * 0.75;
-    const targetCamZ = this.playerMesh.position.z * 0.45 + CAMERA_VIEW_CONFIG.zOffset;
+    // 4. Dynamic Over-The-Shoulder Chase Camera Tracking Behind Avatar (10° to 15° Downward Pitch)
+    const rotY = this.playerMesh.rotation.y;
+    const fwdX = Math.sin(rotY);
+    const fwdZ = Math.cos(rotY);
+    const rightX = Math.cos(rotY);
+    const rightZ = -Math.sin(rotY);
+
+    const targetCamX =
+      this.playerMesh.position.x -
+      fwdX * CHASE_CAMERA_CONFIG.followDistance +
+      rightX * CHASE_CAMERA_CONFIG.shoulderOffsetX;
+    const targetCamY = CHASE_CAMERA_CONFIG.height;
+    const targetCamZ =
+      this.playerMesh.position.z -
+      fwdZ * CHASE_CAMERA_CONFIG.followDistance +
+      rightZ * CHASE_CAMERA_CONFIG.shoulderOffsetX;
+
     this.camera.position.x = THREE.MathUtils.lerp(
       this.camera.position.x,
       targetCamX,
-      CAMERA_VIEW_CONFIG.smoothLerp
+      CHASE_CAMERA_CONFIG.smoothFollowLerp
     );
     this.camera.position.y = THREE.MathUtils.lerp(
       this.camera.position.y,
-      CAMERA_VIEW_CONFIG.height,
-      0.05
+      targetCamY,
+      0.08
     );
     this.camera.position.z = THREE.MathUtils.lerp(
       this.camera.position.z,
       targetCamZ,
-      CAMERA_VIEW_CONFIG.smoothLerp
-    );
-    this.camera.lookAt(
-      this.playerMesh.position.x * 0.65,
-      CAMERA_VIEW_CONFIG.lookAtOffsetY,
-      this.playerMesh.position.z * 0.25
+      CHASE_CAMERA_CONFIG.smoothFollowLerp
     );
 
-    // 4. NPC Look-At Behaviors
-    const npcs = [
-      { mesh: this.mateoMesh, head: this.mateoHead },
-      { mesh: this.srinivasMesh, head: this.srinivasHead },
-      { mesh: this.elenaMesh, head: this.elenaHead },
-    ];
+    const targetLookX =
+      this.playerMesh.position.x +
+      fwdX * CHASE_CAMERA_CONFIG.lookAtAheadDistance;
+    const targetLookY = CHASE_CAMERA_CONFIG.lookAtTargetOffsetY;
+    const targetLookZ =
+      this.playerMesh.position.z +
+      fwdZ * CHASE_CAMERA_CONFIG.lookAtAheadDistance;
 
-    npcs.forEach(({ mesh, head }) => {
+    this.cameraTargetLookAt.x = THREE.MathUtils.lerp(
+      this.cameraTargetLookAt.x,
+      targetLookX,
+      CHASE_CAMERA_CONFIG.smoothLookAtLerp
+    );
+    this.cameraTargetLookAt.y = THREE.MathUtils.lerp(
+      this.cameraTargetLookAt.y,
+      targetLookY,
+      0.08
+    );
+    this.cameraTargetLookAt.z = THREE.MathUtils.lerp(
+      this.cameraTargetLookAt.z,
+      targetLookZ,
+      CHASE_CAMERA_CONFIG.smoothLookAtLerp
+    );
+
+    this.camera.lookAt(this.cameraTargetLookAt);
+
+    // 4. NPC Look-At Behaviors (zero GC overhead using cached this.npcs)
+    this.npcs.forEach(({ mesh, head }) => {
       if (!mesh || !head) return;
       const dist = mesh.position.distanceTo(this.playerMesh.position);
       if (dist < 7.0) {
@@ -1213,12 +1849,14 @@ export class Cafe3DScene {
     window.removeEventListener("resize", this.handleResize);
 
     this.scene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        obj.geometry?.dispose();
+      if ("geometry" in obj && obj.geometry && typeof (obj.geometry as THREE.BufferGeometry).dispose === "function") {
+        (obj.geometry as THREE.BufferGeometry).dispose();
+      }
+      if ("material" in obj && obj.material) {
         if (Array.isArray(obj.material)) {
-          obj.material.forEach((m) => m.dispose());
-        } else if (obj.material) {
-          obj.material.dispose();
+          obj.material.forEach((m) => m?.dispose?.());
+        } else if (typeof (obj.material as THREE.Material).dispose === "function") {
+          (obj.material as THREE.Material).dispose();
         }
       }
     });

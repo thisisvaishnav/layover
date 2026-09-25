@@ -10,7 +10,7 @@ import {
   computeHumanAvatarKinematics,
   MAPLE_HOLLOW_DISTRICT_BLOCKS,
 } from "../src/lib/world/town-park-expansion";
-import { UNIFIED_PLAZA_BOUNDS, getZoneFromPosition } from "../src/lib/world/unified-plaza";
+import { getZoneFromPosition } from "../src/lib/world/unified-plaza";
 
 test("TDD [Camera Angle & Pitch]: Over-the-shoulder chase camera maintains 10° to 15° downward pitch", () => {
   // Downward pitch angle must be between 10 and 15 degrees
