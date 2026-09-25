@@ -9,6 +9,7 @@ import {
   ONBOARDING_COUNTRIES,
   DEFAULT_STARTING_PLACE,
 } from "@/scenarios/catalog";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 
 export default function UnifiedFlowHomePage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function UnifiedFlowHomePage() {
   const [targetLang, setTargetLang] = useState<string>("es");
   const [nativeLang, setNativeLang] = useState<string>("en");
   const [soundOn, setSoundOn] = useState<boolean>(true);
+  const [isStarting, setIsStarting] = useState<boolean>(false);
 
   const toggleSound = () => {
     const next = !soundOn;
@@ -26,6 +28,7 @@ export default function UnifiedFlowHomePage() {
   };
 
   const handleLaunchGame = () => {
+    setIsStarting(true);
     retroAudio.play1Up();
     setTimeout(() => {
       router.push(
@@ -33,11 +36,18 @@ export default function UnifiedFlowHomePage() {
           targetLang
         )}&native=${encodeURIComponent(nativeLang)}`
       );
-    }, 200);
+    }, 400);
   };
 
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col font-sans selection:bg-black selection:text-white">
+    <>
+      <LoadingScreen
+        isLoading={isStarting}
+        targetLang={targetLang}
+        nativeLang={nativeLang}
+        placeType={DEFAULT_STARTING_PLACE}
+      />
+      <div className="min-h-screen bg-white text-black flex flex-col font-sans selection:bg-black selection:text-white">
       {/* Two-color minimal header */}
       <header className="w-full border-b border-black px-6 py-4 sticky top-0 bg-white z-50">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
@@ -189,5 +199,6 @@ export default function UnifiedFlowHomePage() {
         </div>
       </main>
     </div>
+    </>
   );
 }

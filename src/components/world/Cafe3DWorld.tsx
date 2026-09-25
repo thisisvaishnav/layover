@@ -19,12 +19,12 @@ import { Hotspot, Position3D } from "@/lib/world/types";
 import { useGameStore } from "@/lib/game/store";
 import { HotspotPrompt } from "./HotspotPrompt";
 import { InteractiveLearningModal } from "./InteractiveLearningModal";
+import { MinimapHUD, MinimapHUDHandle } from "./MinimapHUD";
 import {
   ArrowUp,
   ArrowDown,
   ArrowLeft,
   ArrowRight,
-  Sparkles,
 } from "lucide-react";
 
 interface Cafe3DWorldProps {
@@ -38,6 +38,7 @@ interface Cafe3DWorldProps {
   targetLang?: string;
   nativeLang?: string;
   hideControlsOverlay?: boolean;
+  onSceneReady?: () => void;
 }
 
 export function Cafe3DWorld({
@@ -46,24 +47,37 @@ export function Cafe3DWorld({
   onSimulateSpeech,
   isVoiceActive,
   className,
-  scenarioName = "Transit Plaza · Walkable 3D",
+  scenarioName: _scenarioName = "Transit Plaza · Walkable 3D",
   placeType = "cafe",
   targetLang = "es",
   nativeLang = "en",
   hideControlsOverlay = false,
+  onSceneReady,
 }: Cafe3DWorldProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sceneRef = useRef<Cafe3DScene | null>(null);
   const controlsRef = useRef<WorldControlsManager | null>(null);
+  const minimapRef = useRef<MinimapHUDHandle | null>(null);
 
   // Player position state - spawn at chosen zone
   const initialSpawn = getSpawnPositionForZone(placeType);
   const playerPosRef = useRef<Position3D>({ ...initialSpawn });
   const [activeHotspot, setActiveHotspot] = useState<Hotspot | null>(null);
   const [isDialogueOpen, setIsDialogueOpen] = useState(false);
+  const isDialogueOpenRef = useRef(isDialogueOpen);
+
+  useEffect(() => {
+    isDialogueOpenRef.current = isDialogueOpen;
+  }, [isDialogueOpen]);
+
   const [currentZone, setCurrentZone] = useState<string>("cafe");
 
   const { baristaAction } = useGameStore();
+
+  const onSceneReadyRef = useRef(onSceneReady);
+  useEffect(() => {
+    onSceneReadyRef.current = onSceneReady;
+  }, [onSceneReady]);
 
   // Open interactive learning dialogue modal
   const handleOpenDialogue = useCallback(() => {
@@ -75,7 +89,14 @@ export function Cafe3DWorld({
     if (!canvasRef.current) return;
 
     // 1. Initialize 3D Scene in unified mode
-    const scene = new Cafe3DScene(canvasRef.current, placeType);
+    const scene = new Cafe3DScene(canvasRef.current, placeType, {
+      onPlayerMove: (pos, rot) => {
+        minimapRef.current?.updatePlayer(pos, rot);
+      },
+      onReady: () => {
+        onSceneReadyRef.current?.();
+      },
+    });
     sceneRef.current = scene;
 
     // 2. Initialize Keyboard Controls Manager (Arrow keys + WASD)
@@ -99,7 +120,7 @@ export function Cafe3DWorld({
       lastTime = now;
 
       // Don't move avatar while dialogue modal is open so typing/spacebar doesn't trigger movement
-      if (isDialogueOpen) {
+      if (isDialogueOpenRef.current) {
         scene.updatePlayerPosition(playerPosRef.current, false, 0, 0);
         return;
       }
@@ -121,6 +142,7 @@ export function Cafe3DWorld({
       );
 
       playerPosRef.current = newPos;
+      // updatePlayerPosition forwards position & heading to onPlayerMove hook for MinimapHUD
       scene.updatePlayerPosition(newPos, isWalking, dir.x, dir.z);
 
       // Track active zone
@@ -141,7 +163,7 @@ export function Cafe3DWorld({
       sceneRef.current = null;
       controlsRef.current = null;
     };
-  }, [handleOpenDialogue, isDialogueOpen, placeType]);
+  }, [handleOpenDialogue, placeType]);
 
   // Sync Barista animation with game store
   useEffect(() => {
@@ -245,6 +267,9 @@ export function Cafe3DWorld({
           onTalk={handleOpenDialogue}
         />
       )}
+
+      {/* Bottom Left: Live Minimap / City Radar HUD */}
+      <MinimapHUD ref={minimapRef} currentZone={currentZone} />
 
       {/* Bottom Right: Touch / Screen Directional Controls (Moveable with Arrow Keys or buttons) */}
       <div className="absolute bottom-4 right-4 z-10 flex flex-col items-center gap-1 bg-stone-900/80 backdrop-blur-md border border-stone-800 p-2 rounded-2xl shadow-2xl">
