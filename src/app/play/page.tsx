@@ -26,8 +26,13 @@ import { DESTINATIONS } from "@/scenarios/catalog";
 function PlayGameContent() {
   const searchParams = useSearchParams();
 
-  const destId = searchParams.get("destination") || "spain-madrid-cafe";
-  const matchedDest = DESTINATIONS.find((d) => d.id === destId) || DESTINATIONS[0];
+  const destId = searchParams.get("destination") || searchParams.get("place") || "cafe";
+  const targetLang = searchParams.get("lang") || searchParams.get("target") || "es";
+  const nativeLang = searchParams.get("native") || searchParams.get("from") || "ja";
+
+  const matchedDest =
+    DESTINATIONS.find((d) => d.id === destId || d.placeType === destId) || DESTINATIONS[0];
+  const placeType = destId;
 
   const {
     status,
@@ -73,30 +78,33 @@ function PlayGameContent() {
           onSimulateSpeech={simulateSpeech}
           isVoiceActive={status === "connected" || status === "ready"}
           className="w-full h-full"
-          scenarioName={`${matchedDest.name} · ${matchedDest.city} 3D`}
+          scenarioName="Metro Transit Plaza · Walkable 3D"
+          placeType={placeType}
+          targetLang={targetLang}
+          nativeLang={nativeLang}
         />
       </div>
 
       {/* 2. Top Floating Navigation Bar */}
       <header className="absolute top-4 inset-x-4 z-20 pointer-events-none flex items-center justify-between gap-3">
-        {/* Left: Back to Dashboard & Destination Identity */}
+        {/* Left: Back to Places & Destination Identity */}
         <div className="pointer-events-auto flex items-center gap-2">
           <Link
-            href="/"
+            href="/places"
             className="px-3.5 py-2 rounded-2xl bg-stone-950/80 hover:bg-stone-900 border border-stone-800 backdrop-blur-md text-stone-300 hover:text-stone-100 text-xs font-bold transition-all flex items-center gap-2 shadow-xl active:scale-95"
-            title="Volver al Tablero de Salidas"
+            title="Back to Places Map"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Tablero de Salidas</span>
+            <ArrowLeft className="w-3.5 h-3.5 text-[#ffcc00]" />
+            <span className="hidden sm:inline">Places</span>
           </Link>
 
           <div className="bg-stone-950/80 backdrop-blur-md border border-stone-800 rounded-2xl px-3.5 py-2 shadow-xl flex items-center gap-2 text-xs font-semibold">
-            <span className="text-base">{matchedDest.flag}</span>
+            <span className="text-base">{matchedDest.bossIcon || matchedDest.flag}</span>
             <span className="font-bold text-stone-100 hidden sm:inline">
               {matchedDest.name}
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">
-              Nivel {level}
+            <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#e52521] text-white font-arcade">
+              {matchedDest.worldCode || `LEVEL ${level}`}
             </span>
           </div>
         </div>
@@ -135,13 +143,13 @@ function PlayGameContent() {
             }
             className={`px-3 py-2 rounded-2xl border backdrop-blur-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-xl active:scale-95 cursor-pointer ${
               activePanel === "objectives"
-                ? "bg-amber-500 text-stone-950 border-amber-400"
+                ? "bg-[#ffcc00] text-black border-black shadow-[2px_2px_0px_#000]"
                 : "bg-stone-950/80 hover:bg-stone-900 border-stone-800 text-stone-300"
             }`}
-            title="Misiones del Nivel"
+            title="Stage Quests"
           >
             <Trophy className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Misiones</span>
+            <span className="hidden sm:inline">Quests</span>
           </button>
 
           {/* Ticket / Order Receipt Button */}
@@ -151,13 +159,13 @@ function PlayGameContent() {
             }
             className={`px-3 py-2 rounded-2xl border backdrop-blur-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-xl active:scale-95 cursor-pointer ${
               activePanel === "receipt"
-                ? "bg-amber-500 text-stone-950 border-amber-400"
+                ? "bg-[#ffcc00] text-black border-black shadow-[2px_2px_0px_#000]"
                 : "bg-stone-950/80 hover:bg-stone-900 border-stone-800 text-stone-300"
             }`}
-            title="Ver Ticket de Pedido"
+            title="Order Receipt"
           >
             <Receipt className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Ticket</span>
+            <span className="hidden sm:inline">Order</span>
           </button>
 
           {/* Transcript Log Button */}
@@ -167,10 +175,10 @@ function PlayGameContent() {
             }
             className={`px-3 py-2 rounded-2xl border backdrop-blur-md text-xs font-bold transition-all flex items-center gap-1.5 shadow-xl active:scale-95 cursor-pointer ${
               activePanel === "transcript"
-                ? "bg-amber-500 text-stone-950 border-amber-400"
+                ? "bg-[#ffcc00] text-black border-black shadow-[2px_2px_0px_#000]"
                 : "bg-stone-950/80 hover:bg-stone-900 border-stone-800 text-stone-300"
             }`}
-            title="Transcripción de Voz"
+            title="Voice Transcript"
           >
             <MessageSquare className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Chat</span>

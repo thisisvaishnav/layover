@@ -24,3 +24,122 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 🎮 Mario Retro Pixel Styles */
+.font-arcade {
+  font-family: 'Press Start 2P', monospace, cursive;
+}
+
+.font-silkscreen {
+  font-family: 'Silkscreen', monospace, cursive;
+}
+
+/* Pixel borders and shadows */
+.mario-box {
+  border: 4px solid #000;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.mario-box-lg {
+  border: 4px solid #000;
+  box-shadow: 6px 6px 0px #000;
+}
+
+.mario-box-sm {
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0px #000;
+}
+
+.mario-btn {
+  border: 4px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.mario-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+.mario-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+/* Mario Question Block styling */
+.mario-block-q {
+  background: linear-gradient(180deg, #ffcc00 0%, #e69100 100%);
+  border: 4px solid #000;
+  box-shadow: inset -4px -4px 0px #9e5b00, inset 4px 4px 0px #ffe57f, 4px 4px 0px #000;
+}
+
+/* Mario Green Warp Pipe styling */
+.mario-pipe-rim {
+  background: linear-gradient(90deg, #008800 0%, #00cc00 30%, #55ff55 45%, #00aa00 70%, #005500 100%);
+  border: 4px solid #000;
+  box-shadow: 4px 4px 0px #000;
+}
+
+/* Mario Brick styling */
+.mario-brick {
+  background: #c84c0c;
+  background-image: 
+    linear-gradient(335deg, #000 2px, transparent 2px),
+    linear-gradient(155deg, #882200 2px, transparent 2px),
+    linear-gradient(335deg, #000 2px, transparent 2px),
+    linear-gradient(155deg, #882200 2px, transparent 2px);
+  background-size: 20px 20px;
+  background-position: 0px 2px, 2px 10px, 10px 12px, 12px 20px;
+}
+
+/* Mario Cloud float animation */
+@keyframes marioFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.mario-float {
+  animation: marioFloat 3s ease-in-out infinite;
+}
+
+/* Mario Coin Spin animation */
+@keyframes coinSpin {
+  0% {
+    transform: scaleX(1);
+  }
+  25% {
+    transform: scaleX(0.2);
+  }
+  50% {
+    transform: scaleX(1);
+  }
+  75% {
+    transform: scaleX(0.2);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.mario-coin {
+  display: inline-block;
+  animation: coinSpin 1.4s infinite ease-in-out;
+}
+
+/* Retro text blink */
+@keyframes arcadeBlink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0.15;
+  }
+}
+
+.arcade-blink {
+  animation: arcadeBlink 1.2s infinite;
+}

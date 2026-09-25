@@ -10,14 +10,21 @@ interface HotspotPromptProps {
 }
 
 export function HotspotPrompt({ hotspot, onInteract, onTalk }: HotspotPromptProps) {
-  const isMateo = hotspot.id === "barista_mateo";
+  const isNpc =
+    !!hotspot.npcName ||
+    hotspot.id.includes("mateo") ||
+    hotspot.id.includes("cashier") ||
+    hotspot.id.includes("agent") ||
+    hotspot.id.includes("concierge") ||
+    hotspot.id.includes("pharmacist") ||
+    hotspot.id.includes("host");
 
   return (
     <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 w-[92%] max-w-md pointer-events-auto animate-in slide-in-from-bottom-3 duration-200">
       <div className="bg-stone-900/95 border border-amber-500/40 rounded-2xl p-3.5 shadow-2xl backdrop-blur-md flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-            {isMateo ? (
+            {isNpc ? (
               <MessageCircle className="w-5 h-5 text-amber-400 animate-pulse" />
             ) : (
               <Sparkles className="w-5 h-5 text-amber-400" />
@@ -35,7 +42,7 @@ export function HotspotPrompt({ hotspot, onInteract, onTalk }: HotspotPromptProp
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          {isMateo && onTalk && (
+          {isNpc && onTalk && (
             <button
               onClick={onTalk}
               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1 active:scale-95"
@@ -49,7 +56,7 @@ export function HotspotPrompt({ hotspot, onInteract, onTalk }: HotspotPromptProp
             onClick={onInteract}
             className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1 active:scale-95"
           >
-            <span>{isMateo ? "Ver Frases [E]" : "Explorar [E]"}</span>
+            <span>{isNpc ? "Ver Frases [E]" : "Explorar [E]"}</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>

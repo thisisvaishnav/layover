@@ -36,5 +36,5 @@ export interface Hotspot {
   spanishPhrases: string[];
   vocabulary: VocabularyItem[];
   culturalNote: string;
-  iconName: "coffee" | "croissant" | "book-open" | "credit-card" | "utensils";
+  iconName: "coffee" | "croissant" | "book-open" | "credit-card" | "utensils" | "shopping-cart" | "plane" | "hotel" | "pill" | "sparkles";
 }
