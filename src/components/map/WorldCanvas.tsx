@@ -8,8 +8,7 @@ import {
   createPlayerState,
   setPlayerDestination,
   updatePlayerMovement,
-  updatePlayerKeyboard,
-  updatePlayerMouseAim,
+  updatePlayerMovementState,
   type PlayerState,
   type KeyboardInput,
   type Vector2D,
@@ -59,12 +58,14 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     z: number;
     isMoving: boolean;
     movementState: string;
+    movementMode: string;
     plotsCount: number;
   }>({
     x: Math.round(initX * 10) / 10,
     z: Math.round(initZ * 10) / 10,
     isMoving: false,
     movementState: "IDLE",
+    movementMode: "FREE_ROAM",
     plotsCount: 16,
   });
 
@@ -188,8 +189,11 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       hasPointer = true;
       isDragging = false;
 
-      // Right-click or middle-click or Shift+Click triggers camera orbit
-      if (event.button === 2 || event.button === 1 || event.shiftKey) {
+      // Right-click triggers aiming mode and camera orbit
+      if (event.button === 2) {
+        isRightDrag = true;
+        keyboardInput.aiming = true;
+      } else if (event.button === 1 || event.shiftKey) {
         isRightDrag = true;
       } else {
         isRightDrag = false;
@@ -213,6 +217,10 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     };
 
     const handlePointerUp = (event: MouseEvent) => {
+      if (event.button === 2) {
+        keyboardInput.aiming = false;
+      }
+
       const isCanvas = event.target === renderer.domElement;
       if (!isCanvas || (event.target as HTMLElement).closest("button")) {
         isDragging = false;
@@ -341,6 +349,7 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       keyboardInput.backward = false;
       keyboardInput.left = false;
       keyboardInput.right = false;
+      keyboardInput.aiming = false;
       hasPointer = false;
       cursorAimIndicator.hide();
     };
@@ -398,23 +407,24 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
         );
       }
 
-      // Update subtle ground direction indicator
-      if (cursorGroundPos) {
+      // Aim reticle indicator: only displayed during AIMING mode
+      if (keyboardInput.aiming && cursorGroundPos) {
         cursorAimIndicator.show(cursorGroundPos);
+        cursorAimIndicator.update(deltaSeconds);
       } else {
         cursorAimIndicator.hide();
       }
-      cursorAimIndicator.update(deltaSeconds);
 
-      // Update movement: keyboard controller takes highest priority and uses mouse-direction
-      if (hasKeyboardActive) {
-        playerState = updatePlayerKeyboard(
+      const horizontalSpeed = Math.hypot(playerState.velocity.x, playerState.velocity.z);
+
+      // Update movement: GTA San Andreas Camera-Relative Locomotion & Aiming
+      if (hasKeyboardActive || keyboardInput.aiming || horizontalSpeed > 0.05) {
+        playerState = updatePlayerMovementState(
           playerState,
           keyboardInput,
+          cameraController.camera,
           deltaSeconds,
-          mapData.bounds,
-          0.8,
-          cursorGroundPos
+          mapData.bounds
         );
         destinationIndicator.hide();
       } else if (playerState.isMoving && playerState.target) {
@@ -423,12 +433,13 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
           destinationIndicator.hide();
         }
       } else {
-        // When not moving via keyboard or click, mouse continuously controls player facing direction
-        if (cursorGroundPos) {
-          playerState = updatePlayerMouseAim(playerState, cursorGroundPos, deltaSeconds);
-        }
         if (playerState.isMoving && !playerState.target) {
-          playerState = { ...playerState, movementState: "IDLE", isMoving: false };
+          playerState = {
+            ...playerState,
+            movementState: "IDLE",
+            isMoving: false,
+            velocity: { x: 0, y: playerState.verticalVelocity, z: 0 },
+          };
         }
       }
 
@@ -463,13 +474,15 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
         const roundedZ = Math.round(playerState.position.z * 10) / 10;
         const moving = playerState.isMoving;
         const mState = playerState.movementState;
+        const mMode = playerState.movementMode ?? (keyboardInput.aiming ? "AIMING" : "FREE_ROAM");
 
         setHudState((prev) => {
           if (
             prev.x === roundedX &&
             prev.z === roundedZ &&
             prev.isMoving === moving &&
-            prev.movementState === mState
+            prev.movementState === mState &&
+            prev.movementMode === mMode
           ) {
             return prev;
           }
@@ -478,6 +491,7 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
             z: roundedZ,
             isMoving: moving,
             movementState: mState,
+            movementMode: mMode,
             plotsCount: mapData.plots.length,
           };
         });
@@ -585,32 +599,43 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       <div className="absolute bottom-6 left-6 pointer-events-none z-20 flex flex-col gap-2">
         <div className="pointer-events-auto bg-white/95 backdrop-blur border border-black/20 px-4 py-3 shadow-md max-w-md flex flex-col gap-2">
           <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wide text-black border-b border-black/10 pb-1.5">
-            <span>Mouse-Direction Controls</span>
-            <span
-              className={`px-2 py-0.5 text-[10px] font-mono uppercase ${
-                hudState.movementState === "MOVING"
-                  ? "bg-blue-100 text-blue-800 font-bold"
-                  : "bg-slate-100 text-slate-600"
-              }`}
-            >
-              {hudState.movementState === "MOVING" ? "Moving" : "Idle"}
-            </span>
+            <span>GTA Locomotion</span>
+            <div className="flex items-center gap-1.5">
+              <span
+                className={`px-2 py-0.5 text-[10px] font-mono uppercase ${
+                  hudState.movementMode === "AIMING"
+                    ? "bg-amber-100 text-amber-800 font-bold"
+                    : "bg-emerald-100 text-emerald-800 font-bold"
+                }`}
+              >
+                {hudState.movementMode}
+              </span>
+              <span
+                className={`px-2 py-0.5 text-[10px] font-mono uppercase ${
+                  hudState.movementState === "MOVING"
+                    ? "bg-blue-100 text-blue-800 font-bold"
+                    : "bg-slate-100 text-slate-600"
+                }`}
+              >
+                {hudState.movementState === "MOVING" ? "Moving" : "Idle"}
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-black/80 font-mono">
-            <div><strong className="text-black font-bold">▲ / W</strong> Toward Cursor</div>
-            <div><strong className="text-black font-bold">▼ / S</strong> Away From Cursor</div>
-            <div><strong className="text-black font-bold">◄ / A</strong> Strafe Left</div>
-            <div><strong className="text-black font-bold">► / D</strong> Strafe Right</div>
+            <div><strong className="text-black font-bold">▲ / W</strong> Cam Forward</div>
+            <div><strong className="text-black font-bold">▼ / S</strong> Cam Backward</div>
+            <div><strong className="text-black font-bold">◄ / A</strong> Turn / Strafe L</div>
+            <div><strong className="text-black font-bold">► / D</strong> Turn / Strafe R</div>
             <div className="col-span-2 pt-1 border-t border-black/10 text-[11px] text-black/70 font-sans">
-              <strong className="font-semibold text-black">Mouse:</strong> Aim / Face Direction · <strong className="font-semibold text-black">Click:</strong> Walk To Point · <strong className="font-semibold text-black">Wheel:</strong> Zoom
+              <strong className="font-semibold text-black">Hold Right Mouse:</strong> Aim & Strafe · <strong className="font-semibold text-black">Right Drag:</strong> Orbit · <strong className="font-semibold text-black">Click:</strong> Walk To Point
             </div>
           </div>
 
           <div className="flex items-center gap-4 text-[11px] font-mono text-black/60 pt-1 border-t border-black/10">
             <span>Pos X: <strong className="text-black font-semibold">{hudState.x}</strong></span>
             <span>Pos Z: <strong className="text-black font-semibold">{hudState.z}</strong></span>
-            <span>State: <strong className="text-black font-semibold">{hudState.movementState}</strong></span>
+            <span>Mode: <strong className="text-black font-semibold">{hudState.movementMode}</strong></span>
           </div>
         </div>
       </div>

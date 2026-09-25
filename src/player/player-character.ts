@@ -115,8 +115,8 @@ export function createPlayerCharacter(): PlayerCharacter {
   return {
     group,
     update(state: PlayerState, deltaSeconds: number) {
-      // 1. Update 3D world position (X and Z on ground plane y = 0)
-      group.position.set(state.position.x, 0, state.position.z);
+      // 1. Update 3D world position (X, Y with gravity, and Z)
+      group.position.set(state.position.x, state.position.y ?? 0, state.position.z);
 
       // 2. Update rotation around Y axis
       group.rotation.y = state.rotation;

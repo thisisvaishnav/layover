@@ -406,3 +406,45 @@ test("TDD 24: Ground detection works correctly and clamps to surface", () => {
   assert.equal(result.isGrounded, true, "Player should be grounded");
   assert.ok(result.verticalVelocity <= 0, "Vertical velocity remains small downward stick value");
 });
+
+// ==========================================
+// 7. HELPER FUNCTIONS & ANIMATION DATA
+// ==========================================
+
+test("TDD 25: getCameraHorizontalVectors projects camera onto XZ plane and computes yaw", () => {
+  const camera = createTestCamera({ x: 0, y: 15, z: -20 }, { x: 0, y: 1.4, z: 0 });
+  const vectors = getCameraHorizontalVectors(camera);
+
+  assert.ok(vectors.forward.z > 0.99, "Camera forward vector should point North (+Z)");
+  assert.ok(Math.abs(vectors.forward.x) < 0.05, "Camera forward X should be ~0");
+  assert.ok(vectors.right.x > 0.99, "Camera right vector should point East (+X)");
+  assert.ok(Math.abs(vectors.yaw - 0) < 0.05, "Camera yaw should be ~0");
+});
+
+test("TDD 26: getCameraRelativeDirection converts input to normalized world direction", () => {
+  const camera = createTestCamera({ x: 0, y: 15, z: -20 }, { x: 0, y: 1.4, z: 0 });
+  const inputDiag: KeyboardInput = { forward: true, backward: false, left: false, right: true };
+  const dir = getCameraRelativeDirection(inputDiag, camera);
+
+  assert.ok(dir !== null, "Direction must not be null for active input");
+  assert.ok(dir.x > 0, "X should be positive for right input");
+  assert.ok(dir.z > 0, "Z should be positive for forward input");
+  assert.ok(Math.abs(Math.hypot(dir.x, dir.z) - 1.0) < 1e-4, "Direction vector must be normalized unit length");
+});
+
+test("TDD 27: getAnimationData exposes blend tree data including speed, isAiming, and move axes", () => {
+  const testState: PlayerState = createPlayerState({
+    velocity: { x: 3, y: 0, z: 4 },
+    speed: 5,
+    isAiming: true,
+    isMoving: true,
+  });
+  const input: KeyboardInput = { forward: true, backward: false, left: true, right: false, aiming: true };
+  const anim = getAnimationData(testState, input);
+
+  assert.equal(anim.isAiming, true);
+  assert.equal(anim.isMoving, true);
+  assert.ok(Math.abs(anim.speed - 5) < 0.1, "Speed should match hypot(3, 4) = 5");
+  assert.ok(anim.moveX < 0, "moveX should be negative for left strafe");
+  assert.ok(anim.moveY > 0, "moveY should be positive for forward move");
+});
