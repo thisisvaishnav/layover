@@ -1,25 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import * as THREE from "three";
 import { generateMap } from "../src/map/map-generator";
 import {
   createPlayerState,
   updatePlayerKeyboard,
-  updatePlayerMovement,
-  setPlayerDestination,
-  clampPositionToBounds,
-  calculateRotation,
-  shortestAngleDiff,
-  type PlayerState,
   type KeyboardInput,
 } from "../src/player/movement-controller";
 import {
   worldToMinimap,
+  minimapToWorld,
   playerRotationToMinimapHeading,
   isInsideMinimapCircle,
   clampToMinimapCircle,
-  MINIMAP_DEFAULT_CONFIG,
-  type MinimapPoint2D,
 } from "../src/map/minimap-math";
 import {
   createCameraController,
@@ -27,6 +19,7 @@ import {
   MAX_CAMERA_DISTANCE,
   DEFAULT_CAMERA_DISTANCE,
 } from "../src/camera/camera-controller";
+import * as THREE from "three";
 
 // ==========================================
 // 1. PLAYER CONTROLS — RESPONSIVENESS & STATES
@@ -288,45 +281,53 @@ test("TDD [Minimap Bounds]: Correctly tests and clamps coordinates to circular b
 // 7. CAMERA POLISH — PERSPECTIVE, FOLLOW & ZOOM
 // ==========================================
 
-test("TDD [Camera Perspective]: Uses comfortable elevated third-person/isometric angle without extreme pitch", () => {
+test("TDD [Camera Perspective]: Uses comfortable elevated perspective framing character in lower-middle third", () => {
   const controller = createCameraController(1280, 800, { x: 0, z: 0 });
 
-  // Verify camera distance defaults to comfortable zoomed-out distance
-  assert.ok(DEFAULT_CAMERA_DISTANCE >= 25 && DEFAULT_CAMERA_DISTANCE <= 45, `Default distance (${DEFAULT_CAMERA_DISTANCE}) should be comfortably zoomed out`);
+  // Verify camera distance defaults to comfortable Medium preset (~22m)
+  assert.ok(DEFAULT_CAMERA_DISTANCE >= 18 && DEFAULT_CAMERA_DISTANCE <= 30, `Default distance (${DEFAULT_CAMERA_DISTANCE}) should be Medium preset`);
 
   // Update camera at origin
   controller.update({ x: 0, z: 0 }, 0.1);
 
   // Check camera height and elevation angle
   const camPos = controller.camera.position;
-  const horizDist = Math.hypot(camPos.x, camPos.z);
-  const pitchAngle = Math.atan2(camPos.y - 1.35, horizDist);
-  const pitchDegrees = (pitchAngle * 180) / Math.PI;
-
-  // Must be between 25° and 55°: elevated third-person/isometric, NOT horizontal (7°) and NOT top-down (80°)
-  assert.ok(
-    pitchDegrees >= 25 && pitchDegrees <= 55,
-    `Camera angle (${pitchDegrees.toFixed(1)}°) must be a comfortable elevated isometric perspective (25° - 55°)`
-  );
+  assert.ok(camPos.y >= 6.0 && camPos.y <= 12.0, `Medium preset camera height should be elevated, got ${camPos.y.toFixed(2)}m`);
 });
 
-test("TDD [Camera Zoom Bounds]: Manual zoom is strictly bounded between MIN and MAX distance", () => {
+test("TDD [On Foot Presets]: Sits at shoulder-to-head height (1.5-1.7m) for close preset and elevates dynamically", () => {
   const controller = createCameraController(1280, 800, { x: 0, z: 0 });
 
-  assert.ok(MIN_CAMERA_DISTANCE >= 12 && MIN_CAMERA_DISTANCE <= 20, "MIN_CAMERA_DISTANCE must prevent extreme close-up");
-  assert.ok(MAX_CAMERA_DISTANCE >= 55 && MAX_CAMERA_DISTANCE <= 90, "MAX_CAMERA_DISTANCE must prevent extreme far view");
+  assert.ok(MIN_CAMERA_DISTANCE >= 4.0 && MIN_CAMERA_DISTANCE <= 7.0, "MIN_CAMERA_DISTANCE corresponds to Close preset");
+  assert.ok(MAX_CAMERA_DISTANCE >= 50 && MAX_CAMERA_DISTANCE <= 75, "MAX_CAMERA_DISTANCE must prevent extreme far view");
 
-  // Attempt extreme zoom in
-  controller.setZoom(0.01);
+  // 1. Close Preset: zoom to minimum distance
+  controller.zoomBy(-100); // Zoom in to minimum
   for (let i = 0; i < 30; i++) controller.update({ x: 0, z: 0 }, 0.1);
-  const closeCamDist = Math.hypot(controller.camera.position.x, controller.camera.position.z);
-  assert.ok(closeCamDist >= MIN_CAMERA_DISTANCE * 0.7, "Camera must not zoom closer than MIN limit");
 
-  // Attempt extreme zoom out
-  controller.setZoom(10.0);
+  const closeHeight = controller.camera.position.y;
+  assert.ok(
+    closeHeight >= 1.5 && closeHeight <= 1.75,
+    `Close preset height must sit at shoulder-to-head height (~1.5m to 1.7m), got ${closeHeight.toFixed(2)}m`
+  );
+
+  // 2. Medium Preset: default zoom
+  controller.resetOrbit();
   for (let i = 0; i < 30; i++) controller.update({ x: 0, z: 0 }, 0.1);
-  const farCamDist = Math.hypot(controller.camera.position.x, controller.camera.position.z);
-  assert.ok(farCamDist <= MAX_CAMERA_DISTANCE * 1.3, "Camera must not zoom farther than MAX limit");
+  const mediumHeight = controller.camera.position.y;
+  assert.ok(
+    mediumHeight > closeHeight + 4.0,
+    `Medium preset height (${mediumHeight.toFixed(2)}m) must dynamically elevate from close (${closeHeight.toFixed(2)}m)`
+  );
+
+  // 3. Far Preset: zoom to maximum distance
+  controller.zoomBy(100); // Zoom out to maximum
+  for (let i = 0; i < 30; i++) controller.update({ x: 0, z: 0 }, 0.1);
+  const farHeight = controller.camera.position.y;
+  assert.ok(
+    farHeight > mediumHeight + 10.0,
+    `Far preset height (${farHeight.toFixed(2)}m) must dynamically elevate from medium (${mediumHeight.toFixed(2)}m)`
+  );
 });
 
 test("TDD [Camera Stability]: Walking does NOT automatically zoom the camera in or out", () => {
@@ -351,3 +352,53 @@ test("TDD [Camera Stability]: Walking does NOT automatically zoom the camera in 
     `Relative camera distance while walking (${distWalking.toFixed(2)}) must match idle distance (${distIdle.toFixed(2)})`
   );
 });
+
+test("TDD [Minimap Inversion]: Correctly maps minimap pixel coordinates back to 3D world coordinates", () => {
+  const map = generateMap();
+  const originalWorld = { x: 35.5, z: -28.0 };
+  const minimapPt = worldToMinimap(originalWorld, map.bounds, 90, 8, 1.0);
+  const reconstructedWorld = minimapToWorld(minimapPt, map.bounds, 90, 8, 1.0);
+
+  assert.ok(
+    Math.abs(reconstructedWorld.x - originalWorld.x) < 0.1,
+    `Reconstructed X (${reconstructedWorld.x}) should match original (${originalWorld.x})`
+  );
+  assert.ok(
+    Math.abs(reconstructedWorld.z - originalWorld.z) < 0.1,
+    `Reconstructed Z (${reconstructedWorld.z}) should match original (${originalWorld.z})`
+  );
+});
+
+test("TDD [Camera Obstacle Clearance]: Pulls camera closer when obstacle is between camera and player", () => {
+  const controller = createCameraController(1280, 800, { x: 0, z: 0 });
+
+  // Update without obstacles first
+  for (let i = 0; i < 30; i++) controller.update({ x: 0, z: 0 }, 0.1);
+  const unobstructedDistance = Math.hypot(
+    controller.camera.position.x,
+    controller.camera.position.y - 1.62,
+    controller.camera.position.z
+  );
+
+  // Place a tall obstacle directly behind the player where the camera sits
+  // At default orbitYaw=0, camera is at -Z (South) looking North towards (0, 0, 0)
+  const obstacleGeo = new THREE.BoxGeometry(10, 20, 4);
+  const obstacleMat = new THREE.MeshBasicMaterial();
+  const obstacleMesh = new THREE.Mesh(obstacleGeo, obstacleMat);
+  obstacleMesh.position.set(0, 10, -8);
+  obstacleMesh.updateMatrixWorld(true);
+
+  // Update with obstacle in collisionObjects
+  controller.update({ x: 0, z: 0 }, 0.1, 0, [obstacleMesh]);
+  const obstructedDistance = Math.hypot(
+    controller.camera.position.x,
+    controller.camera.position.y - 1.62,
+    controller.camera.position.z
+  );
+
+  assert.ok(
+    obstructedDistance < unobstructedDistance - 2.0,
+    `Obstructed camera distance (${obstructedDistance.toFixed(2)}) must be closer than unobstructed (${unobstructedDistance.toFixed(2)}) to avoid clipping`
+  );
+});
+

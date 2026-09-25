@@ -4,6 +4,7 @@ import type { GeneratedMap, PlotData } from "./map-generator";
 export interface MapMeshSystem {
   group: THREE.Group;
   clickableObjects: THREE.Object3D[];
+  obstacleObjects: THREE.Object3D[];
   dispose(): void;
 }
 
@@ -19,6 +20,7 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
   group.name = "MapGridSystem";
 
   const clickableObjects: THREE.Object3D[] = [];
+  const obstacleObjects: THREE.Object3D[] = [];
   const geometries: THREE.BufferGeometry[] = [];
   const materials: THREE.Material[] = [];
 
@@ -162,6 +164,11 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
       buildPortPlot(plot, plotGroup);
     } else {
       buildBuildingPlot(plot, plotGroup);
+      plotGroup.traverse((child) => {
+        if (child instanceof THREE.Mesh && !child.name.endsWith("-surface") && !child.name.endsWith("-curb")) {
+          obstacleObjects.push(child);
+        }
+      });
     }
 
     group.add(plotGroup);
@@ -616,6 +623,7 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
   return {
     group,
     clickableObjects,
+    obstacleObjects,
     dispose() {
       for (const geo of geometries) {
         geo.dispose();

@@ -7,6 +7,7 @@ import {
   worldToMinimap,
   playerRotationToMinimapHeading,
   clampToMinimapCircle,
+  MINIMAP_DEFAULT_CONFIG,
 } from "../../map/minimap-math";
 
 export interface MinimapHUDProps {
@@ -14,6 +15,8 @@ export interface MinimapHUDProps {
   playerPosition?: Vector2D;
   playerRotation?: number;
   playerStateRef?: React.RefObject<{ position: Vector2D; rotation: number }>;
+  radius?: number;
+  padding?: number;
   initialScale?: number;
   onScaleChange?: (newScale: number) => void;
 }
@@ -32,6 +35,8 @@ export default function MinimapHUD({
   playerPosition = { x: 0, z: 0 },
   playerRotation = 0,
   playerStateRef,
+  radius = 96,
+  padding = MINIMAP_DEFAULT_CONFIG.padding,
   initialScale = 1.0,
   onScaleChange,
 }: MinimapHUDProps) {
@@ -43,23 +48,16 @@ export default function MinimapHUD({
     z: Math.round(playerPosition.z),
   });
 
-  const radius = 96; // 192px circular HUD
-  const padding = 10;
-
   const handleZoomIn = () => {
-    setScale((prev) => {
-      const next = Math.min(2.0, Math.round((prev + 0.2) * 10) / 10);
-      onScaleChange?.(next);
-      return next;
-    });
+    const next = Math.min(2.0, Math.round((scale + 0.2) * 10) / 10);
+    setScale(next);
+    onScaleChange?.(next);
   };
 
   const handleZoomOut = () => {
-    setScale((prev) => {
-      const next = Math.max(0.7, Math.round((prev - 0.2) * 10) / 10);
-      onScaleChange?.(next);
-      return next;
-    });
+    const next = Math.max(0.7, Math.round((scale - 0.2) * 10) / 10);
+    setScale(next);
+    onScaleChange?.(next);
   };
 
   // 1. Pre-render static base map (roads, buildings, park, port) whenever mapData or scale changes
@@ -345,10 +343,9 @@ export default function MinimapHUD({
           renderMinimapFrame(cur.position, cur.rotation);
           throttleCounter++;
           if (throttleCounter % 15 === 0) {
-            setCoords({
-              x: Math.round(cur.position.x),
-              z: Math.round(cur.position.z),
-            });
+            const nx = Math.round(cur.position.x);
+            const nz = Math.round(cur.position.z);
+            setCoords((prev) => (prev.x === nx && prev.z === nz ? prev : { x: nx, z: nz }));
           }
         }
         animId = requestAnimationFrame(loop);

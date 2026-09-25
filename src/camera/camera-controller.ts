@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import type { Vector2D } from "../player/movement-controller";
 
-export const DEFAULT_CAMERA_DISTANCE = 34.0; // Comfortable zoomed-out third-person/isometric view
-export const MIN_CAMERA_DISTANCE = 16.0;    // Close limit preventing awkward clipping or occlusion
-export const MAX_CAMERA_DISTANCE = 65.0;    // Far limit preventing player from becoming a speck
-export const DEFAULT_PITCH_ANGLE = 0.65;    // ~37.2°: stable elevated isometric/third-person perspective
+// GTA V On Foot Presets: Close (shoulder-to-head height), Medium, Far
+export const MIN_CAMERA_DISTANCE = 5.0;       // Close preset: sits at shoulder-to-head height (1.5m to 1.7m)
+export const DEFAULT_CAMERA_DISTANCE = 22.0;   // Medium preset: dynamically elevated framing character in lower-middle third
+export const MAX_CAMERA_DISTANCE = 55.0;       // Far preset: elevated overview of city environment
 
 export interface CameraController {
   camera: THREE.PerspectiveCamera;
@@ -30,12 +30,36 @@ export interface CameraConfig {
 }
 
 /**
- * Stable elevated third-person / isometric camera controller.
- * - Elevated angle (~37°) providing clear view of player, roads, park, and buildings.
- * - Frame-rate independent smooth following without shaking, snapping, or whipping.
+ * Computes on-foot camera elevation and pitch.
+ * - Sits at roughly shoulder-to-head height for closest preset (~1.62m, between 1.5m and 1.7m).
+ * - Dynamically elevates as you zoom out to keep character framed in lower-middle third of screen.
+ */
+export function computeCameraElevation(
+  dist: number,
+  pitchOffset: number = 0
+): { height: number; pitch: number; horizDist: number } {
+  const minDist = MIN_CAMERA_DISTANCE;
+  const maxDist = MAX_CAMERA_DISTANCE;
+  const t = Math.max(0, Math.min(1, (dist - minDist) / (maxDist - minDist)));
+
+  // Close sits at shoulder-to-head height (~1.62m) with slight downward look (~4.6°)
+  // Dynamically elevates up to ~39° as distance expands
+  const basePitch = 0.08 + Math.pow(t, 0.7) * 0.60;
+  const effectivePitch = Math.max(0.04, Math.min(1.05, basePitch + pitchOffset));
+  const height = 1.62 + (dist - minDist) * Math.sin(effectivePitch);
+  const horizDist = dist * Math.cos(effectivePitch);
+
+  return { height, pitch: effectivePitch, horizDist };
+}
+
+/**
+ * GTA V-style third-person on-foot camera controller with dynamic elevation.
+ * - Close preset: sits at shoulder-to-head height (1.5m - 1.7m).
+ * - Medium / Far presets: dynamically elevates to frame character in lower-middle third.
+ * - Frame-rate independent smooth following without shaking or lag.
  * - Zero automatic walking zoom — camera distance stays completely stable during movement.
- * - Manual mouse-wheel zoom bounded strictly between MIN and MAX distance.
- * - Simple obstacle clearance test to avoid clipping through building meshes.
+ * - Manual mouse-wheel zoom bounded strictly between MIN (5.0m) and MAX (55.0m).
+ * - Obstacle collision clearance preventing camera clipping through buildings.
  */
 export function createCameraController(
   width: number,
@@ -43,16 +67,15 @@ export function createCameraController(
   initialPosition: Vector2D = { x: 0, z: 0 },
   config?: CameraConfig
 ): CameraController {
-  const fov = config?.fov ?? 52;
+  const fov = config?.fov ?? 54;
   const aspect = width > 0 && height > 0 ? width / height : 1;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, 0.5, 900);
+  const camera = new THREE.PerspectiveCamera(fov, aspect, 0.4, 900);
 
   const defaultDistance = config?.baseDistance ?? DEFAULT_CAMERA_DISTANCE;
   let targetDistance = defaultDistance;
   let currentDistance = defaultDistance;
 
-  const basePitch = config?.basePitch ?? DEFAULT_PITCH_ANGLE;
-  let orbitPitch = basePitch;
+  let pitchOffset = 0;
   let orbitYaw = config?.baseYaw ?? 0; // Fixed stable south-to-north view looking into the city
 
   // Target follows upper chest/shoulders
@@ -64,14 +87,17 @@ export function createCameraController(
   const rayDir = new THREE.Vector3();
 
   // Initial placement
-  const initHoriz = currentDistance * Math.cos(orbitPitch);
-  const initHeight = currentDistance * Math.sin(orbitPitch);
+  const initialProfile = computeCameraElevation(currentDistance, pitchOffset);
   camera.position.set(
-    currentTarget.x - Math.sin(orbitYaw) * initHoriz,
-    currentTarget.y + initHeight,
-    currentTarget.z - Math.cos(orbitYaw) * initHoriz
+    currentTarget.x - Math.sin(orbitYaw) * initialProfile.horizDist,
+    initialProfile.height,
+    currentTarget.z - Math.cos(orbitYaw) * initialProfile.horizDist
   );
-  camera.lookAt(currentTarget.x, currentTarget.y + 0.3, currentTarget.z);
+  camera.lookAt(
+    currentTarget.x,
+    currentTarget.y + (initialProfile.height - 1.62) * 0.08,
+    currentTarget.z
+  );
 
   return {
     camera,
@@ -90,42 +116,40 @@ export function createCameraController(
       const zoomRate = 1 - Math.exp(-8.0 * Math.min(deltaSeconds, 0.1));
       currentDistance += (targetDistance - currentDistance) * zoomRate;
 
-      // 3. Compute spherical third-person camera position
+      // 3. Compute dynamic on-foot elevation
       let effectiveDistance = currentDistance;
 
       // 4. Simple camera collision prevention against building meshes
       if (collisionObjects && collisionObjects.length > 0) {
-        const horiz = effectiveDistance * Math.cos(orbitPitch);
-        const vert = effectiveDistance * Math.sin(orbitPitch);
+        const testProfile = computeCameraElevation(effectiveDistance, pitchOffset);
         const testPos = new THREE.Vector3(
-          currentTarget.x - Math.sin(orbitYaw) * horiz,
-          currentTarget.y + vert,
-          currentTarget.z - Math.cos(orbitYaw) * horiz
+          currentTarget.x - Math.sin(orbitYaw) * testProfile.horizDist,
+          testProfile.height,
+          currentTarget.z - Math.cos(orbitYaw) * testProfile.horizDist
         );
 
         rayDir.subVectors(testPos, currentTarget).normalize();
         raycaster.set(currentTarget, rayDir);
-        raycaster.near = 1.0;
+        raycaster.near = 0.5;
         raycaster.far = effectiveDistance + 0.5;
 
-        const hits = raycaster.intersectObjects(collisionObjects, false);
+        const hits = raycaster.intersectObjects(collisionObjects, true);
         if (hits.length > 0 && hits[0].distance < effectiveDistance) {
-          // Obstacle found: pull camera in front of obstacle
-          effectiveDistance = Math.max(MIN_CAMERA_DISTANCE * 0.75, hits[0].distance - 1.2);
+          effectiveDistance = Math.max(MIN_CAMERA_DISTANCE, hits[0].distance - 1.0);
         }
       }
 
-      const finalHoriz = effectiveDistance * Math.cos(orbitPitch);
-      const finalVert = effectiveDistance * Math.sin(orbitPitch);
+      const profile = computeCameraElevation(effectiveDistance, pitchOffset);
 
       camera.position.set(
-        currentTarget.x - Math.sin(orbitYaw) * finalHoriz,
-        currentTarget.y + finalVert,
-        currentTarget.z - Math.cos(orbitYaw) * finalHoriz
+        currentTarget.x - Math.sin(orbitYaw) * profile.horizDist,
+        profile.height,
+        currentTarget.z - Math.cos(orbitYaw) * profile.horizDist
       );
 
-      // Look slightly above ground target for balanced vertical framing
-      camera.lookAt(currentTarget.x, currentTarget.y + 0.3, currentTarget.z);
+      // LookAt dynamically adjusts to keep character in lower-middle third
+      const lookAtY = currentTarget.y + (profile.height - 1.62) * 0.08;
+      camera.lookAt(currentTarget.x, lookAtY, currentTarget.z);
     },
 
     handleResize(newWidth: number, newHeight: number) {
@@ -135,14 +159,11 @@ export function createCameraController(
     },
 
     setZoom(factor: number) {
-      // Scales relative to default distance: factor 1.0 = DEFAULT_CAMERA_DISTANCE
-      const clampedFactor = Math.max(
-        MIN_CAMERA_DISTANCE / DEFAULT_CAMERA_DISTANCE,
-        Math.min(MAX_CAMERA_DISTANCE / DEFAULT_CAMERA_DISTANCE, factor)
-      );
+      // Maps zoom factor to distance: factor 0.23 -> MIN (5m), factor 1.0 -> DEFAULT (22m), factor 2.5 -> MAX (55m)
+      const targetDist = defaultDistance * factor;
       targetDistance = Math.max(
         MIN_CAMERA_DISTANCE,
-        Math.min(MAX_CAMERA_DISTANCE, defaultDistance * clampedFactor)
+        Math.min(MAX_CAMERA_DISTANCE, targetDist)
       );
     },
 
@@ -156,12 +177,11 @@ export function createCameraController(
     rotateOrbit(deltaYaw: number, deltaPitch: number) {
       orbitYaw += deltaYaw;
       orbitYaw = ((orbitYaw + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
-      // Clamp pitch between ~23° (0.40 rad) and ~57° (1.00 rad) to maintain elevated perspective
-      orbitPitch = Math.max(0.40, Math.min(1.00, orbitPitch + deltaPitch));
+      pitchOffset = Math.max(-0.25, Math.min(0.40, pitchOffset + deltaPitch));
     },
 
     resetOrbit() {
-      orbitPitch = basePitch;
+      pitchOffset = 0;
       orbitYaw = 0;
       targetDistance = defaultDistance;
     },

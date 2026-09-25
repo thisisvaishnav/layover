@@ -198,7 +198,12 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     };
 
     const handlePointerUp = (event: MouseEvent) => {
-      if ((event.target as HTMLElement).closest("button")) return;
+      const isCanvas = event.target === renderer.domElement;
+      if (!isCanvas || (event.target as HTMLElement).closest("button")) {
+        isDragging = false;
+        isRightDrag = false;
+        return;
+      }
 
       const hasKeyboardActive =
         keyboardInput.forward ||
@@ -377,10 +382,11 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       }
 
       // Sync position to ref for silky-smooth 60fps minimap rendering
-      playerStateRef.current = {
-        position: { x: playerState.position.x, z: playerState.position.z },
-        rotation: playerState.rotation,
-      };
+      if (playerStateRef.current) {
+        playerStateRef.current.position.x = playerState.position.x;
+        playerStateRef.current.position.z = playerState.position.z;
+        playerStateRef.current.rotation = playerState.rotation;
+      }
 
       // Update 3D player mesh animation
       playerChar.update(playerState, deltaSeconds);
@@ -393,7 +399,7 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
         playerState.position,
         deltaSeconds,
         playerState.rotation,
-        mapMeshes.clickableObjects
+        mapMeshes.obstacleObjects
       );
 
       // Render frame
