@@ -154,6 +154,8 @@ export function createRaycastHandler(): RaycastHandler {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const hitPoint = new THREE.Vector3();
+  const groundNormal = new THREE.Vector3(0, 1, 0);
+  const groundPlane = new THREE.Plane(groundNormal, 0);
 
   return {
     getPointedWorldCoordinates(
@@ -195,15 +197,15 @@ export function createRaycastHandler(): RaycastHandler {
       pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
       pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
 
-      // Cursor must be on or near the canvas
+      // Allow a subtle ±10% margin beyond exact canvas bounds to prevent jarring dropoff at edges
       if (pointer.x < -1.1 || pointer.x > 1.1 || pointer.y < -1.1 || pointer.y > 1.1) {
         return null;
       }
 
       raycaster.setFromCamera(pointer, camera);
 
-      // Horizontal ground plane at groundY
-      const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -groundY);
+      // Reusable horizontal ground plane at groundY (ax + by + cz + d = 0 => y - groundY = 0)
+      groundPlane.constant = -groundY;
       const hit = raycaster.ray.intersectPlane(groundPlane, hitPoint);
 
       if (!hit) {

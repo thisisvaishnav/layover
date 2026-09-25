@@ -341,6 +341,8 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       keyboardInput.backward = false;
       keyboardInput.left = false;
       keyboardInput.right = false;
+      hasPointer = false;
+      cursorAimIndicator.hide();
     };
 
     renderer.domElement.addEventListener("pointerdown", handlePointerDown);

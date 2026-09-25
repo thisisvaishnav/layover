@@ -6,10 +6,8 @@ import {
   createPlayerState,
   updatePlayerKeyboard,
   calculateAimDirection,
-  calculateFacingVectors,
   updatePlayerMouseAim,
   type KeyboardInput,
-  type PlayerState,
 } from "../src/player/movement-controller";
 import {
   createRaycastHandler,
