@@ -42,15 +42,15 @@
     "semantic_hash": ""
   },
   "src/app/page.tsx": {
-    "mtime": 1790307271.47581,
-    "seen": 1790307347.894123,
-    "ast_hash": "161e40ed7244779d5cf7da66cff1acfe",
+    "mtime": 1790312589.012108,
+    "seen": 1790312664.364151,
+    "ast_hash": "13163e478eb11ef2a143e0c6cd8c0213",
     "semantic_hash": ""
   },
   "src/app/play/page.tsx": {
-    "mtime": 1790254566.1565738,
-    "seen": 1790254618.965554,
-    "ast_hash": "0829ad09c9fbd9149501f0376c0803d3",
+    "mtime": 1790312646.6897428,
+    "seen": 1790312664.364152,
+    "ast_hash": "5d0d0cd51b739d2870befe327e66e9fd",
     "semantic_hash": ""
   },
   "src/components/hud/FeedbackModal.tsx": {
@@ -90,9 +90,9 @@
     "semantic_hash": "f5a6cce54c3624b44af7be97d3ac522a"
   },
   "src/components/world/Cafe3DWorld.tsx": {
-    "mtime": 1790308299.9771705,
-    "seen": 1790308342.020951,
-    "ast_hash": "5a93daf2d6940281f75d48175b190c45",
+    "mtime": 1790312689.2466738,
+    "seen": 1790312762.849727,
+    "ast_hash": "d13c5b1a76593b592705ed98078858d5",
     "semantic_hash": ""
   },
   "src/components/world/HotspotPrompt.tsx": {
@@ -168,9 +168,9 @@
     "semantic_hash": "1f96f0b8b9d07fe443ebd96c44811eb0"
   },
   "src/lib/world/scene-builder.ts": {
-    "mtime": 1790310519.9438086,
-    "seen": 1790310541.658396,
-    "ast_hash": "aeff364d55422fef973fb4892e6d6868",
+    "mtime": 1790312518.2304869,
+    "seen": 1790312664.3641758,
+    "ast_hash": "4a9116f0ae74e293a6e20e60b588fd13",
     "semantic_hash": ""
   },
   "src/lib/world/types.ts": {
@@ -305,12 +305,6 @@
     "ast_hash": "bfc21947d3791ae56072c9682d659ea1",
     "semantic_hash": ""
   },
-  "src/app/places/page.tsx": {
-    "mtime": 1790186090.6553938,
-    "seen": 1790186192.517482,
-    "ast_hash": "cb20982aaaffceac87b8681261713529",
-    "semantic_hash": ""
-  },
   "src/components/world/InteractiveLearningModal.tsx": {
     "mtime": 1790254421.3846626,
     "seen": 1790254618.965575,
@@ -318,9 +312,9 @@
     "semantic_hash": ""
   },
   "src/lib/world/avatar-kinematics.ts": {
-    "mtime": 1790254378.8880763,
-    "seen": 1790254618.965609,
-    "ast_hash": "d6536865ae07120cbcd9482d26733ef4",
+    "mtime": 1790311836.1602638,
+    "seen": 1790311905.165515,
+    "ast_hash": "205eb5df08a283ef1fb2f5699a1165cc",
     "semantic_hash": ""
   },
   "src/lib/world/unified-plaza.ts": {
@@ -387,6 +381,102 @@
     "mtime": 1790310481.165722,
     "seen": 1790310541.658397,
     "ast_hash": "84bfa4a0b06686becc8a07bf9f0c2e74",
+    "semantic_hash": ""
+  },
+  "city-config.json": {
+    "mtime": 1790311589.4722753,
+    "seen": 1790311905.164644,
+    "ast_hash": "0c0bf0f8101870770b4212848be22615",
+    "semantic_hash": ""
+  },
+  "src/buildings/buildings.ts": {
+    "mtime": 1790312297.5111132,
+    "seen": 1790312333.7310221,
+    "ast_hash": "06ffc51b0dc1038c8a20e984566c919b",
+    "semantic_hash": ""
+  },
+  "src/city-config.json": {
+    "mtime": 1790311595.2415369,
+    "seen": 1790311905.164675,
+    "ast_hash": "0c0bf0f8101870770b4212848be22615",
+    "semantic_hash": ""
+  },
+  "src/city/city-scene.ts": {
+    "mtime": 1790311714.141646,
+    "seen": 1790311905.1646771,
+    "ast_hash": "003be761a37ce40906e0d1997c719f35",
+    "semantic_hash": ""
+  },
+  "src/city/types.ts": {
+    "mtime": 1790311614.2749794,
+    "seen": 1790311905.1646788,
+    "ast_hash": "1e3f5ce1deae826ba4ac7e8d225a4047",
+    "semantic_hash": ""
+  },
+  "src/park/park.ts": {
+    "mtime": 1790312283.6611917,
+    "seen": 1790312333.7310479,
+    "ast_hash": "f52cf0f40706ce4317f967238ee5e063",
+    "semantic_hash": ""
+  },
+  "src/pedestrians/pedestrians.ts": {
+    "mtime": 1790312360.5179086,
+    "seen": 1790312412.492461,
+    "ast_hash": "0222f3f1b509c1c49d5ede120752d602",
+    "semantic_hash": ""
+  },
+  "src/roads/road-graph.ts": {
+    "mtime": 1790312251.6460352,
+    "seen": 1790312333.731049,
+    "ast_hash": "55952d66a72ec433cfa8a7db70101c42",
+    "semantic_hash": ""
+  },
+  "src/roads/road-network.ts": {
+    "mtime": 1790312270.6565313,
+    "seen": 1790312333.73105,
+    "ast_hash": "4be6d367a22eafab09ae9adea1ef5ad7",
+    "semantic_hash": ""
+  },
+  "src/traffic/traffic.ts": {
+    "mtime": 1790312379.5416937,
+    "seen": 1790312412.492466,
+    "ast_hash": "27851d017d15231c06b098b2951565af",
+    "semantic_hash": ""
+  },
+  "tests/maple-hollow-city.test.ts": {
+    "mtime": 1790311845.6093457,
+    "seen": 1790311905.165535,
+    "ast_hash": "010a2e266fae604aa31fdfe69d810581",
+    "semantic_hash": ""
+  },
+  "MAPLE_HOLLOW_SPEC.md": {
+    "mtime": 1790311583.2094727,
+    "seen": 1790311905.165569,
+    "ast_hash": "594478e9a2b8bf019495cb695e087f98",
+    "semantic_hash": ""
+  },
+  "info.md": {
+    "mtime": 1790312328.4618194,
+    "seen": 1790312333.7310688,
+    "ast_hash": "d1579f198ecb5e1eaafe6e2e9c6918fc",
+    "semantic_hash": ""
+  },
+  "src/components/ui/LoadingScreen.tsx": {
+    "mtime": 1790312722.013777,
+    "seen": 1790312762.849725,
+    "ast_hash": "998fe467976f87ade2dc580f8d3520ba",
+    "semantic_hash": ""
+  },
+  "tests/loading-screen.test.ts": {
+    "mtime": 1790312432.0744364,
+    "seen": 1790312664.364186,
+    "ast_hash": "b6f9f16d9577b721d0d27e2f21e65969",
+    "semantic_hash": ""
+  },
+  "docs/testing/loading-screen.tdd.md": {
+    "mtime": 1790312757.0363092,
+    "seen": 1790312762.849768,
+    "ast_hash": "17c03fc51ac55b4f7af4a18a92ca91b7",
     "semantic_hash": ""
   }
 }

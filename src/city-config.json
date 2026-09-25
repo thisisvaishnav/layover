@@ -1,0 +1,39 @@
+{
+  "world": { "width": 2000, "height": 2000, "units": "meters" },
+  "park": { "center": [1000, 1000], "radius": 180 },
+  "rings": [220, 460, 760],
+  "radialCount": 8,
+  "roadWidths": { "ring": 12, "radial": 14 },
+  "footpathWidth": 2.5,
+  "busStop": { "spacing": 135, "shelterFootprint": [3, 2] },
+  "busRoutes": ["innerRingLoop", "middleRingLoop", "outerRingLoop", "radialExpress"],
+  "buildings": {
+    "houseA": { "footprint": [10, 8], "height": 6, "floors": 2, "count": 12, "ring": "inner" },
+    "houseB": { "footprint": [12, 9], "height": 6, "floors": 2, "count": 8, "ring": "inner" },
+    "apartmentBig": { "footprint": [40, 25], "height": 45, "floors": 15, "count": 2, "ring": "middle" },
+    "shop": { "footprint": [8, 10], "height": 5, "floors": 1, "count": 10, "ring": "inner" },
+    "cafe": { "footprint": [9, 9], "height": 5, "floors": 1, "count": 2, "ring": "inner" },
+    "salon": { "footprint": [8, 8], "height": 5, "floors": 1, "count": 2, "ring": "inner" },
+    "church": { "footprint": [18, 30], "height": 22, "floors": 1, "count": 1, "ring": "middle" },
+    "temple": { "footprint": [20, 20], "height": 18, "floors": 1, "count": 1, "ring": "middle" },
+    "school": { "footprint": [40, 30], "height": 12, "floors": 3, "count": 1, "ring": "middle" },
+    "townHall": { "footprint": [35, 25], "height": 14, "floors": 2, "count": 1, "ring": "middle" },
+    "hospital": { "footprint": [50, 35], "height": 20, "floors": 5, "count": 1, "ring": "outer" },
+    "police": { "footprint": [25, 20], "height": 10, "floors": 2, "count": 1, "ring": "outer" },
+    "airportTerminal": { "footprint": [60, 30], "height": 12, "floors": 2, "count": 1, "ring": "outer" },
+    "runway": { "footprint": [400, 45], "count": 1, "ring": "outer" },
+    "trainStation": { "footprint": [40, 20], "height": 10, "floors": 1, "count": 1, "ring": "outer" },
+    "busDepot": { "footprint": [30, 20], "height": 8, "floors": 1, "count": 1, "ring": "outer" }
+  },
+  "traffic": {
+    "targetDensity": 150,
+    "mix": { "car": 0.55, "taxi": 0.15, "van": 0.12, "bus": 0.10, "motorbike": 0.08 },
+    "speedKmh": { "radial": [30, 45], "ring": [20, 30], "bus": 30 },
+    "followGapSeconds": 2
+  },
+  "pedestrians": {
+    "targetCount": 30,
+    "walkSpeedMs": [1.2, 1.5],
+    "idlePauseSeconds": [1, 3]
+  }
+}

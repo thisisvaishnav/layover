@@ -38,6 +38,7 @@ interface Cafe3DWorldProps {
   targetLang?: string;
   nativeLang?: string;
   hideControlsOverlay?: boolean;
+  onSceneReady?: () => void;
 }
 
 export function Cafe3DWorld({
@@ -51,6 +52,7 @@ export function Cafe3DWorld({
   targetLang = "es",
   nativeLang = "en",
   hideControlsOverlay = false,
+  onSceneReady,
 }: Cafe3DWorldProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const sceneRef = useRef<Cafe3DScene | null>(null);
@@ -72,6 +74,11 @@ export function Cafe3DWorld({
 
   const { baristaAction } = useGameStore();
 
+  const onSceneReadyRef = useRef(onSceneReady);
+  useEffect(() => {
+    onSceneReadyRef.current = onSceneReady;
+  }, [onSceneReady]);
+
   // Open interactive learning dialogue modal
   const handleOpenDialogue = useCallback(() => {
     setIsDialogueOpen(true);
@@ -85,6 +92,9 @@ export function Cafe3DWorld({
     const scene = new Cafe3DScene(canvasRef.current, placeType, {
       onPlayerMove: (pos, rot) => {
         minimapRef.current?.updatePlayer(pos, rot);
+      },
+      onReady: () => {
+        onSceneReadyRef.current?.();
       },
     });
     sceneRef.current = scene;

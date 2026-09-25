@@ -11,6 +11,7 @@ import { ObjectivesHUD } from "@/components/hud/ObjectivesHUD";
 import { OrderReceipt } from "@/components/hud/OrderReceipt";
 import { TranscriptHUD } from "@/components/hud/TranscriptHUD";
 import { FeedbackModal } from "@/components/hud/FeedbackModal";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import {
   ArrowLeft,
   Trophy,
@@ -46,16 +47,29 @@ function PlayGameContent() {
 
   const { resetGame, level } = useGameStore();
 
+  // 3D Scene readiness & loading curtain state
+  const [isSceneReady, setIsSceneReady] = useState(false);
+
   // Floating HUD panel states
   const [activePanel, setActivePanel] = useState<"none" | "objectives" | "receipt" | "transcript">(
     "none"
   );
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Auto-connect voice agent on mount
+  // Safety watchdog: ensure loading screen resolves even on slow devices or WebGL issues
   useEffect(() => {
-    connect();
-  }, [connect]);
+    const watchdog = setTimeout(() => {
+      setIsSceneReady(true);
+    }, 4500);
+    return () => clearTimeout(watchdog);
+  }, []);
+
+  // Connect voice agent once 3D world is ready
+  useEffect(() => {
+    if (isSceneReady) {
+      connect();
+    }
+  }, [isSceneReady, connect]);
 
   // Fullscreen toggle handler
   const toggleFullscreen = () => {
@@ -70,6 +84,14 @@ function PlayGameContent() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-stone-950 text-stone-100 select-none">
+      {/* 0. Full-Screen Flight & 3D World Loading Curtain */}
+      <LoadingScreen
+        isLoading={!isSceneReady}
+        targetLang={targetLang}
+        nativeLang={nativeLang}
+        placeType={placeType}
+      />
+
       {/* 1. Full-Screen 3D WebGL Canvas Layer */}
       <div className="absolute inset-0 z-0">
         <Cafe3DWorld
@@ -82,6 +104,7 @@ function PlayGameContent() {
           placeType={placeType}
           targetLang={targetLang}
           nativeLang={nativeLang}
+          onSceneReady={() => setIsSceneReady(true)}
         />
       </div>
 
@@ -90,12 +113,12 @@ function PlayGameContent() {
         {/* Left: Back to Places & Destination Identity */}
         <div className="pointer-events-auto flex items-center gap-2">
           <Link
-            href="/places"
+            href="/"
             className="px-3.5 py-2 rounded-2xl bg-stone-950/80 hover:bg-stone-900 border border-stone-800 backdrop-blur-md text-stone-300 hover:text-stone-100 text-xs font-bold transition-all flex items-center gap-2 shadow-xl active:scale-95"
-            title="Back to Places Map"
+            title="Back to Home"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-[#ffcc00]" />
-            <span className="hidden sm:inline">Places</span>
+            <span className="hidden sm:inline">Home</span>
           </Link>
 
           <div className="bg-stone-950/80 backdrop-blur-md border border-stone-800 rounded-2xl px-3.5 py-2 shadow-xl flex items-center gap-2 text-xs font-semibold">

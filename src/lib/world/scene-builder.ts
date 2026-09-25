@@ -21,16 +21,19 @@ import {
   computeHumanAvatarKinematics,
   PedestrianSpec,
 } from "./town-park-expansion";
+import { CityScene } from "@/city/city-scene";
 
 export interface CafeSceneHooks {
   onHotspotClick?: (hotspotId: string) => void;
   onPlayerMove?: (pos: Position3D, rotation: number) => void;
+  onReady?: () => void;
 }
 
 export class Cafe3DScene {
   public scene: THREE.Scene;
   public camera: THREE.PerspectiveCamera;
   public renderer: THREE.WebGLRenderer;
+  public cityScene!: CityScene;
   private canvas: HTMLCanvasElement;
   public hooks?: CafeSceneHooks;
 
@@ -71,6 +74,7 @@ export class Cafe3DScene {
   private isPlayerWalking: boolean = false;
   private isMateoTalking: boolean = false;
   private isBaristaBrewing: boolean = false;
+  private hasNotifiedReady: boolean = false;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -135,6 +139,8 @@ export class Cafe3DScene {
     this.buildBusStopZone();
     this.buildAirportZone();
     this.buildHotspotMarkers();
+    this.cityScene = new CityScene();
+    this.cityScene.init(this.scene);
 
     // 5. Build Characters
     this.mateoMesh = this.buildMateoCharacter();
@@ -1689,6 +1695,14 @@ export class Cafe3DScene {
     const elapsed = performance.now() / 1000;
     const delta = Math.min(this.clock.getDelta(), 0.05);
 
+    if (!this.hasNotifiedReady) {
+      this.hasNotifiedReady = true;
+      this.hooks?.onReady?.();
+    }
+
+    // CityScene composite update (Roads, Park, Buildings, Traffic, Pedestrians)
+    this.cityScene?.update(delta, elapsed);
+
     // 0. Update Moving Traffic Kinematics on Boulevard
     this.carMeshes.forEach(({ mesh, spec, wheels }) => {
       const updatedPos = computeCarPosition(spec, elapsed);
@@ -1831,6 +1845,11 @@ export class Cafe3DScene {
     });
 
     this.renderer.render(this.scene, this.camera);
+
+    if (!this.hasNotifiedReady) {
+      this.hasNotifiedReady = true;
+      this.hooks?.onReady?.();
+    }
   };
 
   private handleResize = () => {
@@ -1843,6 +1862,7 @@ export class Cafe3DScene {
   };
 
   public destroy() {
+    this.cityScene?.dispose();
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
     }
