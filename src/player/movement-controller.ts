@@ -418,6 +418,39 @@ export function updatePlayerMovement(
   };
 }
 
+export type MovementUpdateMode = "KEYBOARD" | "CLICK_TO_MOVE" | "IDLE";
+
+/**
+ * Decides which movement updater runs for a frame.
+ *
+ * Click-to-move writes a full-speed horizontal velocity (e.g. 14.11 u/s) into the
+ * player state, so a speed-based trigger alone would route the *next* frame through
+ * the keyboard updater, which zeroes velocity and clears `target` when no key is
+ * pressed. An active destination therefore always takes the click-to-move path.
+ *
+ * The residual-speed arm only coasts keyboard inertia (deceleration configs) and is
+ * skipped while a destination target is active.
+ */
+export function selectMovementUpdate(
+  state: PlayerState,
+  input: KeyboardInput,
+  horizontalSpeed: number
+): MovementUpdateMode {
+  const hasKeyboardActive =
+    input.forward || input.backward || input.left || input.right;
+
+  if (hasKeyboardActive || input.aiming) {
+    return "KEYBOARD";
+  }
+  if (horizontalSpeed > 0.05 && !state.target) {
+    return "KEYBOARD";
+  }
+  if (state.isMoving && state.target) {
+    return "CLICK_TO_MOVE";
+  }
+  return "IDLE";
+}
+
 // Fallback camera looking North (+Z) when none is provided
 let _defaultNorthCamera: THREE.PerspectiveCamera | null = null;
 function getDefaultCamera(): THREE.PerspectiveCamera {
@@ -601,7 +634,9 @@ export function updatePlayerMovementState(
     verticalVelocity: gravityResult.verticalVelocity,
     isGrounded: gravityResult.isGrounded,
     rotation: newRotation,
-    target: null, // Keyboard movement immediately cancels click-to-move target
+    // Keyboard input (or aiming) immediately cancels click-to-move; when neither is
+    // active the updater must not destroy a destination it was only asked to coast past
+    target: isInputActive || isAiming ? null : currentState.target,
     movementState: isMoving ? "MOVING" : "IDLE",
     movementMode,
     isMoving,

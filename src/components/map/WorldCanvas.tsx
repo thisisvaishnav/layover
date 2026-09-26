@@ -9,6 +9,7 @@ import {
   setPlayerDestination,
   updatePlayerMovement,
   updatePlayerMovementState,
+  selectMovementUpdate,
   type PlayerState,
   type KeyboardInput,
   type Vector2D,
@@ -388,12 +389,6 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       const deltaSeconds = Math.min((currentTime - lastTime) / 1000, 0.1);
       lastTime = currentTime;
 
-      const hasKeyboardActive =
-        keyboardInput.forward ||
-        keyboardInput.backward ||
-        keyboardInput.left ||
-        keyboardInput.right;
-
       // Project mouse screen position onto ground plane for aiming & direction
       let cursorGroundPos: Vector2D | null = null;
       if (hasPointer && renderer.domElement) {
@@ -418,7 +413,8 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       const horizontalSpeed = Math.hypot(playerState.velocity.x, playerState.velocity.z);
 
       // Update movement: GTA San Andreas Camera-Relative Locomotion & Aiming
-      if (hasKeyboardActive || keyboardInput.aiming || horizontalSpeed > 0.05) {
+      const movementUpdate = selectMovementUpdate(playerState, keyboardInput, horizontalSpeed);
+      if (movementUpdate === "KEYBOARD") {
         playerState = updatePlayerMovementState(
           playerState,
           keyboardInput,
