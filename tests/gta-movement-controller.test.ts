@@ -57,10 +57,11 @@ test("TDD 3: A moves camera-relative left", () => {
   const player = createPlayerState({ position: { x: 0, y: 0, z: 0 } });
   const camera = createTestCamera({ x: 0, y: 15, z: -20 }, { x: 0, y: 1.4, z: 0 });
 
+  // This camera looks toward +Z, whose screen-left is +X (camera.matrixWorld X axis is -X)
   const input: KeyboardInput = { forward: false, backward: false, left: true, right: false };
   const next = updatePlayerMovementState(player, input, camera, 0.1, map.bounds);
 
-  assert.ok(next.position.x < 0, "Pressing A must move camera-relative left (-X)");
+  assert.ok(next.position.x > 0, "Pressing A must move camera-relative left (+X for a +Z-facing camera)");
   assert.ok(Math.abs(next.position.z) < 1e-4, "Should not drift on Z");
 });
 
@@ -72,7 +73,7 @@ test("TDD 4: D moves camera-relative right", () => {
   const input: KeyboardInput = { forward: false, backward: false, left: false, right: true };
   const next = updatePlayerMovementState(player, input, camera, 0.1, map.bounds);
 
-  assert.ok(next.position.x > 0, "Pressing D must move camera-relative right (+X)");
+  assert.ok(next.position.x < 0, "Pressing D must move camera-relative right (-X for a +Z-facing camera)");
   assert.ok(Math.abs(next.position.z) < 1e-4, "Should not drift on Z");
 });
 
@@ -84,9 +85,9 @@ test("TDD 5: W+D produces normalized diagonal movement", () => {
   const inputWD: KeyboardInput = { forward: true, backward: false, left: false, right: true };
   const nextWD = updatePlayerMovementState(player, inputWD, camera, 0.1, map.bounds);
 
-  assert.ok(nextWD.position.x > 0, "X must increase on W+D");
+  assert.ok(nextWD.position.x < 0, "X must decrease on W+D (camera right is -X for this camera)");
   assert.ok(nextWD.position.z > 0, "Z must increase on W+D");
-  assert.ok(Math.abs(nextWD.position.x - nextWD.position.z) < 1e-4, "W+D must be symmetric along diagonal");
+  assert.ok(Math.abs(Math.abs(nextWD.position.x) - nextWD.position.z) < 1e-4, "W+D must be symmetric along diagonal");
 });
 
 // ==========================================
@@ -98,7 +99,7 @@ test("TDD 6: Character rotates toward movement direction in FREE_ROAM", () => {
   const player = createPlayerState({ position: { x: 0, y: 0, z: 0 }, rotation: 0 });
   const camera = createTestCamera({ x: 0, y: 15, z: -20 }, { x: 0, y: 1.4, z: 0 });
 
-  // Move right (+X East) -> character should rotate toward π/2 (East)
+  // Move screen-right (-X for this camera) -> character turns toward -π/2
   const inputD: KeyboardInput = { forward: false, backward: false, left: false, right: true };
   let state = player;
   for (let i = 0; i < 20; i++) {
@@ -106,19 +107,19 @@ test("TDD 6: Character rotates toward movement direction in FREE_ROAM", () => {
   }
 
   assert.ok(
-    Math.abs(state.rotation - Math.PI / 2) < 0.05,
-    `Character must turn East (~π/2), got ${state.rotation}`
+    Math.abs(state.rotation - -Math.PI / 2) < 0.05,
+    `Character must turn toward camera-right (-π/2), got ${state.rotation}`
   );
 
-  // Move left (-X West) -> character should turn toward -π/2 (West)
+  // Move screen-left (+X for this camera) -> character turns toward +π/2
   const inputA: KeyboardInput = { forward: false, backward: false, left: true, right: false };
   for (let i = 0; i < 25; i++) {
     state = updatePlayerMovementState(state, inputA, camera, 0.05, map.bounds);
   }
 
   assert.ok(
-    Math.abs(state.rotation - (-Math.PI / 2)) < 0.05,
-    `Character must turn West (~-π/2), got ${state.rotation}`
+    Math.abs(state.rotation - Math.PI / 2) < 0.05,
+    `Character must turn toward camera-left (π/2), got ${state.rotation}`
   );
 });
 
@@ -218,7 +219,7 @@ test("TDD 13: In AIMING: A strafes left while maintaining camera-facing rotation
   const inputA: KeyboardInput = { forward: false, backward: false, left: true, right: false, aiming: true };
   const next = updatePlayerMovementState(player, inputA, cameraNorth, 0.1, map.bounds);
 
-  assert.ok(next.position.x < 0, "A strafes left (-X)");
+  assert.ok(next.position.x > 0, "A strafes camera-left (+X for a +Z-facing camera)");
   assert.ok(Math.abs(next.rotation - 0) < 0.05, "Must keep facing camera North");
 });
 
@@ -230,7 +231,7 @@ test("TDD 14: In AIMING: D strafes right while maintaining camera-facing rotatio
   const inputD: KeyboardInput = { forward: false, backward: false, left: false, right: true, aiming: true };
   const next = updatePlayerMovementState(player, inputD, cameraNorth, 0.1, map.bounds);
 
-  assert.ok(next.position.x > 0, "D strafes right (+X)");
+  assert.ok(next.position.x < 0, "D strafes camera-right (-X for a +Z-facing camera)");
   assert.ok(Math.abs(next.rotation - 0) < 0.05, "Must keep facing camera North");
 });
 
@@ -242,7 +243,7 @@ test("TDD 15: In AIMING: W+A produces diagonal strafe movement while maintaining
   const inputWA: KeyboardInput = { forward: true, backward: false, left: true, right: false, aiming: true };
   const next = updatePlayerMovementState(player, inputWA, cameraNorth, 0.1, map.bounds);
 
-  assert.ok(next.position.x < 0, "Diagonal strafe left (-X)");
+  assert.ok(next.position.x > 0, "Diagonal strafe camera-left (+X for a +Z-facing camera)");
   assert.ok(next.position.z > 0, "Diagonal move forward (+Z)");
   assert.ok(Math.abs(next.rotation - 0) < 0.05, "Character must keep facing camera");
 });
@@ -417,7 +418,16 @@ test("TDD 25: getCameraHorizontalVectors projects camera onto XZ plane and compu
 
   assert.ok(vectors.forward.z > 0.99, "Camera forward vector should point North (+Z)");
   assert.ok(Math.abs(vectors.forward.x) < 0.05, "Camera forward X should be ~0");
-  assert.ok(vectors.right.x > 0.99, "Camera right vector should point East (+X)");
+
+  // right must equal the camera's world X axis projected onto XZ (never its negation)
+  const axisX = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+  const axisLen = Math.hypot(axisX.x, axisX.z);
+  assert.ok(axisLen > 0.99, "Fixture camera X axis must be horizontal");
+  assert.ok(
+    Math.abs(vectors.right.x - axisX.x / axisLen) < 1e-3 &&
+      Math.abs(vectors.right.z - axisX.z / axisLen) < 1e-3,
+    `right (${vectors.right.x}, ${vectors.right.z}) must match camera.matrixWorld X axis (${axisX.x / axisLen}, ${axisX.z / axisLen})`
+  );
   assert.ok(Math.abs(vectors.yaw - 0) < 0.05, "Camera yaw should be ~0");
 });
 
@@ -427,7 +437,7 @@ test("TDD 26: getCameraRelativeDirection converts input to normalized world dire
   const dir = getCameraRelativeDirection(inputDiag, camera);
 
   assert.ok(dir !== null, "Direction must not be null for active input");
-  assert.ok(dir.x > 0, "X should be positive for right input");
+  assert.ok(dir.x < 0, "X should be negative for right input on a +Z-facing camera");
   assert.ok(dir.z > 0, "Z should be positive for forward input");
   assert.ok(Math.abs(Math.hypot(dir.x, dir.z) - 1.0) < 1e-4, "Direction vector must be normalized unit length");
 });

@@ -143,3 +143,37 @@ body {
 .arcade-blink {
   animation: arcadeBlink 1.2s infinite;
 }
+
+/* 📐 Neo-Brutalist & Graph Paper Theme Styles */
+.bg-graph-paper {
+  background-color: #FAF9F5;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+.text-stroke-num {
+  -webkit-text-stroke: 2px #000000;
+  color: #ffffff;
+  paint-order: stroke fill;
+}
+
+@keyframes tickerMarquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker {
+  display: flex;
+  width: max-content;
+  animation: tickerMarquee 40s linear infinite;
+}
+
+.animate-ticker:hover {
+  animation-play-state: paused;
+}

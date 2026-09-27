@@ -9,6 +9,11 @@ import {
   clampToMinimapCircle,
   MINIMAP_DEFAULT_CONFIG,
 } from "../../map/minimap-math";
+import { COFFEE_SHOP_WORLD_POSITION } from "../../scenarios/coffee-shop-scenario";
+import { BUS_STOP_WORLD_POSITION } from "../../scenarios/bus-stop-scenario";
+import { TAXI_STAND_WORLD_POSITION } from "../../scenarios/taxi-stand-scenario";
+import { BARBER_SHOP_WORLD_POSITION } from "../../scenarios/barber-shop-scenario";
+import { getCountryMinimapBuildingColors } from "../../map/country-building-architectures";
 
 export interface MinimapHUDProps {
   mapData: GeneratedMap;
@@ -18,6 +23,7 @@ export interface MinimapHUDProps {
   radius?: number;
   padding?: number;
   initialScale?: number;
+  countryCode?: string;
   onScaleChange?: (newScale: number) => void;
 }
 
@@ -30,14 +36,20 @@ export interface MinimapHUDProps {
  * - Configurable zoom scale.
  * - Lightweight HTML5 2D Canvas with cached static base map layer.
  */
+/** Stable identity for the default position: an inline `{ x: 0, z: 0 }` default would be a
+ * new object every render, changing the render-loop effect's deps and restarting the rAF
+ * loop (resetting its throttle counter) on every parent re-render. */
+const DEFAULT_PLAYER_POSITION: Vector2D = { x: 0, z: 0 };
+
 export default function MinimapHUD({
   mapData,
-  playerPosition = { x: 0, z: 0 },
+  playerPosition = DEFAULT_PLAYER_POSITION,
   playerRotation = 0,
   playerStateRef,
   radius = 96,
   padding = MINIMAP_DEFAULT_CONFIG.padding,
   initialScale = 1.0,
+  countryCode,
   onScaleChange,
 }: MinimapHUDProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -79,13 +91,13 @@ export default function MinimapHUD({
     ctx.arc(radius, radius, radius - 2, 0, Math.PI * 2);
     ctx.clip();
 
-    // Map background (dark city grid)
-    ctx.fillStyle = "#0c101c";
+    // Map background (clean modern city grid)
+    ctx.fillStyle = "#161e2e";
     ctx.fillRect(0, 0, size, size);
 
     // A. Render Roads
-    ctx.fillStyle = "#1e2638";
-    ctx.strokeStyle = "#334155";
+    ctx.fillStyle = "#2d374d";
+    ctx.strokeStyle = "#475569";
     ctx.lineWidth = 1;
 
     for (const road of mapData.roads) {
@@ -151,16 +163,16 @@ export default function MinimapHUD({
 
       if (plot.type === "park") {
         // Central Park
-        ctx.fillStyle = "#14462a";
+        ctx.fillStyle = "#1b5936";
         ctx.fillRect(tl.x, tl.y, pw, ph);
 
         // Park lawn inner section
-        ctx.fillStyle = "#1e683e";
+        ctx.fillStyle = "#277a4a";
         const margin = pw * 0.12;
         ctx.fillRect(tl.x + margin, tl.y + margin, pw - margin * 2, ph - margin * 2);
 
-        // Park footpaths
-        ctx.strokeStyle = "#c2a677";
+        // Park footpaths (warm terracotta)
+        ctx.strokeStyle = "#c05436";
         ctx.lineWidth = Math.max(1, pw * 0.05);
         ctx.strokeRect(tl.x + margin, tl.y + margin, pw - margin * 2, ph - margin * 2);
 
@@ -172,36 +184,84 @@ export default function MinimapHUD({
         ctx.lineTo(tl.x + pw - margin, tl.y + ph / 2);
         ctx.stroke();
 
-        ctx.strokeStyle = "#2e8852";
+        ctx.strokeStyle = "#34a864";
         ctx.lineWidth = 1;
         ctx.strokeRect(tl.x, tl.y, pw, ph);
       } else if (plot.type === "port") {
         // Port & Water Basin
-        ctx.fillStyle = "#0f365d";
+        ctx.fillStyle = "#144e82";
         ctx.fillRect(tl.x, tl.y, pw, ph);
 
         // Water surface
-        ctx.fillStyle = "#1a5286";
+        ctx.fillStyle = "#0284c7";
         ctx.fillRect(tl.x + 2, tl.y + 2, pw - 4, ph - 4);
 
         // Wooden dock piers
-        ctx.fillStyle = "#96754b";
+        ctx.fillStyle = "#b48554";
         ctx.fillRect(tl.x + pw * 0.3, tl.y + ph * 0.2, pw * 0.4, ph * 0.6);
 
         ctx.strokeStyle = "#38bdf8";
         ctx.lineWidth = 1;
         ctx.strokeRect(tl.x, tl.y, pw, ph);
+      } else if (plot.id === "plot-0-0") {
+        // Central Taxi Terminal & Transit Hub Plot
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(tl.x, tl.y, pw, ph);
+
+        // North Terminal Portico footprint
+        ctx.fillStyle = "#475569";
+        ctx.fillRect(tl.x + pw * 0.06, tl.y + ph * 0.06, pw * 0.88, ph * 0.20);
+
+        // South Terminal Concourse footprint
+        ctx.fillRect(tl.x + pw * 0.06, tl.y + ph * 0.74, pw * 0.88, ph * 0.20);
+
+        // Center Taxi Plaza & Bay pavement
+        ctx.fillStyle = "#0f172a";
+        ctx.fillRect(tl.x + pw * 0.06, tl.y + ph * 0.30, pw * 0.88, ph * 0.40);
+
+        // Taxi bay markings & yellow lot boundary
+        ctx.strokeStyle = "#eab308";
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(tl.x + pw * 0.08, tl.y + ph * 0.32, pw * 0.84, ph * 0.36);
+
+        // Elevated skybridge connecting North and South concourses
+        ctx.fillStyle = "rgba(56, 189, 248, 0.45)";
+        ctx.fillRect(tl.x + pw * 0.38, tl.y + ph * 0.26, pw * 0.24, ph * 0.48);
+
+        ctx.strokeStyle = "#64748b";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(tl.x, tl.y, pw, ph);
+      } else if (plot.id === "plot-1-0") {
+        // Multi-story Parking Garage Plot
+        ctx.fillStyle = "#27303f";
+        ctx.fillRect(tl.x, tl.y, pw, ph);
+
+        // L-shaped parking garage footprint (North and West)
+        ctx.fillStyle = "#4b5563";
+        // North bar
+        ctx.fillRect(tl.x + pw * 0.05, tl.y + ph * 0.05, pw * 0.9, ph * 0.45);
+        // West bar
+        ctx.fillRect(tl.x + pw * 0.05, tl.y + ph * 0.05, pw * 0.45, ph * 0.9);
+
+        // South-East parking apron pavement
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(tl.x + pw * 0.52, tl.y + ph * 0.52, pw * 0.43, ph * 0.43);
+
+        ctx.strokeStyle = "#64748b";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(tl.x, tl.y, pw, ph);
       } else {
-        // Standard Building Blocks
-        ctx.fillStyle = "#273349";
+        // Standard Building Blocks (country-adapted palette)
+        const bColors = getCountryMinimapBuildingColors(countryCode);
+        ctx.fillStyle = bColors.base;
         ctx.fillRect(tl.x, tl.y, pw, ph);
 
         // Inner building architectural roof footprint
-        ctx.fillStyle = "#384762";
+        ctx.fillStyle = bColors.roof;
         const bMargin = Math.max(1.5, pw * 0.08);
         ctx.fillRect(tl.x + bMargin, tl.y + bMargin, pw - bMargin * 2, ph - bMargin * 2);
 
-        ctx.strokeStyle = "#4b5f82";
+        ctx.strokeStyle = bColors.border;
         ctx.lineWidth = 1;
         ctx.strokeRect(tl.x, tl.y, pw, ph);
       }
@@ -209,7 +269,7 @@ export default function MinimapHUD({
 
     ctx.restore();
     baseMapCanvasRef.current = baseCanvas;
-  }, [mapData, scale, radius, padding]);
+  }, [mapData, scale, radius, padding, countryCode]);
 
   // 2. Dynamic render loop: Blit static map and draw rotating player marker
   useEffect(() => {
@@ -281,7 +341,171 @@ export default function MinimapHUD({
       );
       const markerAngle = playerRotationToMinimapHeading(rot);
 
-      // D. Render Directional Player Arrow (GTA V Chevron Style)
+      // D1. Render Coffee Shop / Stall POI Marker
+      const shopMinimapPos = worldToMinimap(
+        COFFEE_SHOP_WORLD_POSITION,
+        mapData.bounds,
+        radius,
+        padding,
+        scale
+      );
+      const clampedShopPos = clampToMinimapCircle(
+        shopMinimapPos,
+        { x: radius, y: radius },
+        radius,
+        8
+      );
+
+      ctx.save();
+      ctx.translate(clampedShopPos.x, clampedShopPos.y);
+
+      // Amber glowing pulse halo
+      ctx.fillStyle = "rgba(245, 197, 24, 0.4)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 7.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Golden pin circle
+      ctx.fillStyle = "#f59e0b"; // Warm amber
+      ctx.beginPath();
+      ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Center dot
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(0, 0, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // D2. Render Bus Stop POI Marker (Transit Cyan/Blue pin)
+      const busMinimapPos = worldToMinimap(
+        BUS_STOP_WORLD_POSITION,
+        mapData.bounds,
+        radius,
+        padding,
+        scale
+      );
+      const clampedBusPos = clampToMinimapCircle(
+        busMinimapPos,
+        { x: radius, y: radius },
+        radius,
+        8
+      );
+
+      ctx.save();
+      ctx.translate(clampedBusPos.x, clampedBusPos.y);
+
+      // Cyan glowing pulse halo
+      ctx.fillStyle = "rgba(14, 165, 233, 0.4)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 7.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Sky blue transit pin circle
+      ctx.fillStyle = "#0284c7";
+      ctx.beginPath();
+      ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Center dot
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(0, 0, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // D3. Render Taxi Stand POI Marker (Vibrant Taxi Yellow pin)
+      const taxiMinimapPos = worldToMinimap(
+        TAXI_STAND_WORLD_POSITION,
+        mapData.bounds,
+        radius,
+        padding,
+        scale
+      );
+      const clampedTaxiPos = clampToMinimapCircle(
+        taxiMinimapPos,
+        { x: radius, y: radius },
+        radius,
+        8
+      );
+
+      ctx.save();
+      ctx.translate(clampedTaxiPos.x, clampedTaxiPos.y);
+
+      // Yellow glowing pulse halo
+      ctx.fillStyle = "rgba(250, 204, 21, 0.45)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 7.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Taxi yellow pin circle
+      ctx.fillStyle = "#facc15";
+      ctx.beginPath();
+      ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Center black dot for taxi contrast
+      ctx.fillStyle = "#000000";
+      ctx.beginPath();
+      ctx.arc(0, 0, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+ 
+      // D4. Render Barber Shop POI Marker (Deep Crimson / Barber Pole pin)
+      const barberMinimapPos = worldToMinimap(
+        BARBER_SHOP_WORLD_POSITION,
+        mapData.bounds,
+        radius,
+        padding,
+        scale
+      );
+      const clampedBarberPos = clampToMinimapCircle(
+        barberMinimapPos,
+        { x: radius, y: radius },
+        radius,
+        8
+      );
+
+      ctx.save();
+      ctx.translate(clampedBarberPos.x, clampedBarberPos.y);
+
+      // Crimson glowing pulse halo
+      ctx.fillStyle = "rgba(220, 38, 38, 0.45)";
+      ctx.beginPath();
+      ctx.arc(0, 0, 7.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Crimson pin circle
+      ctx.fillStyle = "#dc2626";
+      ctx.beginPath();
+      ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Center white dot
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(0, 0, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+
+      // D5. Render Directional Player Arrow (GTA V Chevron Style)
       ctx.save();
       ctx.translate(clampedPos.x, clampedPos.y);
       ctx.rotate(markerAngle);

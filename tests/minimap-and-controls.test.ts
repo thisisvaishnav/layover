@@ -86,14 +86,15 @@ test("TDD [Cardinal Movement]: Arrow keys move in correct 3D world directions", 
   assert.ok(down.position.z < 0, "Backward must decrease Z");
   assert.equal(down.position.x, 0);
 
-  // Left -> -X
+  // Fallback camera faces +Z, so camera-left is +X and camera-right is -X
+  // Left -> +X
   const left = updatePlayerKeyboard(origin, { forward: false, backward: false, left: true, right: false }, 0.1, map.bounds);
-  assert.ok(left.position.x < 0, "Left must decrease X");
+  assert.ok(left.position.x > 0, "Left must move camera-left (+X)");
   assert.equal(left.position.z, 0);
 
-  // Right -> +X
+  // Right -> -X
   const right = updatePlayerKeyboard(origin, { forward: false, backward: false, left: false, right: true }, 0.1, map.bounds);
-  assert.ok(right.position.x > 0, "Right must increase X");
+  assert.ok(right.position.x < 0, "Right must move camera-right (-X)");
   assert.equal(right.position.z, 0);
 });
 
@@ -133,11 +134,11 @@ test("TDD [Player Rotation]: Character smoothly faces the direction of movement 
   }
   assert.ok(Math.abs(state.rotation - 0) < 0.05, `Facing forward should be ~0 rad, got ${state.rotation}`);
 
-  // Moving right (+X): target angle is π/2
+  // Moving camera-right (-X for the +Z-facing fallback camera): target angle is -π/2
   for (let i = 0; i < 20; i++) {
     state = updatePlayerKeyboard(state, { forward: false, backward: false, left: false, right: true }, 0.05, map.bounds);
   }
-  assert.ok(Math.abs(state.rotation - Math.PI / 2) < 0.05, `Facing right should be ~π/2 rad, got ${state.rotation}`);
+  assert.ok(Math.abs(state.rotation - -Math.PI / 2) < 0.05, `Facing camera-right should be ~-π/2 rad, got ${state.rotation}`);
 
   // Moving backward (-Z): target angle is π or -π
   for (let i = 0; i < 20; i++) {
@@ -145,11 +146,11 @@ test("TDD [Player Rotation]: Character smoothly faces the direction of movement 
   }
   assert.ok(Math.abs(Math.abs(state.rotation) - Math.PI) < 0.05, `Facing backward should be ~±π rad, got ${state.rotation}`);
 
-  // Diagonal forward-left (+Z, -X): target angle is -π/4
+  // Diagonal forward + camera-left (+Z, +X): target angle is π/4
   for (let i = 0; i < 20; i++) {
     state = updatePlayerKeyboard(state, { forward: true, backward: false, left: true, right: false }, 0.05, map.bounds);
   }
-  assert.ok(Math.abs(state.rotation - (-Math.PI / 4)) < 0.05, `Facing forward-left should be ~-π/4 rad, got ${state.rotation}`);
+  assert.ok(Math.abs(state.rotation - Math.PI / 4) < 0.05, `Facing forward-left should be ~π/4 rad, got ${state.rotation}`);
 });
 
 // ==========================================

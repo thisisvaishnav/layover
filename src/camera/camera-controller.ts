@@ -42,9 +42,9 @@ export function computeCameraElevation(
   const maxDist = MAX_CAMERA_DISTANCE;
   const t = Math.max(0, Math.min(1, (dist - minDist) / (maxDist - minDist)));
 
-  // Close sits at shoulder-to-head height (~1.62m) with slight downward look (~4.6°)
-  // Dynamically elevates up to ~39° as distance expands
-  const basePitch = 0.08 + Math.pow(t, 0.7) * 0.60;
+  // Close sits at shoulder-to-head height (~1.62m, between 1.5m and 1.7m)
+  // Dynamically elevates to ~28° at medium distance (~9.6m height) and up to ~47° as distance expands
+  const basePitch = 0.08 + Math.pow(t, 0.55) * 0.74;
   const effectivePitch = Math.max(0.04, Math.min(1.05, basePitch + pitchOffset));
   const height = 1.62 + (dist - minDist) * Math.sin(effectivePitch);
   const horizDist = dist * Math.cos(effectivePitch);
@@ -54,8 +54,10 @@ export function computeCameraElevation(
 
 /**
  * GTA V-style third-person on-foot camera controller with dynamic elevation.
- * - Close preset: sits at shoulder-to-head height (1.5m - 1.7m).
- * - Medium / Far presets: dynamically elevates to frame character in lower-middle third.
+ * - Elevated height framing character cleanly from above-behind in lower-middle third.
+ * - Dynamically positions behind character's back based on playerRotation.
+ * - Close preset: sits at shoulder-to-head height (1.5m - 1.75m).
+ * - Medium / Far presets: dynamically elevates to frame character and surrounding city.
  * - Frame-rate independent smooth following without shaking or lag.
  * - Zero automatic walking zoom — camera distance stays completely stable during movement.
  * - Manual mouse-wheel zoom bounded strictly between MIN (5.0m) and MAX (55.0m).
@@ -75,8 +77,15 @@ export function createCameraController(
   let targetDistance = defaultDistance;
   let currentDistance = defaultDistance;
 
-  let pitchOffset = 0;
-  let orbitYaw = config?.baseYaw ?? 0; // Fixed stable south-to-north view looking into the city
+  let pitchOffset = config?.basePitch ?? 0;
+  let orbitYaw = 0;
+  let currentPlayerRotation = config?.baseYaw ?? 0;
+  let currentYaw = currentPlayerRotation + orbitYaw;
+  let hasReceivedRotation = false;
+
+  // Track player position to detect movement for gentle orbit auto-centering
+  let prevPlayerX = initialPosition.x;
+  let prevPlayerZ = initialPosition.z;
 
   // Target follows upper chest/shoulders
   const currentTarget = new THREE.Vector3(initialPosition.x, 1.4, initialPosition.z);
@@ -86,12 +95,12 @@ export function createCameraController(
   const raycaster = new THREE.Raycaster();
   const rayDir = new THREE.Vector3();
 
-  // Initial placement
+  // Initial placement behind player
   const initialProfile = computeCameraElevation(currentDistance, pitchOffset);
   camera.position.set(
-    currentTarget.x - Math.sin(orbitYaw) * initialProfile.horizDist,
+    currentTarget.x - Math.sin(currentYaw) * initialProfile.horizDist,
     initialProfile.height,
-    currentTarget.z - Math.cos(orbitYaw) * initialProfile.horizDist
+    currentTarget.z - Math.cos(currentYaw) * initialProfile.horizDist
   );
   camera.lookAt(
     currentTarget.x,
@@ -104,7 +113,7 @@ export function createCameraController(
     update(
       playerPosition: Vector2D,
       deltaSeconds: number,
-      _playerRotation?: number,
+      playerRotation?: number,
       collisionObjects?: THREE.Object3D[]
     ) {
       // 1. Smoothly follow player position (responsive 8.5/s damping without lag or shaking)
@@ -116,16 +125,50 @@ export function createCameraController(
       const zoomRate = 1 - Math.exp(-8.0 * Math.min(deltaSeconds, 0.1));
       currentDistance += (targetDistance - currentDistance) * zoomRate;
 
-      // 3. Compute dynamic on-foot elevation
+      // 3. Track player rotation to dynamically stay behind the character's back
+      if (playerRotation !== undefined && Number.isFinite(playerRotation)) {
+        currentPlayerRotation = playerRotation;
+        if (!hasReceivedRotation) {
+          currentYaw = currentPlayerRotation + orbitYaw;
+          hasReceivedRotation = true;
+        }
+      }
+
+      // Check if player moved to gently auto-center manual orbit offset behind character
+      const moveDelta = Math.hypot(playerPosition.x - prevPlayerX, playerPosition.z - prevPlayerZ);
+      prevPlayerX = playerPosition.x;
+      prevPlayerZ = playerPosition.z;
+
+      if (moveDelta > 0.01 && Math.abs(orbitYaw) > 1e-4) {
+        const orbitDecay = 1 - Math.exp(-2.5 * Math.min(deltaSeconds, 0.1));
+        orbitYaw -= orbitYaw * orbitDecay;
+        if (Math.abs(orbitYaw) < 0.005) {
+          orbitYaw = 0;
+        }
+      }
+
+      const targetYaw = currentPlayerRotation + orbitYaw;
+
+      // Shortest angle difference in [-PI, PI]
+      let yawDiff = (targetYaw - currentYaw) % (Math.PI * 2);
+      if (yawDiff < -Math.PI) yawDiff += Math.PI * 2;
+      if (yawDiff > Math.PI) yawDiff -= Math.PI * 2;
+
+      // Responsive frame-rate independent camera rotation follow (7.5/s) keeps camera smoothly behind player
+      const yawRate = 1 - Math.exp(-7.5 * Math.min(deltaSeconds, 0.1));
+      currentYaw += yawDiff * yawRate;
+      currentYaw = ((currentYaw + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+
+      // 4. Compute dynamic on-foot elevation
       let effectiveDistance = currentDistance;
 
-      // 4. Simple camera collision prevention against building meshes
+      // 5. Camera collision prevention against building meshes
       if (collisionObjects && collisionObjects.length > 0) {
         const testProfile = computeCameraElevation(effectiveDistance, pitchOffset);
         const testPos = new THREE.Vector3(
-          currentTarget.x - Math.sin(orbitYaw) * testProfile.horizDist,
+          currentTarget.x - Math.sin(currentYaw) * testProfile.horizDist,
           testProfile.height,
-          currentTarget.z - Math.cos(orbitYaw) * testProfile.horizDist
+          currentTarget.z - Math.cos(currentYaw) * testProfile.horizDist
         );
 
         rayDir.subVectors(testPos, currentTarget).normalize();
@@ -142,9 +185,9 @@ export function createCameraController(
       const profile = computeCameraElevation(effectiveDistance, pitchOffset);
 
       camera.position.set(
-        currentTarget.x - Math.sin(orbitYaw) * profile.horizDist,
+        currentTarget.x - Math.sin(currentYaw) * profile.horizDist,
         profile.height,
-        currentTarget.z - Math.cos(orbitYaw) * profile.horizDist
+        currentTarget.z - Math.cos(currentYaw) * profile.horizDist
       );
 
       // LookAt dynamically adjusts to keep character in lower-middle third
@@ -177,12 +220,15 @@ export function createCameraController(
     rotateOrbit(deltaYaw: number, deltaPitch: number) {
       orbitYaw += deltaYaw;
       orbitYaw = ((orbitYaw + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+      currentYaw += deltaYaw;
+      currentYaw = ((currentYaw + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
       pitchOffset = Math.max(-0.25, Math.min(0.40, pitchOffset + deltaPitch));
     },
 
     resetOrbit() {
-      pitchOffset = 0;
+      pitchOffset = config?.basePitch ?? 0;
       orbitYaw = 0;
+      currentYaw = currentPlayerRotation;
       targetDistance = defaultDistance;
     },
 

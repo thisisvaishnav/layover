@@ -2,18 +2,22 @@
 
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import * as THREE from "three";
-import { generateMap, type GeneratedMap } from "../../map/map-generator";
+import { generateMap, getParkSpawnPoint, type GeneratedMap } from "../../map/map-generator";
 import { buildMapMeshes, type MapMeshSystem } from "../../map/map-mesh-builder";
+import { createTrafficSystem, type TrafficSystem } from "../../map/traffic-system";
+import { createSunlightSystem, type SunlightSystem } from "../../map/sunlight-system";
 import {
   createPlayerState,
   setPlayerDestination,
   updatePlayerMovement,
   updatePlayerMovementState,
   selectMovementUpdate,
+  DEFAULT_MOVEMENT_CONFIG,
   type PlayerState,
   type KeyboardInput,
   type Vector2D,
 } from "../../player/movement-controller";
+import { PlayerCollisionWorld } from "../../player/world-collision";
 import { createPlayerCharacter, type PlayerCharacter } from "../../player/player-character";
 import { createCameraController, type CameraController } from "../../camera/camera-controller";
 import {
@@ -25,13 +29,82 @@ import {
   type RaycastHandler,
 } from "../../interaction/raycast-handler";
 import MinimapHUD from "./MinimapHUD";
+import { MapPlacesDirectory } from "./MapPlacesDirectory";
+import { createCoffeeShop, isWithinInteractionRange, type CoffeeShopSystem } from "../../interaction/coffee-shop";
+import { createBusStop, isWithinBusStopRange, type BusStopSystem } from "../../interaction/bus-stop";
+import { createTaxiStand, isWithinTaxiStandRange, type TaxiStandSystem } from "../../interaction/taxi-stand";
+import { createBarberShop, isWithinBarberShopRange, type BarberShopSystem } from "../../interaction/barber-shop";
+import { useConversationStore } from "../../lib/conversation/store";
+import { matchScriptedNpcLine } from "../../lib/conversation/format";
+import { createVoiceAgentClient, type VoiceAgentClient } from "../../lib/voice-agent/voice-agent-client";
+import { warmUpAudioContext } from "../../lib/voice-agent/audio-capture";
+import { COFFEE_SHOP_WORLD_POSITION, COFFEE_SHOP_ROTATION } from "../../scenarios/coffee-shop-scenario";
+import { BUS_STOP_WORLD_POSITION } from "../../scenarios/bus-stop-scenario";
+import { TAXI_STAND_WORLD_POSITION, TAXI_STAND_ROTATION } from "../../scenarios/taxi-stand-scenario";
+import { BARBER_SHOP_WORLD_POSITION } from "../../scenarios/barber-shop-scenario";
+import {
+  getBilingualDialogue,
+  getMultilingualScenario,
+  type MultilingualScenarioConfig,
+  SUPPORTED_LEARNER_LANGUAGES,
+} from "../../scenarios/multilingual";
+import { ONBOARDING_COUNTRIES } from "../../scenarios/catalog";
+import { InteractionPrompt } from "../conversation/InteractionPrompt";
+import { ConversationUI } from "../conversation/ConversationUI";
 
 interface WorldCanvasProps {
   onBackToOnboarding?: () => void;
+  targetLang?: string;
+  nativeLang?: string;
 }
 
-export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
+export default function WorldCanvas({ onBackToOnboarding, targetLang, nativeLang }: WorldCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic language configuration from onboarding or URL/localStorage
+  const resolvedTargetLang = useMemo(() => {
+    if (targetLang) return targetLang;
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTarget = urlParams.get("target");
+      if (urlTarget) return urlTarget;
+      const stored = localStorage.getItem("layover_target_lang");
+      if (stored) return stored;
+    }
+    return "es";
+  }, [targetLang]);
+
+  const resolvedNativeLang = useMemo(() => {
+    if (nativeLang) return nativeLang;
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlNative = urlParams.get("native");
+      if (urlNative) return urlNative;
+      const stored = localStorage.getItem("layover_native_lang");
+      if (stored) return stored;
+    }
+    return "en";
+  }, [nativeLang]);
+
+  const targetCountry = useMemo(
+    () => ONBOARDING_COUNTRIES.find((c) => c.code === resolvedTargetLang) || ONBOARDING_COUNTRIES[0],
+    [resolvedTargetLang]
+  );
+
+  const learnerLang = useMemo(
+    () =>
+      SUPPORTED_LEARNER_LANGUAGES.find((l) => l.code === resolvedNativeLang) ||
+      SUPPORTED_LEARNER_LANGUAGES[0],
+    [resolvedNativeLang]
+  );
+
+  const targetLangRef = useRef(resolvedTargetLang);
+  const nativeLangRef = useRef(resolvedNativeLang);
+
+  useEffect(() => {
+    targetLangRef.current = resolvedTargetLang;
+    nativeLangRef.current = resolvedNativeLang;
+  }, [resolvedTargetLang, resolvedNativeLang]);
 
   // 1. Data-Driven Map Generation (4x4 = 16 large plots, 1.5x larger plot size: 72x72)
   const mapData: GeneratedMap = useMemo(
@@ -41,13 +114,15 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
         plotSize: 72,
         roadWidth: 20,
         hasPerimeterRoads: true,
+        parkSizeMultiplier: 2,
       }),
     []
   );
 
-  const parkPlot = useMemo(() => mapData.plots.find((p) => p.type === "park"), [mapData]);
-  const initX = parkPlot ? parkPlot.x : 0;
-  const initZ = parkPlot ? parkPlot.z - 38 : 0;
+  // Spawn on the park lawn (south of the memorial), never on the perimeter footpath
+  const spawnPoint = useMemo(() => getParkSpawnPoint(mapData), [mapData]);
+  const initX = spawnPoint.x;
+  const initZ = spawnPoint.z;
 
   const playerStateRef = useRef<{ position: Vector2D; rotation: number }>({
     position: { x: initX, z: initZ },
@@ -71,6 +146,223 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
   });
 
   const cameraControllerRef = useRef<CameraController | null>(null);
+  const coffeeShopRef = useRef<CoffeeShopSystem | null>(null);
+  const busStopRef = useRef<BusStopSystem | null>(null);
+  const taxiStandRef = useRef<TaxiStandSystem | null>(null);
+  const barberShopRef = useRef<BarberShopSystem | null>(null);
+  const voiceClientRef = useRef<VoiceAgentClient | null>(null);
+  const [showControls, setShowControls] = useState(false);
+  const navigateToTargetRef = useRef<Vector2D | null>(null);
+
+  const handleNavigateToPlace = useCallback((position: Vector2D) => {
+    navigateToTargetRef.current = position;
+  }, []);
+
+  // Active scenario tracking for dynamic interaction (Coffee Shop vs Bus Stop vs Taxi Stand vs Barber Shop)
+  const [activeScenario, setActiveScenario] = useState<MultilingualScenarioConfig>(() =>
+    getMultilingualScenario(resolvedTargetLang, resolvedNativeLang, "cafe")
+  );
+
+  const activeScenarioRef = useRef<MultilingualScenarioConfig>(
+    getMultilingualScenario(resolvedTargetLang, resolvedNativeLang, "cafe")
+  );
+
+  useEffect(() => {
+    const isBarber = activeScenarioRef.current.id.includes("barber");
+    const isBus = activeScenarioRef.current.id.includes("bus");
+    const isTaxi = activeScenarioRef.current.id.includes("taxi");
+    const zone: "cafe" | "bus_stop" | "taxi" | "barber" = isBarber ? "barber" : isTaxi ? "taxi" : (isBus ? "bus_stop" : "cafe");
+    const updated = getMultilingualScenario(
+      resolvedTargetLang,
+      resolvedNativeLang,
+      zone
+    );
+    activeScenarioRef.current = updated;
+    setActiveScenario(updated);
+  }, [resolvedTargetLang, resolvedNativeLang]);
+
+  // Synchronous trigger to open conversation with proper bilingual dialogue
+  const triggerOpenConversation = useCallback(() => {
+    warmUpAudioContext();
+    const currentTarget = targetLangRef.current;
+    const currentNative = nativeLangRef.current;
+    const scenario = activeScenarioRef.current;
+    const isBus = scenario.id.includes("bus");
+    const isTaxi = scenario.id.includes("taxi");
+    const currentZone: "cafe" | "bus_stop" | "taxi" = isTaxi ? "taxi" : (isBus ? "bus_stop" : "cafe");
+    const dialogue = getBilingualDialogue({
+      targetLang: currentTarget,
+      nativeLang: currentNative,
+      zone: currentZone,
+      stepIndex: 0,
+    });
+
+    useConversationStore.getState().openConversation(
+      scenario.npcName,
+      dialogue.objective,
+      dialogue.totalSteps,
+      {
+        targetLang: currentTarget,
+        nativeLang: currentNative,
+        zone: currentZone,
+        npcRole: scenario.npcRole,
+        suggestedTarget: dialogue.userSuggestedTarget,
+        suggestedPhonetics: dialogue.userSuggestedPhonetics,
+        suggestedNative: dialogue.userSuggestedNative,
+        initialNpcMessage: {
+          speaker: "NPC",
+          text: dialogue.npcTargetText,
+          phonetic: dialogue.npcPhonetics,
+          translation: dialogue.npcNativeTranslation,
+        },
+      }
+    );
+  }, []);
+
+  const triggerOpenConversationRef = useRef(triggerOpenConversation);
+  useEffect(() => {
+    triggerOpenConversationRef.current = triggerOpenConversation;
+  }, [triggerOpenConversation]);
+
+  // Audio recording handlers for AssemblyAI integration
+  const handleStartRecording = useCallback(async () => {
+    warmUpAudioContext();
+    const client = voiceClientRef.current;
+    if (!client) {
+      // No live voice session — never claim the mic is open
+      return false;
+    }
+    const ok = await client.startRecording();
+    useConversationStore.getState().setIsMicRecording(ok);
+    if (ok) {
+      useConversationStore.getState().setStatus("USER_SPEAKING");
+    }
+    return ok;
+  }, []);
+
+  const handleStopRecording = useCallback(() => {
+    if (voiceClientRef.current) {
+      voiceClientRef.current.stopRecording();
+    }
+    useConversationStore.getState().setIsMicRecording(false);
+  }, []);
+
+  const handleSendTextMessage = useCallback((text: string) => {
+    if (voiceClientRef.current) {
+      voiceClientRef.current.sendTextMessage(text);
+    }
+  }, []);
+
+  // Conversation state: read from Zustand so JSX can react to changes
+  const conversationOpen = useConversationStore((s) => s.isOpen);
+  const conversationInRange = useConversationStore((s) => s.isInRange);
+  // Bumped on every openConversation (initial open, Retry) so a reconnect only
+  // ever happens from an explicit user gesture — never from a bare remount.
+  const sessionVersion = useConversationStore((s) => s.sessionVersion);
+
+  const handleCloseConversation = useCallback(() => {
+    useConversationStore.getState().closeConversation();
+  }, []);
+
+  // Voice agent lifecycle — connect when conversation opens, clean up on close
+  useEffect(() => {
+    if (!conversationOpen) {
+      voiceClientRef.current?.disconnect();
+      voiceClientRef.current = null;
+      return;
+    }
+
+    const currentScenario = activeScenarioRef.current;
+    const client = createVoiceAgentClient({
+      agentId: currentScenario.id,
+      systemPrompt: currentScenario.systemPrompt,
+      greeting: currentScenario.greeting,
+      onPartialTranscript(text) {
+        const store = useConversationStore.getState();
+        store.setStatus("USER_SPEAKING");
+        store.updatePartialTranscript(text);
+      },
+      onFinalTranscript(text) {
+        useConversationStore.getState().finalizeUserTurn(text);
+      },
+      onNpcTurnStart() {
+        useConversationStore.getState().setStatus("NPC_SPEAKING");
+      },
+      onNpcMessage(msg) {
+        const store = useConversationStore.getState();
+        const norm = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
+
+        // The opening greeting was already shown when E was pressed and is what
+        // the agent just read back out. Re-appending it would duplicate the card
+        // and burn the learner's first reply on an NPC line.
+        if (!store.messages.some((m) => m.speaker === "USER")) {
+          let lastNpc: { text?: string } | undefined;
+          for (let i = store.messages.length - 1; i >= 0; i--) {
+            const m = store.messages[i];
+            if (m.speaker === "NPC") { lastNpc = m; break; }
+          }
+          if (lastNpc?.text && norm(lastNpc.text) === norm(msg.text)) return;
+          store.addMessage(msg);
+          return;
+        }
+
+        const match = matchScriptedNpcLine({
+          text: msg.text,
+          targetLang: store.targetLang ?? "es",
+          nativeLang: store.nativeLang ?? "en",
+          zone: store.zone ?? "cafe",
+        });
+        store.addMessage(match ? { ...msg, phonetic: match.phonetic, translation: match.translation } : msg);
+        store.advanceStep();
+      },
+      onNpcTurnEnd() {
+        useConversationStore.getState().setStatus("LISTENING");
+      },
+      onConnected() {
+        useConversationStore.getState().setStatus("CONNECTED");
+        console.log("[Conversation] Voice agent connected for", currentScenario.npcName);
+      },
+      onError(message) {
+        useConversationStore.getState().setError(message);
+        console.error("[Conversation] Voice agent error:", message);
+      },
+      onSessionEnded() {
+        console.log("[Conversation] Voice session ended for", currentScenario.npcName);
+        // The session is dead: release the mic/socket immediately instead of
+        // leaving a hot microphone behind a stale client.
+        if (voiceClientRef.current === client) {
+          client.disconnect();
+          voiceClientRef.current = null;
+        }
+        const store = useConversationStore.getState();
+        store.setIsMicRecording(false);
+        if (store.isOpen && store.status !== "ERROR") {
+          store.setError("Voice session ended. Tap Retry to reconnect.");
+        }
+      },
+    });
+
+    voiceClientRef.current = client;
+    void client.connect();
+
+    return () => {
+      client.disconnect();
+      voiceClientRef.current = null;
+    };
+  }, [conversationOpen, sessionVersion]);
+
+  // The conversation store survives unmount (it is module-scoped), so without
+  // this an unmount/remount would reconnect — and reopen the mic — with no user
+  // gesture behind it. Ending the conversation here forces the next open to come
+  // from a real gesture (E key / prompt click / Retry).
+  useEffect(() => {
+    return () => {
+      const store = useConversationStore.getState();
+      if (store.isOpen) {
+        store.closeConversation();
+      }
+    };
+  }, []);
 
   const handleZoom = useCallback((deltaDist: number) => {
     if (cameraControllerRef.current) {
@@ -90,8 +382,8 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
 
     // 2. Setup Three.js Scene & Renderer
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xdde3ea); // Crisp modern atmosphere
-    scene.fog = new THREE.FogExp2(0xdde3ea, 0.0014); // Balanced horizon fog for 388-unit city
+    scene.background = new THREE.Color(0xf0f4f9); // Bright sunny sky atmosphere
+    scene.fog = new THREE.FogExp2(0xf0f4f9, 0.0010); // Clear, soft luminous horizon fog for 388-unit city
 
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
@@ -104,20 +396,23 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 1.18;
     container.appendChild(renderer.domElement);
 
-    // 3. Lighting System (scaled to cover 388-unit expanded world)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    // 3. Lighting System (bright, warm daylight covering 388-unit world)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.15);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xfffdf5, 1.3);
-    dirLight.position.set(120, 180, 90);
+    // Primary direct warm sunlight aligned with celestial sun position
+    const dirLight = new THREE.DirectionalLight(0xfffaed, 1.85);
+    dirLight.position.set(180, 260, 140);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 2048;
     dirLight.shadow.mapSize.height = 2048;
     dirLight.shadow.camera.near = 10;
-    dirLight.shadow.camera.far = 550;
-    const d = 215;
+    dirLight.shadow.camera.far = 650;
+    const d = 230;
     dirLight.shadow.camera.left = -d;
     dirLight.shadow.camera.right = d;
     dirLight.shadow.camera.top = d;
@@ -125,12 +420,74 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     dirLight.shadow.bias = -0.0005;
     scene.add(dirLight);
 
-    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d99ae, 0.35);
+    // Secondary soft fill light from opposite angle to prevent dark shadowed faces
+    const fillLight = new THREE.DirectionalLight(0xeef4fc, 0.40);
+    fillLight.position.set(-120, 140, -100);
+    scene.add(fillLight);
+
+    // Dynamic sky-and-ground hemisphere bounce (warm sunlight from above, soft sky bounce)
+    const hemiLight = new THREE.HemisphereLight(0xfffaed, 0xc9d9e8, 0.75);
     scene.add(hemiLight);
 
-    // 4. Build Map 3D Meshes
-    const mapMeshes: MapMeshSystem = buildMapMeshes(mapData);
+    // 4. Build Map 3D Meshes (with country-specific memorial)
+    const mapMeshes: MapMeshSystem = buildMapMeshes(mapData, {
+      countryCode: targetCountry.code,
+    });
     scene.add(mapMeshes.group);
+
+    // 4b. Build Coffee Shop Stall (NPC interaction point on the Central Park lawn)
+    const coffeeShop = createCoffeeShop(
+      COFFEE_SHOP_WORLD_POSITION.x,
+      COFFEE_SHOP_WORLD_POSITION.z,
+      COFFEE_SHOP_ROTATION
+    );
+    scene.add(coffeeShop.group);
+    coffeeShopRef.current = coffeeShop;
+
+    // 4c. Build Bus Stop Shelter & Conductor (NPC interaction point in Transit Plaza)
+    const busStop = createBusStop(
+      BUS_STOP_WORLD_POSITION.x,
+      BUS_STOP_WORLD_POSITION.z
+    );
+    scene.add(busStop.group);
+    busStopRef.current = busStop;
+
+    // 4c2. Build Taxi Stand, Bay Shelter & Local Stationed Taxis (NPC interaction point on West plot)
+    const taxiStand = createTaxiStand(
+      TAXI_STAND_WORLD_POSITION.x,
+      TAXI_STAND_WORLD_POSITION.z,
+      { countryCode: targetCountry.code, rotation: TAXI_STAND_ROTATION }
+    );
+    scene.add(taxiStand.group);
+    taxiStandRef.current = taxiStand;
+
+    // 4c3. Build Boutique Vintage Barber Shop Salon (NPC interaction point on East plot, plot-1-2)
+    const barberShop = createBarberShop(
+      BARBER_SHOP_WORLD_POSITION.x,
+      BARBER_SHOP_WORLD_POSITION.z,
+      {
+        countryCode: targetCountry.code,
+        rotation: -Math.PI / 2, // Facing West towards the road separating Central Park and plot-1-2
+      }
+    );
+    scene.add(barberShop.group);
+    barberShopRef.current = barberShop;
+
+    // 4d. Build Dynamic City Traffic System (Red Transit Buses & Selective Cars)
+    const trafficSystem: TrafficSystem = createTrafficSystem(mapData);
+    scene.add(trafficSystem.group);
+
+    // 4d2. Player collision world — solid shops, buildings, street lights + moving cars
+    const collisionWorld = new PlayerCollisionWorld();
+    collisionWorld.addStatic(mapMeshes.obstacleObjects);
+    collisionWorld.addStatic([coffeeShop.group, busStop.group, taxiStand.group, barberShop.group]);
+    collisionWorld.addDynamic(trafficSystem.vehicles.map((vehicle) => vehicle.group));
+
+    // 4e. Cinematic Sunlight System (Sun core, radiant corona, volumetric god rays, airborne motes)
+    const sunlightSystem: SunlightSystem = createSunlightSystem({
+      sunPosition: dirLight.position,
+    });
+    scene.add(sunlightSystem.group);
 
     // 5. Build Procedural 3D Human Player
     const playerChar: PlayerCharacter = createPlayerCharacter();
@@ -223,7 +580,11 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       }
 
       const isCanvas = event.target === renderer.domElement;
-      if (!isCanvas || (event.target as HTMLElement).closest("button")) {
+      if (
+        !isCanvas ||
+        (event.target as HTMLElement).closest("button") ||
+        useConversationStore.getState().isOpen
+      ) {
         isDragging = false;
         isRightDrag = false;
         return;
@@ -314,6 +675,27 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
           keyboardInput.right = true;
           handled = true;
           break;
+
+        case "KeyE": {
+          const convState = useConversationStore.getState();
+          if (convState.isInRange && !convState.isOpen) {
+            triggerOpenConversationRef.current();
+            keyboardInput.forward = false;
+            keyboardInput.backward = false;
+            keyboardInput.left = false;
+            keyboardInput.right = false;
+            playerState = {
+              ...playerState,
+              movementState: "IDLE",
+              isMoving: false,
+              target: null,
+              velocity: { x: 0, y: playerState.verticalVelocity, z: 0 },
+            };
+            destinationIndicator.hide();
+          }
+          handled = true;
+          break;
+        }
       }
 
       if (handled) {
@@ -382,12 +764,69 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
     let animationFrameId: number;
     let lastTime = performance.now();
     let hudThrottleCounter = 0;
+    const movementCamera = new THREE.PerspectiveCamera();
+    let activeKeyCombo: string | null = null;
 
     const animate = (currentTime: number) => {
       animationFrameId = requestAnimationFrame(animate);
 
       const deltaSeconds = Math.min((currentTime - lastTime) / 1000, 0.1);
       lastTime = currentTime;
+
+      // Freeze all player input and stop motion while conversation is open
+      const isConvOpen = useConversationStore.getState().isOpen;
+      if (isConvOpen) {
+        keyboardInput.forward = false;
+        keyboardInput.backward = false;
+        keyboardInput.left = false;
+        keyboardInput.right = false;
+        keyboardInput.aiming = false;
+        if (playerState.isMoving) {
+          playerState = {
+            ...playerState,
+            movementState: "IDLE",
+            isMoving: false,
+            target: null,
+            velocity: { x: 0, y: playerState.verticalVelocity, z: 0 },
+          };
+          destinationIndicator.hide();
+        }
+      }
+
+      // Programmatic navigation triggered by Places Directory
+      if (navigateToTargetRef.current && !isConvOpen) {
+        const navTarget = navigateToTargetRef.current;
+        navigateToTargetRef.current = null;
+        playerState = setPlayerDestination(playerState, navTarget, mapData.bounds);
+        if (playerState.target) {
+          destinationIndicator.show(playerState.target);
+        }
+      }
+
+      const hasKeyboardActive =
+
+        keyboardInput.forward ||
+        keyboardInput.backward ||
+        keyboardInput.left ||
+        keyboardInput.right;
+
+      const inputX = (keyboardInput.right ? 1 : 0) - (keyboardInput.left ? 1 : 0);
+      const inputY = (keyboardInput.forward ? 1 : 0) - (keyboardInput.backward ? 1 : 0);
+      const keyCombo = `${inputX},${inputY}`;
+
+      if (hasKeyboardActive && !keyboardInput.aiming) {
+        if (activeKeyCombo !== keyCombo) {
+          activeKeyCombo = keyCombo;
+          movementCamera.copy(cameraController.camera);
+          movementCamera.updateMatrixWorld();
+        }
+      } else {
+        activeKeyCombo = null;
+      }
+
+      const camForMovement = (activeKeyCombo && !keyboardInput.aiming)
+        ? movementCamera
+        : cameraController.camera;
 
       // Project mouse screen position onto ground plane for aiming & direction
       let cursorGroundPos: Vector2D | null = null;
@@ -412,19 +851,32 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
 
       const horizontalSpeed = Math.hypot(playerState.velocity.x, playerState.velocity.z);
 
-      // Update movement: GTA San Andreas Camera-Relative Locomotion & Aiming
+      // Re-read moving car transforms so the player collides with their current position
+      collisionWorld.refreshDynamic();
+      const solidObstacles = collisionWorld.colliders;
+
+      // Update movement: Camera-Relative Locomotion from player perspective & Aiming
       const movementUpdate = selectMovementUpdate(playerState, keyboardInput, horizontalSpeed);
       if (movementUpdate === "KEYBOARD") {
         playerState = updatePlayerMovementState(
           playerState,
           keyboardInput,
-          cameraController.camera,
+          camForMovement,
           deltaSeconds,
-          mapData.bounds
+          mapData.bounds,
+          0.8,
+          DEFAULT_MOVEMENT_CONFIG,
+          solidObstacles
         );
         destinationIndicator.hide();
       } else if (playerState.isMoving && playerState.target) {
-        playerState = updatePlayerMovement(playerState, deltaSeconds, mapData.bounds);
+        playerState = updatePlayerMovement(
+          playerState,
+          deltaSeconds,
+          mapData.bounds,
+          0.8,
+          solidObstacles
+        );
         if (!playerState.isMoving) {
           destinationIndicator.hide();
         }
@@ -448,6 +900,91 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
 
       // Update 3D player mesh animation
       playerChar.update(playerState, deltaSeconds);
+
+      // Update coffee shop, bus stop, taxi stand, and barber shop NPC animations
+      const isCoffeeConv = isConvOpen && activeScenarioRef.current.id.includes("cafe");
+      const isBusConv = isConvOpen && activeScenarioRef.current.id.includes("bus");
+      const isTaxiConv = isConvOpen && activeScenarioRef.current.id.includes("taxi");
+      const isBarberConv = isConvOpen && activeScenarioRef.current.id.includes("barber");
+      coffeeShop.update(deltaSeconds, isCoffeeConv);
+      busStop.update(deltaSeconds, isBusConv);
+      taxiStand.update(deltaSeconds, isTaxiConv);
+      barberShop.update(deltaSeconds, isBarberConv);
+
+      // Update dynamic city traffic (buses and selective cars)
+      trafficSystem.update(deltaSeconds);
+
+      // Update cinematic sunlight effect (god rays breathing, dust motes drifting, camera glare)
+      sunlightSystem.update(deltaSeconds, cameraController.camera);
+
+      // NPC proximity check — determine if player is near Coffee Shop, Bus Stop, Taxi Stand, or Barber Shop
+      const coffeePos = coffeeShop.npcWorldPosition;
+      const inCoffeeRange = isWithinInteractionRange(
+        playerState.position.x,
+        playerState.position.z,
+        coffeePos.x,
+        coffeePos.z,
+        12
+      );
+
+      const busPos = busStop.conductorWorldPosition;
+      const inBusRange = isWithinBusStopRange(
+        playerState.position.x,
+        playerState.position.z,
+        busPos.x,
+        busPos.z,
+        12
+      );
+
+      const taxiPos = taxiStand.driverWorldPosition;
+      const inTaxiRange = isWithinTaxiStandRange(
+        playerState.position.x,
+        playerState.position.z,
+        taxiPos.x,
+        taxiPos.z,
+        12
+      );
+
+      const barberPos = barberShop.npcWorldPosition;
+      const inBarberRange = isWithinBarberShopRange(
+        playerState.position.x,
+        playerState.position.z,
+        barberPos.x,
+        barberPos.z,
+        12
+      );
+
+      const isNearAnyNpc = inCoffeeRange || inBusRange || inTaxiRange || inBarberRange;
+      if (inCoffeeRange) {
+        const cafeScenario = getMultilingualScenario(targetLangRef.current, nativeLangRef.current, "cafe");
+        if (activeScenarioRef.current.id !== cafeScenario.id) {
+          activeScenarioRef.current = cafeScenario;
+          setActiveScenario(cafeScenario);
+        }
+      } else if (inBusRange) {
+        const busScenario = getMultilingualScenario(targetLangRef.current, nativeLangRef.current, "bus_stop");
+        if (activeScenarioRef.current.id !== busScenario.id) {
+          activeScenarioRef.current = busScenario;
+          setActiveScenario(busScenario);
+        }
+      } else if (inTaxiRange) {
+        const taxiScenario = getMultilingualScenario(targetLangRef.current, nativeLangRef.current, "taxi");
+        if (activeScenarioRef.current.id !== taxiScenario.id) {
+          activeScenarioRef.current = taxiScenario;
+          setActiveScenario(taxiScenario);
+        }
+      } else if (inBarberRange) {
+        const barberScenario = getMultilingualScenario(targetLangRef.current, nativeLangRef.current, "barber");
+        if (activeScenarioRef.current.id !== barberScenario.id) {
+          activeScenarioRef.current = barberScenario;
+          setActiveScenario(barberScenario);
+        }
+      }
+
+      const prevInRange = useConversationStore.getState().isInRange;
+      if (isNearAnyNpc !== prevInRange) {
+        useConversationStore.getState().setInRange(isNearAnyNpc);
+      }
 
       // Update destination indicator animation
       destinationIndicator.update(deltaSeconds);
@@ -519,8 +1056,18 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
 
       mapMeshes.dispose();
       playerChar.dispose();
+      coffeeShop.dispose();
+      coffeeShopRef.current = null;
+      busStop.dispose();
+      busStopRef.current = null;
+      taxiStand.dispose();
+      taxiStandRef.current = null;
+      barberShop.dispose();
+      barberShopRef.current = null;
       destinationIndicator.dispose();
       cursorAimIndicator.dispose();
+      trafficSystem.dispose();
+      sunlightSystem.dispose();
 
       scene.clear();
       renderer.dispose();
@@ -530,35 +1077,62 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       }
       cameraControllerRef.current = null;
     };
-  }, [mapData, initX, initZ]);
+  }, [mapData, initX, initZ, targetCountry.code]);
 
   return (
     <div className="relative w-full h-screen overflow-hidden select-none bg-slate-900 font-sans">
       {/* 3D WebGL Canvas Container */}
       <div ref={containerRef} className="w-full h-full cursor-crosshair" />
 
+      {/* District Places Directory — Left Side */}
+      <MapPlacesDirectory
+        playerPosition={{ x: hudState.x, z: hudState.z }}
+        onNavigateToPlace={handleNavigateToPlace}
+      />
+
+      {/* NPC Interaction Prompt — appears when player is in range */}
+      <InteractionPrompt
+        isVisible={conversationInRange && !conversationOpen}
+        npcName={activeScenario.npcName}
+        interactKey="E"
+        onInteract={() => {
+          if (conversationInRange && !conversationOpen) {
+            triggerOpenConversationRef.current();
+          }
+        }}
+      />
+
+      {/* NPC Conversation Overlay — bottom 50% of screen */}
+      <ConversationUI
+        onClose={handleCloseConversation}
+        onStartRecording={handleStartRecording}
+        onStopRecording={handleStopRecording}
+        onSendTextMessage={handleSendTextMessage}
+      />
+
       {/* Top Header Overlay */}
       <header className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-20">
-        <div className="pointer-events-auto flex items-center gap-3 bg-white/90 backdrop-blur border border-black/20 shadow-sm px-4 py-2.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+        <div className="pointer-events-auto flex items-center gap-2.5 bg-[#FAF9F5] border-[3px] border-black shadow-[4px_4px_0px_#000] px-3.5 py-2">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#00D084] border border-black animate-pulse" />
           <div className="flex flex-col">
-            <span className="font-bold text-xs uppercase tracking-wider text-black">
-              Interactive 3D World
+            <span className="font-black text-xs uppercase tracking-tight text-black flex items-center gap-1.5">
+              <span>{targetCountry.flag}</span>
+              <span>{targetCountry.country} ({targetCountry.language})</span>
             </span>
-            <span className="text-[11px] font-mono text-black/60">
-              GTA V Controls & Minimap · {hudState.plotsCount} Large Plots
+            <span className="text-[10px] font-mono font-bold text-black/60 uppercase">
+              Scaffolding: {learnerLang.name} · {hudState.plotsCount} Plots
             </span>
           </div>
         </div>
 
         <div className="pointer-events-auto flex items-center gap-2">
           {/* Camera Zoom Control Buttons */}
-          <div className="flex items-center bg-white/90 backdrop-blur border border-black/20 shadow-sm px-1 py-1 gap-1">
+          <div className="flex items-center bg-[#FAF9F5] border-[3px] border-black shadow-[4px_4px_0px_#000] p-1 gap-1">
             <button
               onClick={() => handleZoom(-3)}
               title="Zoom Camera In (Mouse Wheel Up)"
               aria-label="Zoom Camera In"
-              className="w-7 h-7 flex items-center justify-center font-bold text-xs bg-white hover:bg-black hover:text-white border border-black/15 transition-colors cursor-pointer"
+              className="w-7 h-7 flex items-center justify-center font-black text-xs bg-[#FFB800] hover:bg-[#ffc633] text-black border border-black transition-colors cursor-pointer shadow-[1px_1px_0px_#000]"
             >
               +
             </button>
@@ -566,15 +1140,15 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
               onClick={handleResetZoom}
               title="Reset Camera Zoom"
               aria-label="Reset Camera Zoom"
-              className="px-2 h-7 flex items-center justify-center font-mono text-[10px] bg-slate-100 hover:bg-black hover:text-white border border-black/15 transition-colors cursor-pointer"
+              className="px-2 h-7 flex items-center justify-center font-mono font-black text-[10px] bg-white hover:bg-black hover:text-white border border-black transition-colors cursor-pointer shadow-[1px_1px_0px_#000]"
             >
-              Reset
+              RESET
             </button>
             <button
               onClick={() => handleZoom(3)}
               title="Zoom Camera Out (Mouse Wheel Down)"
               aria-label="Zoom Camera Out"
-              className="w-7 h-7 flex items-center justify-center font-bold text-xs bg-white hover:bg-black hover:text-white border border-black/15 transition-colors cursor-pointer"
+              className="w-7 h-7 flex items-center justify-center font-black text-xs bg-[#FFB800] hover:bg-[#ffc633] text-black border border-black transition-colors cursor-pointer shadow-[1px_1px_0px_#000]"
             >
               −
             </button>
@@ -583,7 +1157,7 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
           {onBackToOnboarding && (
             <button
               onClick={onBackToOnboarding}
-              className="px-3 py-2 bg-white/90 hover:bg-black hover:text-white backdrop-blur border border-black/20 text-black text-xs font-mono uppercase tracking-wider transition-colors cursor-pointer shadow-sm"
+              className="px-3 py-2 bg-white hover:bg-black hover:text-white border-[3px] border-black text-black text-xs font-mono font-black uppercase tracking-wider transition-colors cursor-pointer shadow-[4px_4px_0px_#000] active:translate-x-0.5 active:translate-y-0.5"
             >
               ← Onboarding
             </button>
@@ -592,47 +1166,38 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
       </header>
 
       {/* Floating Instructions & Coordinates HUD (Bottom-Left) */}
-      <div className="absolute bottom-6 left-6 pointer-events-none z-20 flex flex-col gap-2">
-        <div className="pointer-events-auto bg-white/95 backdrop-blur border border-black/20 px-4 py-3 shadow-md max-w-md flex flex-col gap-2">
-          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wide text-black border-b border-black/10 pb-1.5">
-            <span>GTA Locomotion</span>
+      <div className="absolute bottom-4 left-4 pointer-events-none z-20 flex flex-col gap-1.5 max-w-[280px] sm:max-w-xs select-none">
+        <div className="pointer-events-auto bg-[#FAF9F5] border-[3px] border-black shadow-[4px_4px_0px_#000] p-2 flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5">
-              <span
-                className={`px-2 py-0.5 text-[10px] font-mono uppercase ${
-                  hudState.movementMode === "AIMING"
-                    ? "bg-amber-100 text-amber-800 font-bold"
-                    : "bg-emerald-100 text-emerald-800 font-bold"
-                }`}
-              >
+              <span className="text-[10px] font-mono font-black uppercase bg-[#FFB800] border border-black px-1.5 py-0.5 shadow-[1px_1px_0px_#000]">
                 {hudState.movementMode}
               </span>
-              <span
-                className={`px-2 py-0.5 text-[10px] font-mono uppercase ${
-                  hudState.movementState === "MOVING"
-                    ? "bg-blue-100 text-blue-800 font-bold"
-                    : "bg-slate-100 text-slate-600"
-                }`}
-              >
-                {hudState.movementState === "MOVING" ? "Moving" : "Idle"}
+              <span className="text-[10px] font-mono font-bold text-black/70">
+                ({hudState.x}, {hudState.z})
               </span>
             </div>
+            <button
+              onClick={() => setShowControls(!showControls)}
+              className="px-2 py-0.5 bg-white hover:bg-black hover:text-white border border-black text-[9px] font-mono font-black uppercase transition-colors cursor-pointer shadow-[1px_1px_0px_#000]"
+            >
+              {showControls ? "HIDE KEYS" : "SHOW KEYS"}
+            </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-black/80 font-mono">
-            <div><strong className="text-black font-bold">▲ / W</strong> Cam Forward</div>
-            <div><strong className="text-black font-bold">▼ / S</strong> Cam Backward</div>
-            <div><strong className="text-black font-bold">◄ / A</strong> Turn / Strafe L</div>
-            <div><strong className="text-black font-bold">► / D</strong> Turn / Strafe R</div>
-            <div className="col-span-2 pt-1 border-t border-black/10 text-[11px] text-black/70 font-sans">
-              <strong className="font-semibold text-black">Hold Right Mouse:</strong> Aim & Strafe · <strong className="font-semibold text-black">Right Drag:</strong> Orbit · <strong className="font-semibold text-black">Click:</strong> Walk To Point
+          {showControls && (
+            <div className="pt-1.5 border-t-2 border-black/10 flex flex-col gap-1 text-[11px] font-mono text-black/80">
+              <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                <div><strong className="text-black font-black">W / ▲:</strong> Forward</div>
+                <div><strong className="text-black font-black">S / ▼:</strong> Backward</div>
+                <div><strong className="text-black font-black">A / ◄:</strong> Left</div>
+                <div><strong className="text-black font-black">D / ►:</strong> Right</div>
+              </div>
+              <div className="text-[10px] text-black/70 font-sans pt-1 border-t border-black/10">
+                <strong className="font-bold text-black">Right Mouse:</strong> Aim & Orbit · <strong className="font-bold text-black">Click:</strong> Walk
+              </div>
             </div>
-          </div>
-
-          <div className="flex items-center gap-4 text-[11px] font-mono text-black/60 pt-1 border-t border-black/10">
-            <span>Pos X: <strong className="text-black font-semibold">{hudState.x}</strong></span>
-            <span>Pos Z: <strong className="text-black font-semibold">{hudState.z}</strong></span>
-            <span>Mode: <strong className="text-black font-semibold">{hudState.movementMode}</strong></span>
-          </div>
+          )}
         </div>
       </div>
 
@@ -641,7 +1206,9 @@ export default function WorldCanvas({ onBackToOnboarding }: WorldCanvasProps) {
         mapData={mapData}
         playerStateRef={playerStateRef}
         initialScale={1.0}
+        countryCode={targetCountry.code}
       />
     </div>
+
   );
 }

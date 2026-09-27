@@ -15,12 +15,12 @@ export interface Vector3D {
 export type MovementState = "IDLE" | "MOVING";
 export type MovementMode = "FREE_ROAM" | "AIMING";
 
-export const DEFAULT_PLAYER_SPEED = 6.0; // Responsive brisk walking pace
+export const DEFAULT_PLAYER_SPEED = 14.11; // 20% faster athletic pace (11.76 * 1.20 = 14.11 units/s)
 export const ARRIVAL_THRESHOLD = 0.05;   // Distance at which player stops for click-to-move
 
 export interface MovementConfig {
-  freeRoamSpeed: number;        // World units per second (default: 6.0)
-  aimingSpeed: number;          // World units per second while aiming (default: 4.0)
+  freeRoamSpeed: number;        // World units per second (default: 14.11)
+  aimingSpeed: number;          // World units per second while aiming (default: 9.41)
   acceleration?: number;        // Units/s^2 acceleration (optional; responsive instant when undefined)
   deceleration?: number;        // Units/s^2 deceleration (optional; responsive instant when undefined)
   rotationSmoothTime: number;   // Angular easing speed in FREE_ROAM (default: 14.0 rad/s)
@@ -29,18 +29,188 @@ export interface MovementConfig {
   groundCheckDistance: number;  // Distance to check below feet (default: 0.25 units)
   groundCheckRadius: number;    // Radius of ground check cylinder/sphere (default: 0.3 units)
   terminalVelocity: number;     // Maximum downward fall speed (default: -35.0 units/s)
+  playerRadius?: number;        // Collision radius for character physics (default: 0.7 units)
 }
 
 export const DEFAULT_MOVEMENT_CONFIG: MovementConfig = {
-  freeRoamSpeed: 6.0,
-  aimingSpeed: 4.0,
+  freeRoamSpeed: 14.11,
+  aimingSpeed: 9.41,
   rotationSmoothTime: 14.0,
   aimRotationSmoothing: 22.0,
   gravity: -19.6,
   groundCheckDistance: 0.25,
   groundCheckRadius: 0.3,
   terminalVelocity: -35.0,
+  playerRadius: 0.7,
 };
+
+export interface CircleCollider {
+  type: "circle";
+  x: number;
+  z: number;
+  radius: number;
+  name?: string;
+}
+
+export interface BoxCollider {
+  type: "box";
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
+  name?: string;
+}
+
+export type ObstacleCollider = CircleCollider | BoxCollider;
+
+/**
+ * Resolves horizontal collision between a circular player and a static circular obstacle.
+ * Smoothly pushes the player out along the radial normal, enabling wall sliding.
+ */
+export function resolveCircleCollision(
+  pos: { x: number; z: number },
+  playerRadius: number,
+  circle: CircleCollider
+): boolean {
+  const dx = pos.x - circle.x;
+  const dz = pos.z - circle.z;
+  const distSq = dx * dx + dz * dz;
+  const minDist = circle.radius + playerRadius;
+
+  if (distSq < minDist * minDist) {
+    const dist = Math.sqrt(distSq);
+    if (dist > 1e-4) {
+      const overlap = minDist - dist;
+      pos.x += (dx / dist) * overlap;
+      pos.z += (dz / dist) * overlap;
+    } else {
+      pos.z += minDist;
+    }
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Resolves horizontal collision between a circular player and an axis-aligned box obstacle.
+ * Smoothly pushes player out along the nearest surface normal, preserving tangent velocity.
+ */
+export function resolveBoxCollision(
+  pos: { x: number; z: number },
+  playerRadius: number,
+  box: BoxCollider
+): boolean {
+  const closestX = Math.max(box.minX, Math.min(box.maxX, pos.x));
+  const closestZ = Math.max(box.minZ, Math.min(box.maxZ, pos.z));
+
+  const dx = pos.x - closestX;
+  const dz = pos.z - closestZ;
+  const distSq = dx * dx + dz * dz;
+
+  if (distSq < playerRadius * playerRadius && distSq > 1e-8) {
+    const dist = Math.sqrt(distSq);
+    const overlap = playerRadius - dist;
+    pos.x += (dx / dist) * overlap;
+    pos.z += (dz / dist) * overlap;
+    return true;
+  }
+
+  if (distSq <= 1e-8) {
+    const leftDist = pos.x - box.minX + playerRadius;
+    const rightDist = box.maxX - pos.x + playerRadius;
+    const bottomDist = pos.z - box.minZ + playerRadius;
+    const topDist = box.maxZ - pos.z + playerRadius;
+
+    const minDist = Math.min(leftDist, rightDist, bottomDist, topDist);
+    if (minDist === leftDist) {
+      pos.x = box.minX - playerRadius;
+    } else if (minDist === rightDist) {
+      pos.x = box.maxX + playerRadius;
+    } else if (minDist === bottomDist) {
+      pos.z = box.minZ - playerRadius;
+    } else {
+      pos.z = box.maxZ + playerRadius;
+    }
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Iteratively resolves collisions against a list of static obstacle colliders.
+ */
+export function resolveCollisions(
+  pos: { x: number; z: number },
+  playerRadius: number,
+  obstacles: ObstacleCollider[],
+  maxIterations: number = 3
+): boolean {
+  let anyCollided = false;
+  for (let iter = 0; iter < maxIterations; iter++) {
+    let collidedThisIter = false;
+    for (const obs of obstacles) {
+      if (obs.type === "circle") {
+        if (resolveCircleCollision(pos, playerRadius, obs)) {
+          collidedThisIter = true;
+          anyCollided = true;
+        }
+      } else if (obs.type === "box") {
+        if (resolveBoxCollision(pos, playerRadius, obs)) {
+          collidedThisIter = true;
+          anyCollided = true;
+        }
+      }
+    }
+    if (!collidedThisIter) break;
+  }
+  return anyCollided;
+}
+
+export interface HorizontalMoveResult {
+  x: number;
+  z: number;
+  collided: boolean;
+}
+
+/**
+ * Integrates a horizontal move in small sub-steps, resolving solid obstacles along the way.
+ *
+ * Sub-stepping prevents tunneling: a single frame can move the player further than the
+ * radius of a lamp pole or a wall, so every ~0.35 units the position is pushed back out.
+ * Push-outs accumulate, which produces natural wall sliding instead of sticking.
+ */
+export function integrateHorizontal(
+  from: Vector2D,
+  to: Vector2D,
+  playerRadius: number,
+  obstacles?: ObstacleCollider[]
+): HorizontalMoveResult {
+  if (!obstacles || obstacles.length === 0) {
+    return { x: to.x, z: to.z, collided: false };
+  }
+
+  const dx = to.x - from.x;
+  const dz = to.z - from.z;
+  const distance = Math.hypot(dx, dz);
+  const maxStep = 0.35;
+  const steps = Math.min(16, Math.max(1, Math.ceil(distance / maxStep)));
+
+  let x = from.x;
+  let z = from.z;
+  let collided = false;
+
+  for (let i = 1; i <= steps; i++) {
+    x += dx / steps;
+    z += dz / steps;
+    const pos = { x, z };
+    if (resolveCollisions(pos, playerRadius, obstacles)) collided = true;
+    x = pos.x;
+    z = pos.z;
+  }
+
+  return { x, z, collided };
+}
 
 export interface MovementAnimationData {
   speed: number;          // Current horizontal velocity magnitude
@@ -178,10 +348,11 @@ export function getCameraHorizontalVectors(camera: THREE.Camera): {
   const fx = fwdLen > 1e-5 ? _tempCameraDir.x / fwdLen : 0;
   const fz = fwdLen > 1e-5 ? _tempCameraDir.z / fwdLen : 1;
 
-  // Horizontal right vector: perpendicular to forward in XZ plane
-  // Facing North (0, 1) -> Right is East (1, 0)
-  const rx = fz;
-  const rz = -fx;
+  // Horizontal right vector: perpendicular to forward in XZ plane.
+  // Matches camera.matrixWorld X axis: right = up x (-forward) = (-fz, fx).
+  // Default camera (0, 0, -1) -> right is +X; camera facing +Z -> right is -X.
+  const rx = -fz;
+  const rz = fx;
 
   const yaw = Math.atan2(fx, fz);
 
@@ -339,12 +510,16 @@ export function setPlayerDestination(
 
 /**
  * Updates player position and rotation toward click target based on delta time.
+ *
+ * When `obstacles` is provided the player is pushed out of solid geometry every step,
+ * so a destination behind a wall can never be reached through it.
  */
 export function updatePlayerMovement(
   currentState: PlayerState,
   deltaSeconds: number,
   bounds: MapBounds,
-  padding: number = 0.8
+  padding: number = 0.8,
+  obstacles?: ObstacleCollider[]
 ): PlayerState {
   if (!currentState.isMoving || !currentState.target) {
     return {
@@ -361,12 +536,34 @@ export function updatePlayerMovement(
   const dist = Math.hypot(dx, dz);
 
   const stepDistance = speed * deltaSeconds;
+  const wantsArrival = dist <= stepDistance || dist <= ARRIVAL_THRESHOLD;
 
-  // Reached destination
-  if (dist <= stepDistance || dist <= ARRIVAL_THRESHOLD) {
+  // Move along vector towards destination (or snap to it when close enough)
+  const candidate = wantsArrival
+    ? { x: target.x, y: position.y, z: target.z }
+    : {
+        x: position.x + (dx / dist) * stepDistance,
+        y: position.y,
+        z: position.z + (dz / dist) * stepDistance,
+      };
+
+  const clampedPos = clampPositionToBounds(candidate, bounds, padding);
+  const moved = integrateHorizontal(
+    position,
+    clampedPos,
+    DEFAULT_MOVEMENT_CONFIG.playerRadius ?? 0.7,
+    obstacles
+  );
+  clampedPos.x = moved.x;
+  clampedPos.z = moved.z;
+
+  const distAfter = Math.hypot(target.x - clampedPos.x, target.z - clampedPos.z);
+
+  // A solid obstacle blocks the way: stop at it instead of walking in place forever
+  if (moved.collided && distAfter >= dist - 1e-6) {
     return {
       ...currentState,
-      position: { x: target.x, y: position.y, z: target.z },
+      position: clampedPos,
       velocity: { x: 0, y: 0, z: 0 },
       target: null,
       movementState: "IDLE",
@@ -382,16 +579,25 @@ export function updatePlayerMovement(
     };
   }
 
-  // Move along vector towards destination
-  const ratio = stepDistance / dist;
-  const unverifiedX = position.x + dx * ratio;
-  const unverifiedZ = position.z + dz * ratio;
-
-  const clampedPos = clampPositionToBounds(
-    { x: unverifiedX, y: position.y, z: unverifiedZ },
-    bounds,
-    padding
-  );
+  // Reached destination
+  if (distAfter <= ARRIVAL_THRESHOLD) {
+    return {
+      ...currentState,
+      position: clampedPos,
+      velocity: { x: 0, y: 0, z: 0 },
+      target: null,
+      movementState: "IDLE",
+      isMoving: false,
+      animation: {
+        speed: 0,
+        movementSpeed: speed,
+        isMoving: false,
+        isAiming: currentState.isAiming,
+        moveX: 0,
+        moveY: 0,
+      },
+    };
+  }
 
   // Smooth rotation toward destination
   const desiredRotation = calculateRotation(position, target);
@@ -491,7 +697,8 @@ export function updatePlayerMovementState(
   deltaSeconds: number,
   bounds: MapBounds,
   padding: number = 0.8,
-  config: MovementConfig = DEFAULT_MOVEMENT_CONFIG
+  config: MovementConfig = DEFAULT_MOVEMENT_CONFIG,
+  obstacles?: ObstacleCollider[]
 ): PlayerState {
   const isAiming = Boolean(input.aiming);
   const movementMode: MovementMode = isAiming ? "AIMING" : "FREE_ROAM";
@@ -578,11 +785,22 @@ export function updatePlayerMovementState(
   const posX = currentState.position.x + stepVelX * deltaSeconds;
   const posZ = currentState.position.z + stepVelZ * deltaSeconds;
 
-  const clamped = clampPositionToBounds(
+  const candidate = clampPositionToBounds(
     { x: posX, y: currentState.position.y, z: posZ },
     bounds,
     padding
   );
+
+  // Solid obstacles (shops, walls, street lights, cars) resist the player
+  const moved = integrateHorizontal(
+    { x: currentState.position.x, z: currentState.position.z },
+    candidate,
+    config.playerRadius ?? DEFAULT_MOVEMENT_CONFIG.playerRadius ?? 0.7,
+    obstacles
+  );
+  candidate.x = moved.x;
+  candidate.z = moved.z;
+  const clamped = candidate;
 
   // 5. Rotation System
   let newRotation = currentState.rotation;

@@ -19,7 +19,7 @@ npm run dev          # Start dev server
 npm run build        # Production build
 npm run lint         # ESLint
 npm run type-check   # tsc --noEmit
-npm test             # Vitest
+npm test             # tsx --test (Node test runner)
 ```
 
 ## Environment Variables
@@ -50,7 +50,7 @@ tests/            → Vitest test files
 - **Tool calls** from AssemblyAI map to game state changes via `tool-handler.ts`
 - **Scenario engine** is a state machine; one scenario per file in `src/scenarios/`
 - **3D scene** reads Zustand store; tool calls never touch Three.js directly
-- **Audio capture** uses AudioContext with PCM16 encoding at 16kHz mono
+- **Audio capture** uses AudioContext with PCM16 encoding at 24kHz mono
 
 ## Critical Rules
 - Never commit `.env.local` (contains API key)

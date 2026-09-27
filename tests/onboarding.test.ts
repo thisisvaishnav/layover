@@ -111,4 +111,46 @@ test("TDD [Onboarding Page Content]: Removes clutter and adheres to simple two-c
     content.toLowerCase().includes("language you are comfortable in"),
     "Page must include 'Language you are comfortable in' section"
   );
+  assert.ok(
+    content.includes("Onboarding Complete"),
+    "Page must include completion confirmation card"
+  );
+  assert.ok(
+    content.includes("Edit Preferences"),
+    "Page must include option to edit preferences"
+  );
 });
+
+test("TDD [Pure Onboarding Repo]: All 3D map, city simulation, and game HUD files have been removed", () => {
+  const forbiddenPaths = [
+    "src/buildings",
+    "src/city",
+    "src/park",
+    "src/pedestrians",
+    "src/roads",
+    "src/traffic",
+    "src/components/world",
+    "src/components/hud",
+    "src/components/voice",
+    "src/lib/world",
+    "src/lib/game",
+    "src/app/play",
+    "src/components/ui/LoadingScreen.tsx",
+    "src/components/ui",
+    "docs/testing/loading-screen.tdd.md",
+    "docs/testing/city-expansion.tdd.md",
+    "docs/testing/3d-world.tdd.md",
+    "info.md",
+    "MAPLE_HOLLOW_SPEC.md",
+  ];
+
+  for (const relPath of forbiddenPaths) {
+    const fullPath = path.join(process.cwd(), relPath);
+    assert.equal(
+      fs.existsSync(fullPath),
+      false,
+      `Path '${relPath}' must be completely removed from the repository`
+    );
+  }
+});
+

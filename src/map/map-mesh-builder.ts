@@ -1,11 +1,31 @@
 import * as THREE from "three";
 import type { GeneratedMap, PlotData } from "./map-generator";
+import { BUS_STOP_WORLD_POSITION } from "../scenarios/bus-stop-scenario";
+import {
+  createTerracottaTileTexture,
+  createTactileStripTexture,
+  createTerracottaPavementMaterial,
+  createTactileStripMaterial,
+} from "./pavement-textures";
+import { buildParkFeatures } from "./park-features";
+import {
+  getCountryBuildingPalette,
+  buildCountryPlot00,
+  buildCountryPlot10,
+  buildCountryPlot12,
+  buildCountryGenericBuilding,
+  type BuildingBuildContext,
+} from "./country-building-architectures";
 
 export interface MapMeshSystem {
   group: THREE.Group;
   clickableObjects: THREE.Object3D[];
   obstacleObjects: THREE.Object3D[];
   dispose(): void;
+}
+
+export interface BuildMapMeshesOptions {
+  countryCode?: string;
 }
 
 /**
@@ -15,7 +35,10 @@ export interface MapMeshSystem {
  * - Outer Edge: Port / Dock with maritime boardwalk and mooring posts
  * - Roads: 3D boulevard roads with dashed lane markings
  */
-export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
+export function buildMapMeshes(
+  mapData: GeneratedMap,
+  options?: BuildMapMeshesOptions
+): MapMeshSystem {
   const group = new THREE.Group();
   group.name = "MapGridSystem";
 
@@ -23,6 +46,7 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
   const obstacleObjects: THREE.Object3D[] = [];
   const geometries: THREE.BufferGeometry[] = [];
   const materials: THREE.Material[] = [];
+  const textures: THREE.Texture[] = [];
 
   // Helper to register disposable assets
   function regGeo<T extends THREE.BufferGeometry>(geo: T): T {
@@ -33,8 +57,18 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
     materials.push(mat);
     return mat;
   }
+  function regTex<T extends THREE.Texture>(tex: T): T {
+    textures.push(tex);
+    return tex;
+  }
 
   const { plots, roads, bounds } = mapData;
+
+  // Lamps must never be placed on top of the bus stand (kept clear of its shelter footprint)
+  const BUS_STOP_LAMP_CLEARANCE = 14;
+  const isOverlappingBusStop = (x: number, z: number): boolean =>
+    Math.hypot(x - BUS_STOP_WORLD_POSITION.x, z - BUS_STOP_WORLD_POSITION.z) <
+    BUS_STOP_LAMP_CLEARANCE;
 
   // ----------------------------------------------------
   // 1. Shared Materials & Geometries
@@ -44,7 +78,7 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
   const baseWidth = bounds.totalWidth + baseMargin * 2;
   const baseDepth = bounds.totalDepth + baseMargin * 2;
   const baseGeo = regGeo(new THREE.BoxGeometry(baseWidth, 1.2, baseDepth));
-  const baseMat = regMat(new THREE.MeshLambertMaterial({ color: 0x1a2026 })); // Deep bedrock
+  const baseMat = regMat(new THREE.MeshLambertMaterial({ color: 0x2e3846 })); // Clean bedrock slate
 
   const baseMesh = new THREE.Mesh(baseGeo, baseMat);
   baseMesh.position.set(0, -0.6, 0);
@@ -52,47 +86,117 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
   group.add(baseMesh);
 
   // Roads
-  const roadMat = regMat(new THREE.MeshLambertMaterial({ color: 0x272b30 })); // Dark boulevard asphalt
-  const dashMat = regMat(new THREE.MeshBasicMaterial({ color: 0x94a3b8 })); // Slate white markings
+  const roadMat = regMat(new THREE.MeshLambertMaterial({ color: 0x3d444d })); // Clean modern asphalt
+  const dashMat = regMat(new THREE.MeshBasicMaterial({ color: 0xf1f5f9 })); // Bright white lane markings
   const vDashGeo = regGeo(new THREE.PlaneGeometry(0.3, 2.5));
   const hDashGeo = regGeo(new THREE.PlaneGeometry(2.5, 0.3));
 
   // Common Plot Materials
-  const curbMat = regMat(new THREE.MeshLambertMaterial({ color: 0xd1d5db })); // Concrete curb
-  const plazaMat = regMat(new THREE.MeshLambertMaterial({ color: 0x334155 })); // Urban slate plaza
-  const parkLawnMat = regMat(new THREE.MeshLambertMaterial({ color: 0x3a7d44 })); // Rich lawn green
-  const parkPathMat = regMat(new THREE.MeshLambertMaterial({ color: 0xd9b88f })); // Warm sandstone / light tan pedestrian paving
-  const treeTrunkMat = regMat(new THREE.MeshLambertMaterial({ color: 0x4a2e18 })); // Dark wood bark
-  const treeLeafDarkMat = regMat(new THREE.MeshLambertMaterial({ color: 0x2d6a4f })); // Forest green
-  const treeLeafLightMat = regMat(new THREE.MeshLambertMaterial({ color: 0x40916c })); // Fresh emerald
+  const curbMat = regMat(new THREE.MeshLambertMaterial({ color: 0xe5e7eb })); // Bright concrete curb
+
+  // Procedural Terracotta Tile & Yellow Tactile Strip Pavement System
+  const terracottaTex = regTex(createTerracottaTileTexture({ size: 256, tilesPerSide: 4 }));
+  terracottaTex.repeat.set(16, 16);
+
+  const parkTerracottaTex = regTex(createTerracottaTileTexture({ size: 256, tilesPerSide: 4 }));
+  parkTerracottaTex.repeat.set(14, 14);
+
+  const tactileHTex = regTex(createTactileStripTexture({ width: 128, height: 128, ribCount: 8 }));
+  tactileHTex.repeat.set(32, 1);
+
+  const tactileVTex = regTex(createTactileStripTexture({ width: 128, height: 128, ribCount: 8 }));
+  tactileVTex.repeat.set(1, 32);
+
+  const parkTactileHTex = regTex(createTactileStripTexture({ width: 128, height: 128, ribCount: 8 }));
+  parkTactileHTex.repeat.set(4, 1);
+
+  const parkTactileVTex = regTex(createTactileStripTexture({ width: 128, height: 128, ribCount: 8 }));
+  parkTactileVTex.repeat.set(1, 4);
+
+  const terracottaMat = regMat(createTerracottaPavementMaterial(terracottaTex));
+  const parkTerracottaMat = regMat(createTerracottaPavementMaterial(parkTerracottaTex));
+  const tactileHMat = regMat(createTactileStripMaterial(tactileHTex));
+  const tactileVMat = regMat(createTactileStripMaterial(tactileVTex));
+  const parkTactileHMat = regMat(createTactileStripMaterial(parkTactileHTex));
+  const parkTactileVMat = regMat(createTactileStripMaterial(parkTactileVTex));
+
+  const parkLawnMat = regMat(new THREE.MeshLambertMaterial({ color: 0x489654 })); // Bright lush lawn green
   const lampPoleMat = regMat(new THREE.MeshLambertMaterial({ color: 0x1f2937 })); // Cast iron
   const lampGlowMat = regMat(
     new THREE.MeshStandardMaterial({
       color: 0xfff3b0,
       emissive: 0xffd166,
-      emissiveIntensity: 0.85,
+      emissiveIntensity: 1.2,
     })
   );
 
-  // Building Materials
-  const bldBodyMat1 = regMat(new THREE.MeshLambertMaterial({ color: 0x1e293b })); // Titanium dark slate
-  const bldBodyMat2 = regMat(new THREE.MeshLambertMaterial({ color: 0x334155 })); // Medium graphite
-  const bldBodyMat3 = regMat(new THREE.MeshLambertMaterial({ color: 0x475569 })); // Steel blue
-  const bldGlassMat = regMat(new THREE.MeshLambertMaterial({ color: 0x0284c7 })); // Cyan architectural glass
-  const bldAccentMat = regMat(new THREE.MeshLambertMaterial({ color: 0x64748b })); // Architectural trim
-  const bldRoofMat = regMat(new THREE.MeshLambertMaterial({ color: 0x0f172a })); // Deep roof mechanical
+  // Street Traffic Light Materials
+  const trafficPoleMat = regMat(new THREE.MeshLambertMaterial({ color: 0x1f2937 })); // Dark iron pole
+  const trafficBoxMat = regMat(new THREE.MeshLambertMaterial({ color: 0x111827 })); // Signal housing
+  const signalRedMat = regMat(
+    new THREE.MeshStandardMaterial({
+      color: 0xef4444,
+      emissive: 0xef4444,
+      emissiveIntensity: 1.2,
+    })
+  );
+  const signalYellowMat = regMat(
+    new THREE.MeshStandardMaterial({
+      color: 0xfbbf24,
+      emissive: 0xfbbf24,
+      emissiveIntensity: 1.2,
+    })
+  );
+  const signalGreenMat = regMat(
+    new THREE.MeshStandardMaterial({
+      color: 0x22c55e,
+      emissive: 0x22c55e,
+      emissiveIntensity: 1.2,
+    })
+  );
+
+  // Country-Tailored Building Materials
+  const countryCode = options?.countryCode ?? "es";
+  const buildingPalette = getCountryBuildingPalette(countryCode);
+
+  const matFacadePrimary = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.facadePrimary }));
+  const matFacadeSecondary = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.facadeSecondary }));
+  const matFacadeBase = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.facadeBase }));
+  const matRoofMain = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.roofMain }));
+  const matRoofTrim = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.roofTrim }));
+  const matIronwork = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.ironwork }));
+  const matStoneTrim = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.stoneTrim }));
+  const matAccent = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.accent }));
+  const matGlass = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.glass }));
+  const matParapet = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.parapet }));
 
   // Port Materials
-  const portPlankMat = regMat(new THREE.MeshLambertMaterial({ color: 0x78350f })); // Weathered wood dock
-  const portWaterMat = regMat(new THREE.MeshLambertMaterial({ color: 0x0369a1 })); // Deep harbor water
-  const portBollardMat = regMat(new THREE.MeshLambertMaterial({ color: 0x1c1917 })); // Heavy iron bollard
+  const portPlankMat = regMat(new THREE.MeshLambertMaterial({ color: 0x9a501e })); // Warm honey cedar dock
+  const portWaterMat = regMat(new THREE.MeshLambertMaterial({ color: 0x0ea5e9 })); // Vibrant clear ocean water
+  const portBollardMat = regMat(new THREE.MeshLambertMaterial({ color: 0x374151 })); // Cast iron bollard
 
-  // Reusable plot-level curb geometry
+  // Reusable plot-level curb and sidewalk geometries
   const plotWidth = plots[0]?.width ?? 72;
   const plotDepth = plots[0]?.depth ?? 72;
   const curbGeo = regGeo(new THREE.BoxGeometry(plotWidth, 0.12, plotDepth));
   const sharedPlazaGeo = regGeo(new THREE.BoxGeometry(plotWidth - 1.2, 0.06, plotDepth - 1.2));
   const sharedSpireGeo = regGeo(new THREE.CylinderGeometry(0.15, 0.35, 6, 6));
+
+  // Reusable 3x tall street furniture geometries (11.25m height = 9m * 1.25)
+  const streetPoleGeo = regGeo(new THREE.CylinderGeometry(0.14, 0.20, 11.25, 8));
+  const streetPoleBaseGeo = regGeo(new THREE.CylinderGeometry(0.28, 0.36, 1.0, 8));
+  const trafficArmGeo = regGeo(new THREE.CylinderGeometry(0.08, 0.10, 3.4, 6));
+  const trafficBoxGeo = regGeo(new THREE.BoxGeometry(0.48, 1.75, 0.42));
+  const signalLensGeo = regGeo(new THREE.CylinderGeometry(0.12, 0.12, 0.1, 8));
+  const streetLampArmGeo = regGeo(new THREE.CylinderGeometry(0.08, 0.09, 2.2, 6));
+  const streetLampFixtureGeo = regGeo(new THREE.ConeGeometry(0.45, 0.35, 6));
+  const streetLampBulbGeo = regGeo(new THREE.SphereGeometry(0.25, 8, 8));
+
+  // Reusable tactile edge geometries for building plots & park connectors
+  const bldTactileHGeo = regGeo(new THREE.BoxGeometry(plotWidth - 2.4, 0.05, 1.0));
+  const bldTactileVGeo = regGeo(new THREE.BoxGeometry(1.0, 0.05, plotDepth - 4.4));
+  const parkTactileHGeo = regGeo(new THREE.BoxGeometry(8.0, 0.05, 1.0));
+  const parkTactileVGeo = regGeo(new THREE.BoxGeometry(1.0, 0.05, 8.0));
 
   // ----------------------------------------------------
   // 2. Render Boulevard Roads
@@ -143,6 +247,164 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
   }
 
   // ----------------------------------------------------
+  // 2b. Render 3x Tall Street Furniture: Traffic Lights & Street Lamps (11.25m height)
+  // ----------------------------------------------------
+  // 1. Street Intersection Traffic Lights (3x tall mast poles with signal heads)
+  let tlIndex = 0;
+  for (const hRoad of horizontalRoads) {
+    for (const vRoad of verticalRoads) {
+      const ix = vRoad.x;
+      const iz = hRoad.z;
+      const dx = vRoad.width / 2 + 1.2;
+      const dz = hRoad.depth / 2 + 1.2;
+
+      // Two diagonal corners per intersection
+      const corners = [
+        { x: ix - dx, z: iz - dz, armDir: "east" as const },
+        { x: ix + dx, z: iz + dz, armDir: "west" as const },
+      ];
+
+      for (const corner of corners) {
+        const tlGroup = new THREE.Group();
+        tlGroup.name = `street-traffic-light-${tlIndex++}`;
+        tlGroup.position.set(corner.x, 0.12, corner.z);
+
+        // Mast pole base
+        const baseMesh = new THREE.Mesh(streetPoleBaseGeo, trafficPoleMat);
+        baseMesh.position.y = 0.5;
+        tlGroup.add(baseMesh);
+
+        // 11.25m tall mast pole (3x tall, +25%)
+        const poleMesh = new THREE.Mesh(streetPoleGeo, trafficPoleMat);
+        poleMesh.position.y = 5.625;
+        poleMesh.castShadow = true;
+        tlGroup.add(poleMesh);
+        obstacleObjects.push(poleMesh);
+
+        // Cantilever horizontal arm extending over street lane at y = 10.625
+        const armMesh = new THREE.Mesh(trafficArmGeo, trafficPoleMat);
+        armMesh.position.y = 10.625;
+        if (corner.armDir === "east") {
+          armMesh.position.x = 1.7;
+          armMesh.rotation.z = Math.PI / 2;
+        } else {
+          armMesh.position.x = -1.7;
+          armMesh.rotation.z = -Math.PI / 2;
+        }
+        tlGroup.add(armMesh);
+
+        // Signal Housing Box
+        const boxX = corner.armDir === "east" ? 3.0 : -3.0;
+        const boxMesh = new THREE.Mesh(trafficBoxGeo, trafficBoxMat);
+        boxMesh.position.set(boxX, 10.25, 0);
+        boxMesh.castShadow = true;
+        tlGroup.add(boxMesh);
+
+        // Red, Yellow, Green signal lenses
+        const redLens = new THREE.Mesh(signalLensGeo, signalRedMat);
+        redLens.rotation.x = Math.PI / 2;
+        redLens.position.set(boxX, 10.75, 0.22);
+        tlGroup.add(redLens);
+
+        const yellowLens = new THREE.Mesh(signalLensGeo, signalYellowMat);
+        yellowLens.rotation.x = Math.PI / 2;
+        yellowLens.position.set(boxX, 10.25, 0.22);
+        tlGroup.add(yellowLens);
+
+        const greenLens = new THREE.Mesh(signalLensGeo, signalGreenMat);
+        greenLens.rotation.x = Math.PI / 2;
+        greenLens.position.set(boxX, 9.75, 0.22);
+        tlGroup.add(greenLens);
+
+        group.add(tlGroup);
+      }
+    }
+  }
+
+  // 2. Street Lamps along the streets (3x tall, 11.25m height)
+  let slIndex = 0;
+  const streetLampPositions: { x: number; z: number; armRot: number }[] = [];
+
+  for (const hRoad of horizontalRoads) {
+    const vXs = verticalRoads.map((vr) => vr.x).sort((a, b) => a - b);
+    const intervals: number[] = [bounds.minX + 24];
+    for (let i = 0; i < vXs.length - 1; i++) {
+      intervals.push((vXs[i] + vXs[i + 1]) / 2);
+    }
+    intervals.push(bounds.maxX - 24);
+
+    for (const lx of intervals) {
+      streetLampPositions.push({
+        x: lx,
+        z: hRoad.z + hRoad.depth / 2 + 1.2,
+        armRot: 0,
+      });
+      streetLampPositions.push({
+        x: lx,
+        z: hRoad.z - hRoad.depth / 2 - 1.2,
+        armRot: Math.PI,
+      });
+    }
+  }
+
+  for (const vRoad of verticalRoads) {
+    const hZs = horizontalRoads.map((hr) => hr.z).sort((a, b) => a - b);
+    const intervals: number[] = [bounds.minZ + 24];
+    for (let i = 0; i < hZs.length - 1; i++) {
+      intervals.push((hZs[i] + hZs[i + 1]) / 2);
+    }
+    intervals.push(bounds.maxZ - 24);
+
+    for (const lz of intervals) {
+      streetLampPositions.push({
+        x: vRoad.x + vRoad.width / 2 + 1.2,
+        z: lz,
+        armRot: Math.PI / 2,
+      });
+      streetLampPositions.push({
+        x: vRoad.x - vRoad.width / 2 - 1.2,
+        z: lz,
+        armRot: -Math.PI / 2,
+      });
+    }
+  }
+
+  streetLampPositions
+    .filter((lamp) => !isOverlappingBusStop(lamp.x, lamp.z))
+    .forEach((lamp) => {
+    const lampGroup = new THREE.Group();
+    lampGroup.name = `street-lamp-${slIndex++}`;
+    lampGroup.position.set(lamp.x, 0.12, lamp.z);
+    lampGroup.rotation.y = lamp.armRot;
+
+    const baseMesh = new THREE.Mesh(streetPoleBaseGeo, lampPoleMat);
+    baseMesh.position.y = 0.5;
+    lampGroup.add(baseMesh);
+
+    const poleMesh = new THREE.Mesh(streetPoleGeo, lampPoleMat);
+    poleMesh.position.y = 5.625;
+    poleMesh.castShadow = true;
+    lampGroup.add(poleMesh);
+    obstacleObjects.push(poleMesh);
+
+    const neckMesh = new THREE.Mesh(streetLampArmGeo, lampPoleMat);
+    neckMesh.position.set(0, 11.0, -0.9);
+    neckMesh.rotation.x = Math.PI / 2;
+    lampGroup.add(neckMesh);
+
+    const fixMesh = new THREE.Mesh(streetLampFixtureGeo, lampPoleMat);
+    fixMesh.position.set(0, 11.125, -1.8);
+    lampGroup.add(fixMesh);
+
+    const bulbMesh = new THREE.Mesh(streetLampBulbGeo, lampGlowMat);
+    bulbMesh.name = `street-lamp-glow-${slIndex - 1}`;
+    bulbMesh.position.set(0, 10.8125, -1.8);
+    lampGroup.add(bulbMesh);
+
+    group.add(lampGroup);
+  });
+
+  // ----------------------------------------------------
   // 3. Render Plots: Central Park, Framing Buildings, Port
   // ----------------------------------------------------
   for (const plot of plots) {
@@ -151,7 +413,11 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
     plotGroup.position.set(plot.x, 0, plot.z);
 
     // Curb base for the plot
-    const curbMesh = new THREE.Mesh(curbGeo, curbMat);
+    const plotCurbGeo =
+      plot.width === plotWidth && plot.depth === plotDepth
+        ? curbGeo
+        : regGeo(new THREE.BoxGeometry(plot.width, 0.12, plot.depth));
+    const curbMesh = new THREE.Mesh(plotCurbGeo, curbMat);
     curbMesh.name = `${plot.id}-curb`;
     curbMesh.position.y = 0.06;
     curbMesh.receiveShadow = true;
@@ -165,7 +431,12 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
     } else {
       buildBuildingPlot(plot, plotGroup);
       plotGroup.traverse((child) => {
-        if (child instanceof THREE.Mesh && !child.name.endsWith("-surface") && !child.name.endsWith("-curb")) {
+        if (
+          child instanceof THREE.Mesh &&
+          !child.name.endsWith("-surface") &&
+          !child.name.endsWith("-curb") &&
+          !child.name.includes("-tactile-")
+        ) {
           obstacleObjects.push(child);
         }
       });
@@ -178,22 +449,23 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
   // Sub-builder: Central Park Landmark
   // ----------------------------------------------------
   function buildParkPlot(plot: PlotData, parent: THREE.Group) {
-    const pW = plot.width; // 72
+    const pW = plot.width; // 144 for 2x park size (or plot.width)
 
-    // 1. Walkable Footpath Loop around the lawn (inner: 42x42, outer: 62x62)
-    // Walkway surface width 10 units, height 0.13
-    const pathWidth = 10;
-    const lawnSize = 42;
-    const pathOuterSize = lawnSize + pathWidth * 2; // 62
+    // 1. Walkable Footpath Loop shifted to the edge where the white curb line is
+    // The curb base is pW x pD (e.g. 144x144). Footpath perimeter outer size is pW - 1.2, leaving 0.6 white curb edge.
+    // The central green lawn expands 2x from 58x58 to 116x116 (or pW >= 120 ? 116 : 58).
+    const isExpanded = pW >= 120;
+    const lawnSize = isExpanded ? 116 : 58;
+    const pathOuterSize = pW - 1.2;
     const pathGeo = regGeo(new THREE.BoxGeometry(pathOuterSize, 0.06, pathOuterSize));
-    const pathMesh = new THREE.Mesh(pathGeo, parkPathMat);
+    const pathMesh = new THREE.Mesh(pathGeo, parkTerracottaMat);
     pathMesh.name = `${plot.id}-park-footpath`;
     pathMesh.position.y = 0.12;
     pathMesh.receiveShadow = true;
     parent.add(pathMesh);
     clickableObjects.push(pathMesh);
 
-    // 2. Central Green Lawn (42x42)
+    // 2. Central Green Lawn (116x116 for 2x park size)
     const lawnGeo = regGeo(new THREE.BoxGeometry(lawnSize, 0.08, lawnSize));
     const lawnMesh = new THREE.Mesh(lawnGeo, parkLawnMat);
     lawnMesh.name = `${plot.id}-park-lawn`;
@@ -210,16 +482,14 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
     clickableObjects.push(surfaceMesh);
 
     // 3. 4 Road Connector Footpaths (North, South, East, West)
-    // Connecting perimeter footpath (radius 31) directly and flush to curb boundary (radius 36)
-    // Span: 30.8 to 36.0 -> length = 5.2, center offset = 33.4
-    // Zero bleed into roads (max bound = 33.4 + 2.6 = 36.00)
-    const connectorWidth = 8;
-    const connectorLength = (pW - pathOuterSize) / 2 + 0.2; // 5.2 units
-    const connectorOffset = (pathOuterSize / 2 - 0.2) + connectorLength / 2; // 33.4 units
+    // Connecting outer footpath edge to curb transition
+    const connectorWidth = isExpanded ? 12 : 8;
+    const connectorLength = 1.6;
+    const connectorOffset = pW / 2 - connectorLength / 2;
 
     // North connector (+Z)
     const northGeo = regGeo(new THREE.BoxGeometry(connectorWidth, 0.08, connectorLength));
-    const northPath = new THREE.Mesh(northGeo, parkPathMat);
+    const northPath = new THREE.Mesh(northGeo, parkTerracottaMat);
     northPath.name = `${plot.id}-park-connector-n`;
     northPath.position.set(0, 0.12, connectorOffset);
     northPath.receiveShadow = true;
@@ -228,7 +498,7 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
 
     // South connector (-Z)
     const southGeo = regGeo(new THREE.BoxGeometry(connectorWidth, 0.08, connectorLength));
-    const southPath = new THREE.Mesh(southGeo, parkPathMat);
+    const southPath = new THREE.Mesh(southGeo, parkTerracottaMat);
     southPath.name = `${plot.id}-park-connector-s`;
     southPath.position.set(0, 0.12, -connectorOffset);
     southPath.receiveShadow = true;
@@ -237,7 +507,7 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
 
     // East connector (+X)
     const eastGeo = regGeo(new THREE.BoxGeometry(connectorLength, 0.08, connectorWidth));
-    const eastPath = new THREE.Mesh(eastGeo, parkPathMat);
+    const eastPath = new THREE.Mesh(eastGeo, parkTerracottaMat);
     eastPath.name = `${plot.id}-park-connector-e`;
     eastPath.position.set(connectorOffset, 0.12, 0);
     eastPath.receiveShadow = true;
@@ -246,91 +516,95 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
 
     // West connector (-X)
     const westGeo = regGeo(new THREE.BoxGeometry(connectorLength, 0.08, connectorWidth));
-    const westPath = new THREE.Mesh(westGeo, parkPathMat);
+    const westPath = new THREE.Mesh(westGeo, parkTerracottaMat);
     westPath.name = `${plot.id}-park-connector-w`;
     westPath.position.set(-connectorOffset, 0.12, 0);
     westPath.receiveShadow = true;
     parent.add(westPath);
     clickableObjects.push(westPath);
 
-    // 4. Procedural 3D Trees (Shared Geometries)
-    const trunkGeo = regGeo(new THREE.CylinderGeometry(0.35, 0.45, 2.4, 6));
-    const leafLowerGeo = regGeo(new THREE.ConeGeometry(2.2, 3.4, 6));
-    const leafUpperGeo = regGeo(new THREE.ConeGeometry(1.6, 2.6, 6));
+    // Road-connector Yellow Tactile Warning Strips at curb transitions.
+    // Connectors span y 0.08-0.16, so the strips (0.05 tall) must rest on top of
+    // the connector surface instead of being buried inside the connector box.
+    const tactileParkHGeo =
+      pW === plotWidth ? parkTactileHGeo : regGeo(new THREE.BoxGeometry(connectorWidth, 0.05, 1.0));
+    const tactileParkVGeo =
+      pW === plotWidth ? parkTactileVGeo : regGeo(new THREE.BoxGeometry(1.0, 0.05, connectorWidth));
 
-    // Strategically placed trees around lawn corners and perimeter (inward margins >= 8 units)
-    const treePositions: [number, number][] = [
-      [-16, -16],
-      [16, -16],
-      [-16, 16],
-      [16, 16],
-      [-24, -10],
-      [-24, 10],
-      [24, -10],
-      [24, 10],
-      [-10, -24],
-      [10, -24],
-      [-10, 24],
-      [10, 24],
-    ];
+    const tactileParkY = 0.19; // spans 0.165-0.215, clear of connector top (0.16)
 
-    treePositions.forEach(([tx, tz], i) => {
-      const treeGroup = new THREE.Group();
-      treeGroup.name = `${plot.id}-park-tree-${i}`;
-      treeGroup.position.set(tx, 0.15, tz);
+    const tactileParkNorth = new THREE.Mesh(tactileParkHGeo, parkTactileHMat);
+    tactileParkNorth.name = `${plot.id}-park-tactile-n`;
+    tactileParkNorth.position.set(0, tactileParkY, pW / 2 - 0.6);
+    tactileParkNorth.receiveShadow = true;
+    parent.add(tactileParkNorth);
+    clickableObjects.push(tactileParkNorth);
 
-      // Trunk
-      const trunk = new THREE.Mesh(trunkGeo, treeTrunkMat);
-      trunk.position.y = 1.2;
-      trunk.castShadow = true;
-      trunk.receiveShadow = true;
-      treeGroup.add(trunk);
+    const tactileParkSouth = new THREE.Mesh(tactileParkHGeo, parkTactileHMat);
+    tactileParkSouth.name = `${plot.id}-park-tactile-s`;
+    tactileParkSouth.position.set(0, tactileParkY, -pW / 2 + 0.6);
+    tactileParkSouth.receiveShadow = true;
+    parent.add(tactileParkSouth);
+    clickableObjects.push(tactileParkSouth);
 
-      // Foliage layers
-      const isAlt = i % 2 === 0;
-      const lowerFoliage = new THREE.Mesh(leafLowerGeo, isAlt ? treeLeafDarkMat : treeLeafLightMat);
-      lowerFoliage.name = `${plot.id}-park-tree-foliage-lower-${i}`;
-      lowerFoliage.position.y = 3.2;
-      lowerFoliage.castShadow = true;
-      treeGroup.add(lowerFoliage);
+    const tactileParkEast = new THREE.Mesh(tactileParkVGeo, parkTactileVMat);
+    tactileParkEast.name = `${plot.id}-park-tactile-e`;
+    tactileParkEast.position.set(pW / 2 - 0.6, tactileParkY, 0);
+    tactileParkEast.receiveShadow = true;
+    parent.add(tactileParkEast);
+    clickableObjects.push(tactileParkEast);
 
-      const upperFoliage = new THREE.Mesh(leafUpperGeo, isAlt ? treeLeafLightMat : treeLeafDarkMat);
-      upperFoliage.name = `${plot.id}-park-tree-foliage-upper-${i}`;
-      upperFoliage.position.y = 4.8;
-      upperFoliage.castShadow = true;
-      treeGroup.add(upperFoliage);
+    const tactileParkWest = new THREE.Mesh(tactileParkVGeo, parkTactileVMat);
+    tactileParkWest.name = `${plot.id}-park-tactile-w`;
+    tactileParkWest.position.set(-pW / 2 + 0.6, tactileParkY, 0);
+    tactileParkWest.receiveShadow = true;
+    parent.add(tactileParkWest);
+    clickableObjects.push(tactileParkWest);
 
-      parent.add(treeGroup);
+    // 4. Diverse Trees, Amenities (Picnic Tables, Benches, Planters), and Country Memorial
+    buildParkFeatures(plot, parent, {
+      countryCode: options?.countryCode ?? "es",
+      regGeo,
+      regMat,
+      clickableObjects,
+      obstacleObjects,
     });
 
-    // 5. Procedural 3D Park Lamps (Warm Street/Park Illumination)
-    const lampPoleGeo = regGeo(new THREE.CylinderGeometry(0.08, 0.1, 3.0, 6));
-    const lampHeadGeo = regGeo(new THREE.BoxGeometry(0.5, 0.5, 0.5));
+    // 5. Procedural 3D Park Lamps (3x tall, 11.25m height = 9m * 1.25)
+    const lampPoleGeo = regGeo(new THREE.CylinderGeometry(0.12, 0.16, 11.25, 8));
+    const lampHeadGeo = regGeo(new THREE.BoxGeometry(0.75, 0.75, 0.75));
+
+    const lampDist = isExpanded ? 68 : 32;
+    const lampSpread = isExpanded ? 24 : 12;
 
     const lampPositions: [number, number][] = [
-      [-8, -26],
-      [8, -26],
-      [-8, 26],
-      [8, 26],
-      [-26, -8],
-      [-26, 8],
-      [26, -8],
-      [26, 8],
+      [-lampSpread, -lampDist],
+      [lampSpread, -lampDist],
+      [-lampSpread, lampDist],
+      [lampSpread, lampDist],
+      [-lampDist, -lampSpread],
+      [-lampDist, lampSpread],
+      [lampDist, -lampSpread],
+      [lampDist, lampSpread],
     ];
 
     lampPositions.forEach(([lx, lz], i) => {
+      // Skip lamps that would collide with the bus stand footprint
+      if (isOverlappingBusStop(plot.x + lx, plot.z + lz)) return;
+
       const lampGroup = new THREE.Group();
       lampGroup.name = `${plot.id}-park-lamp-${i}`;
       lampGroup.position.set(lx, 0.12, lz);
 
       const pole = new THREE.Mesh(lampPoleGeo, lampPoleMat);
-      pole.position.y = 1.5;
+      pole.position.y = 5.625;
       pole.castShadow = true;
       lampGroup.add(pole);
+      obstacleObjects.push(pole);
 
       const head = new THREE.Mesh(lampHeadGeo, lampGlowMat);
       head.name = `${plot.id}-park-lamp-head-${i}`;
-      head.position.y = 3.1;
+      head.position.y = 11.5;
       lampGroup.add(head);
 
       parent.add(lampGroup);
@@ -341,216 +615,94 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
   // Sub-builder: Framing Tall Buildings
   // ----------------------------------------------------
   function buildBuildingPlot(plot: PlotData, parent: THREE.Group) {
-    // 1. Ground Plaza / Sidewalk Surface
-    const plazaMesh = new THREE.Mesh(sharedPlazaGeo, plazaMat);
+    // 1. Ground Terracotta Sidewalk Surface
+    const plazaGeo =
+      plot.width === plotWidth && plot.depth === plotDepth
+        ? sharedPlazaGeo
+        : regGeo(new THREE.BoxGeometry(plot.width - 1.2, 0.06, plot.depth - 1.2));
+    const plazaMesh = new THREE.Mesh(plazaGeo, terracottaMat);
     plazaMesh.name = `${plot.id}-surface`;
     plazaMesh.position.y = 0.12;
     plazaMesh.receiveShadow = true;
     parent.add(plazaMesh);
     clickableObjects.push(plazaMesh);
 
+    // Road-facing Yellow Tactile Warning Strips along the 4 plot perimeter edges
+    const tactileNGeo =
+      plot.width === plotWidth
+        ? bldTactileHGeo
+        : regGeo(new THREE.BoxGeometry(plot.width - 2.4, 0.05, 1.0));
+    const tactileVGeo =
+      plot.depth === plotDepth
+        ? bldTactileVGeo
+        : regGeo(new THREE.BoxGeometry(1.0, 0.05, plot.depth - 4.4));
+
+    const tactileN = new THREE.Mesh(tactileNGeo, tactileHMat);
+    tactileN.name = `${plot.id}-tactile-n`;
+    tactileN.position.set(0, 0.125, plot.depth / 2 - 1.1);
+    tactileN.receiveShadow = true;
+    parent.add(tactileN);
+    clickableObjects.push(tactileN);
+
+    const tactileS = new THREE.Mesh(tactileNGeo, tactileHMat);
+    tactileS.name = `${plot.id}-tactile-s`;
+    tactileS.position.set(0, 0.125, -plot.depth / 2 + 1.1);
+    tactileS.receiveShadow = true;
+    parent.add(tactileS);
+    clickableObjects.push(tactileS);
+
+    const tactileE = new THREE.Mesh(tactileVGeo, tactileVMat);
+    tactileE.name = `${plot.id}-tactile-e`;
+    tactileE.position.set(plot.width / 2 - 1.1, 0.125, 0);
+    tactileE.receiveShadow = true;
+    parent.add(tactileE);
+    clickableObjects.push(tactileE);
+
+    const tactileW = new THREE.Mesh(tactileVGeo, tactileVMat);
+    tactileW.name = `${plot.id}-tactile-w`;
+    tactileW.position.set(-plot.width / 2 + 1.1, 0.125, 0);
+    tactileW.receiveShadow = true;
+    parent.add(tactileW);
+    clickableObjects.push(tactileW);
+
     // Seeded procedural height, material, and architectural archetype variation per plot
     const seed = (plot.row * 7 + plot.col * 13) % 9;
-    const bodyMat = seed % 3 === 0 ? bldBodyMat1 : seed % 3 === 1 ? bldBodyMat2 : bldBodyMat3;
-    const bodyMatAlt = seed % 3 === 0 ? bldBodyMat3 : seed % 3 === 1 ? bldBodyMat1 : bldBodyMat2;
     const archetype = (plot.row * 2 + plot.col) % 4;
 
-    if (archetype === 0) {
-      // ARCHETYPE 0: High-Rise Skyscraper with Stepped Urban Podium (covers ~90% plot area)
-      const bWidth = plot.width * (0.88 + (seed % 3) * 0.02); // 63.4 to 66.2
-      const bDepth = plot.depth * (0.88 + ((seed + 1) % 3) * 0.02); // 63.4 to 66.2
-      const totalHeight = 52 + seed * 3.5; // 52 to 80 units tall
+    const ctx: BuildingBuildContext = {
+      plot,
+      parent,
+      countryCode,
+      palette: buildingPalette,
+      seed,
+      archetype,
+      regGeo,
+      regMat,
+      clickableObjects,
+      obstacleObjects,
+      materials: {
+        matFacadePrimary,
+        matFacadeSecondary,
+        matFacadeBase,
+        matRoofMain,
+        matRoofTrim,
+        matIronwork,
+        matStoneTrim,
+        matAccent,
+        matGlass,
+        matParapet,
+        sharedSpireGeo,
+      },
+    };
 
-      // Ground Podium (covers full footprint width x depth, height 10 units)
-      const podiumHeight = 10;
-      const podiumGeo = regGeo(new THREE.BoxGeometry(bWidth, podiumHeight, bDepth));
-      const podiumMesh = new THREE.Mesh(podiumGeo, bodyMat);
-      podiumMesh.name = `${plot.id}-building-tower-podium`;
-      podiumMesh.position.set(0, podiumHeight / 2 + 0.12, 0);
-      podiumMesh.castShadow = true;
-      podiumMesh.receiveShadow = true;
-      parent.add(podiumMesh);
-
-      // Glass Retail / Lobby Band
-      const lobbyBandGeo = regGeo(new THREE.BoxGeometry(bWidth + 0.2, 2.5, bDepth + 0.2));
-      const lobbyBandMesh = new THREE.Mesh(lobbyBandGeo, bldGlassMat);
-      lobbyBandMesh.position.set(0, 3 + 0.12, 0);
-      parent.add(lobbyBandMesh);
-
-      // Main Tower rising from podium (80% setback)
-      const towerW = bWidth * 0.80;
-      const towerD = bDepth * 0.80;
-      const towerH = totalHeight - podiumHeight - 8;
-      const towerGeo = regGeo(new THREE.BoxGeometry(towerW, towerH, towerD));
-      const towerMesh = new THREE.Mesh(towerGeo, bodyMatAlt);
-      towerMesh.name = `${plot.id}-building-tower`;
-      towerMesh.position.set(0, podiumHeight + towerH / 2 + 0.12, 0);
-      towerMesh.castShadow = true;
-      towerMesh.receiveShadow = true;
-      parent.add(towerMesh);
-
-      // Architectural Glass Stripes
-      const numBands = Math.floor(towerH / 4.5);
-      const bandGeo = regGeo(new THREE.BoxGeometry(towerW + 0.2, 0.6, towerD + 0.2));
-      for (let b = 1; b < numBands; b++) {
-        const bandMesh = new THREE.Mesh(bandGeo, bldGlassMat);
-        bandMesh.position.set(0, podiumHeight + b * 4.5 + 0.12, 0);
-        parent.add(bandMesh);
-      }
-
-      // Stepped Mechanical Penthouse Crown
-      const crownH = 5;
-      const crownGeo = regGeo(new THREE.BoxGeometry(towerW * 0.65, crownH, towerD * 0.65));
-      const crownMesh = new THREE.Mesh(crownGeo, bldRoofMat);
-      crownMesh.name = `${plot.id}-building-roof`;
-      crownMesh.position.set(0, podiumHeight + towerH + crownH / 2 + 0.12, 0);
-      crownMesh.castShadow = true;
-      parent.add(crownMesh);
-
-      // Rooftop Spire
-      const spireMesh = new THREE.Mesh(sharedSpireGeo, bldAccentMat);
-      spireMesh.position.set(0, podiumHeight + towerH + crownH + 3.0 + 0.12, 0);
-      parent.add(spireMesh);
-
-    } else if (archetype === 1) {
-      // ARCHETYPE 1: Monolithic Corporate Headquarters with Setback Crown (~90% plot area)
-      const bWidth = plot.width * (0.89 + (seed % 3) * 0.02); // 64.1 to 67.0
-      const bDepth = plot.depth * (0.88 + ((seed + 1) % 3) * 0.02); // 63.4 to 66.2
-      const towerH = 48 + seed * 3.2; // 48 to 74 units tall
-
-      // Main Tower
-      const towerGeo = regGeo(new THREE.BoxGeometry(bWidth, towerH, bDepth));
-      const towerMesh = new THREE.Mesh(towerGeo, bodyMat);
-      towerMesh.name = `${plot.id}-building-tower`;
-      towerMesh.position.set(0, towerH / 2 + 0.12, 0);
-      towerMesh.castShadow = true;
-      towerMesh.receiveShadow = true;
-      parent.add(towerMesh);
-
-      // Horizontal Architectural Glass Bands
-      const numBands = Math.floor(towerH / 4);
-      const bandGeo = regGeo(new THREE.BoxGeometry(bWidth + 0.2, 0.7, bDepth + 0.2));
-      for (let b = 1; b < numBands; b++) {
-        const bandMesh = new THREE.Mesh(bandGeo, bldGlassMat);
-        bandMesh.position.set(0, b * 4 + 0.12, 0);
-        parent.add(bandMesh);
-      }
-
-      // Stepped Mechanical Penthouse
-      const crownH = 5.5;
-      const crownGeo = regGeo(new THREE.BoxGeometry(bWidth * 0.65, crownH, bDepth * 0.65));
-      const crownMesh = new THREE.Mesh(crownGeo, bldRoofMat);
-      crownMesh.name = `${plot.id}-building-roof`;
-      crownMesh.position.set(0, towerH + crownH / 2 + 0.12, 0);
-      crownMesh.castShadow = true;
-      parent.add(crownMesh);
-
-      // Communications Array
-      const spireMesh = new THREE.Mesh(sharedSpireGeo, bldAccentMat);
-      spireMesh.position.set(0, towerH + crownH + 3.0 + 0.12, 0);
-      parent.add(spireMesh);
-
-    } else if (archetype === 2) {
-      // ARCHETYPE 2: Dual-Volume / L-Shaped High-Rise Complex (~89% plot coverage)
-      const bWidth = plot.width * (0.88 + (seed % 3) * 0.02); // 63.4 to 66.2
-      const bDepth = plot.depth * (0.88 + ((seed + 1) % 3) * 0.02); // 63.4 to 66.2
-      const towerH = 50 + seed * 3.0; // 50 to 74 units tall
-      const wingH = towerH * 0.65; // 32.5 to 48 units tall
-
-      // Primary Volume A (north half +Z, slightly indented on west face by 0.2 for clean architectural reveal)
-      const volA_W = bWidth - 0.2;
-      const volA_D = bDepth * 0.58;
-      const volA_OffsetX = 0.1;
-      const volA_OffsetZ = bDepth / 2 - volA_D / 2;
-      const geoA = regGeo(new THREE.BoxGeometry(volA_W, towerH, volA_D));
-      const meshA = new THREE.Mesh(geoA, bodyMat);
-      meshA.name = `${plot.id}-building-tower`;
-      meshA.position.set(volA_OffsetX, towerH / 2 + 0.12, volA_OffsetZ);
-      meshA.castShadow = true;
-      meshA.receiveShadow = true;
-      parent.add(meshA);
-
-      // Intersecting Wing Volume B (west half -X, slightly indented on north face by 0.2 for clean reveal)
-      const volB_W = bWidth * 0.55;
-      const volB_D = bDepth - 0.2;
-      const volB_OffsetX = -bWidth / 2 + volB_W / 2;
-      const volB_OffsetZ = -0.1;
-      const geoB = regGeo(new THREE.BoxGeometry(volB_W, wingH, volB_D));
-      const meshB = new THREE.Mesh(geoB, bodyMatAlt);
-      meshB.name = `${plot.id}-building-tower-wing`;
-      meshB.position.set(volB_OffsetX, wingH / 2 + 0.12, volB_OffsetZ);
-      meshB.castShadow = true;
-      meshB.receiveShadow = true;
-      parent.add(meshB);
-
-      // Glass bands on Primary Volume
-      const numBandsA = Math.floor(towerH / 4.5);
-      const bandGeoA = regGeo(new THREE.BoxGeometry(bWidth + 0.2, 0.6, volA_D + 0.2));
-      for (let b = 1; b < numBandsA; b++) {
-        const bandMesh = new THREE.Mesh(bandGeoA, bldGlassMat);
-        bandMesh.position.set(0, b * 4.5 + 0.12, volA_OffsetZ);
-        parent.add(bandMesh);
-      }
-
-      // Rooftop Penthouse Crown
-      const crownH = 4.5;
-      const crownGeo = regGeo(new THREE.BoxGeometry(bWidth * 0.5, crownH, volA_D * 0.7));
-      const crownMesh = new THREE.Mesh(crownGeo, bldRoofMat);
-      crownMesh.name = `${plot.id}-building-roof`;
-      crownMesh.position.set(0, towerH + crownH / 2 + 0.12, volA_OffsetZ);
-      crownMesh.castShadow = true;
-      parent.add(crownMesh);
-
+    if (plot.id === "plot-0-0") {
+      buildCountryPlot00(ctx);
+    } else if (plot.id === "plot-1-0") {
+      buildCountryPlot10(ctx);
+    } else if (plot.id === "plot-1-2") {
+      buildCountryPlot12(ctx);
     } else {
-      // ARCHETYPE 3: Art Deco Multi-Tier Stepped Skyscraper (~91% plot coverage)
-      const bWidth = plot.width * (0.90 + (seed % 3) * 0.015); // 64.8 to 67.0
-      const bDepth = plot.depth * (0.90 + ((seed + 1) % 3) * 0.015); // 64.8 to 67.0
-      const baseH = 14;
-      const midH = 26;
-      const upperH = 22 + seed * 2.0; // 22 to 38
-      const decoH = 8;
-
-      // Tier 1: Base (covers full footprint width x depth)
-      const baseGeo = regGeo(new THREE.BoxGeometry(bWidth, baseH, bDepth));
-      const baseMesh = new THREE.Mesh(baseGeo, bodyMat);
-      baseMesh.name = `${plot.id}-building-tower`;
-      baseMesh.position.set(0, baseH / 2 + 0.12, 0);
-      baseMesh.castShadow = true;
-      baseMesh.receiveShadow = true;
-      parent.add(baseMesh);
-
-      // Tier 2: Mid Tower (76% setback)
-      const midW = bWidth * 0.76;
-      const midD = bDepth * 0.76;
-      const midGeo = regGeo(new THREE.BoxGeometry(midW, midH, midD));
-      const midMesh = new THREE.Mesh(midGeo, bodyMatAlt);
-      midMesh.position.set(0, baseH + midH / 2 + 0.12, 0);
-      midMesh.castShadow = true;
-      midMesh.receiveShadow = true;
-      parent.add(midMesh);
-
-      // Tier 3: Upper Tower (56% setback)
-      const upperW = bWidth * 0.56;
-      const upperD = bDepth * 0.56;
-      const upperGeo = regGeo(new THREE.BoxGeometry(upperW, upperH, upperD));
-      const upperMesh = new THREE.Mesh(upperGeo, bodyMat);
-      upperMesh.position.set(0, baseH + midH + upperH / 2 + 0.12, 0);
-      upperMesh.castShadow = true;
-      upperMesh.receiveShadow = true;
-      parent.add(upperMesh);
-
-      // Tier 4: Deco Stepped Crown
-      const crownGeo = regGeo(new THREE.BoxGeometry(upperW * 0.55, decoH, upperD * 0.55));
-      const crownMesh = new THREE.Mesh(crownGeo, bldRoofMat);
-      crownMesh.name = `${plot.id}-building-roof`;
-      crownMesh.position.set(0, baseH + midH + upperH + decoH / 2 + 0.12, 0);
-      crownMesh.castShadow = true;
-      parent.add(crownMesh);
-
-      // Deco Needle Spire
-      const spireMesh = new THREE.Mesh(sharedSpireGeo, bldAccentMat);
-      spireMesh.position.set(0, baseH + midH + upperH + decoH + 3.0 + 0.12, 0);
-      parent.add(spireMesh);
+      buildCountryGenericBuilding(ctx);
     }
   }
 
@@ -630,6 +782,9 @@ export function buildMapMeshes(mapData: GeneratedMap): MapMeshSystem {
       }
       for (const mat of materials) {
         mat.dispose();
+      }
+      for (const tex of textures) {
+        tex.dispose();
       }
     },
   };

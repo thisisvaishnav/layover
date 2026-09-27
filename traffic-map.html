@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layover City - Traffic Map</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+  background: #1a1a2e; 
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+canvas { display: block; }
+#hud {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 15px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+#hud h2 { font-size: 16px; margin-bottom: 10px; color: #4ecdc4; }
+#hud .stat { margin: 5px 0; }
+#hud .label { color: #888; }
+#hud .value { color: #fff; font-weight: bold; }
+#legend {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  padding: 15px 20px;
+  border-radius: 12px;
+  font-size: 12px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+#legend .item { display: flex; align-items: center; margin: 5px 0; }
+#legend .color-box { width: 16px; height: 16px; border-radius: 3px; margin-right: 10px; }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<div id="hud">
+  <h2>🚦 Layover City Traffic</h2>
+  <div class="stat"><span class="label">Cars: </span><span class="value" id="carCount">0</span></div>
+  <div class="stat"><span class="label">Buses: </span><span class="value" id="busCount">0</span></div>
+  <div class="stat"><span class="label">Avg Speed: </span><span class="value" id="avgSpeed">0</span> km/h</div>
+  <div class="stat"><span class="label">Traffic Level: </span><span class="value" id="trafficLevel">Moderate</span></div>
+</div>
+<div id="legend">
+  <div class="item"><div class="color-box" style="background:#ff6b6b"></div> Cars</div>
+  <div class="item"><div class="color-box" style="background:#4ecdc4"></div> Buses</div>
+  <div class="item"><div class="color-box" style="background:#45b7d1"></div> Roads</div>
+  <div class="item"><div class="color-box" style="background:#96ceb4"></div> Parks</div>
+  <div class="item"><div class="color-box" style="background:#6c5ce7"></div> Buildings</div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+let W, H;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// City grid config (matching map-generator.ts)
+const GRID_SIZE = 4;
+const PLOT_SIZE = 100;
+const ROAD_WIDTH = 30;
+const SCALE = Math.min(W, H) / (GRID_SIZE * (PLOT_SIZE + ROAD_WIDTH) + ROAD_WIDTH * 2);
+
+// City offset to center
+let offsetX, offsetY;
+function calcOffset() {
+  const citySize = GRID_SIZE * (PLOT_SIZE + ROAD_WIDTH) + ROAD_WIDTH * 2;
+  offsetX = (W - citySize * SCALE) / 2;
+  offsetY = (H - citySize * SCALE) / 2;
+}
+calcOffset();
+window.addEventListener('resize', calcOffset);
+
+// Plot types
+const plotTypes = ['park', 'building', 'building', 'empty', 'park', 'building', 'building', 'port'];
+const plotColors = {
+  park: '#2d5a3d',
+  building: '#4a3f6b',
+  empty: '#3d3d5c',
+  port: '#5a4a3d'
+};
+
+// Generate plots
+const plots = [];
+for (let r = 0; r < GRID_SIZE; r++) {
+  for (let c = 0; c < GRID_SIZE; c++) {
+    const x = ROAD_WIDTH + c * (PLOT_SIZE + ROAD_WIDTH);
+    const z = ROAD_WIDTH + r * (PLOT_SIZE + ROAD_WIDTH);
+    const type = plotTypes[(r * GRID_SIZE + c) % plotTypes.length];
+    plots.push({ x, z, w: PLOT_SIZE, h: PLOT_SIZE, type });
+  }
+}
+
+// Generate road segments
+const roads = [];
+// Horizontal roads
+for (let r = 0; r <= GRID_SIZE; r++) {
+  const z = r * (PLOT_SIZE + ROAD_WIDTH);
+  roads.push({ x: 0, z, w: GRID_SIZE * (PLOT_SIZE + ROAD_WIDTH) + ROAD_WIDTH * 2, h: ROAD_WIDTH, dir: 'h' });
+}
+// Vertical roads
+for (let c = 0; c <= GRID_SIZE; c++) {
+  const x = c * (PLOT_SIZE + ROAD_WIDTH);
+  roads.push({ x, z: 0, w: ROAD_WIDTH, h: GRID_SIZE * (PLOT_SIZE + ROAD_WIDTH) + ROAD_WIDTH * 2, dir: 'v' });
+}
+
+// Vehicle system
+class Vehicle {
+  constructor(type) {
+    this.type = type; // 'car' or 'bus'
+    this.speed = type === 'car' ? (0.3 + Math.random() * 0.4) : (0.2 + Math.random() * 0.3); // Slow speeds
+    this.length = type === 'car' ? 12 : 28;
+    this.width = type === 'car' ? 6 : 8;
+    this.color = type === 'car' ? this.randomCarColor() : '#4ecdc4';
+    this.headlightOn = Math.random() > 0.3;
+    this.tailLightOn = Math.random() > 0.5;
+    
+    // Pick a random road
+    this.roadIndex = Math.floor(Math.random() * roads.length);
+    this.road = roads[this.roadIndex];
+    this.progress = Math.random();
+    this.direction = Math.random() > 0.5 ? 1 : -1;
+    
+    // Perpendicular offset (lane)
+    this.laneOffset = (Math.random() > 0.5 ? 1 : -1) * (ROAD_WIDTH * 0.25);
+    
+    this.updatePosition();
+  }
+  
+  randomCarColor() {
+    const colors = ['#ff6b6b', '#feca57', '#ff9ff3', '#54a0ff', '#5f27cd', '#01a3a4', '#f368e0', '#ff9f43'];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+  
+  updatePosition() {
+    const road = this.road;
+    if (road.dir === 'h') {
+      const startX = -20;
+      const endX = road.w + 20;
+      const x = startX + this.progress * (endX - startX);
+      this.x = x;
+      this.z = road.z + road.h / 2 + this.laneOffset;
+      this.rotation = this.direction > 0 ? 0 : Math.PI;
+    } else {
+      const startZ = -20;
+      const endZ = road.h + 20;
+      const z = startZ + this.progress * (endZ - startZ);
+      this.x = road.x + road.w / 2 + this.laneOffset;
+      this.z = z;
+      this.rotation = this.direction > 0 ? Math.PI / 2 : -Math.PI / 2;
+    }
+  }
+  
+  update() {
+    this.progress += this.speed * this.direction * 0.001;
+    
+    // Wrap around
+    if (this.progress > 1.1) {
+      this.progress = -0.1;
+      // Maybe switch roads
+      if (Math.random() > 0.7) {
+        this.roadIndex = Math.floor(Math.random() * roads.length);
+        this.road = roads[this.roadIndex];
+        this.laneOffset = (Math.random() > 0.5 ? 1 : -1) * (ROAD_WIDTH * 0.25);
+        this.direction = Math.random() > 0.5 ? 1 : -1;
+      }
+    }
+    if (this.progress < -0.1) {
+      this.progress = 1.1;
+      if (Math.random() > 0.7) {
+        this.roadIndex = Math.floor(Math.random() * roads.length);
+        this.road = roads[this.roadIndex];
+        this.laneOffset = (Math.random() > 0.5 ? 1 : -1) * (ROAD_WIDTH * 0.25);
+        this.direction = Math.random() > 0.5 ? 1 : -1;
+      }
+    }
+    
+    this.updatePosition();
+  }
+  
+  draw(ctx) {
+    ctx.save();
+    ctx.translate(offsetX + this.x * SCALE, offsetY + this.z * SCALE);
+    ctx.rotate(this.rotation);
+    
+    // Vehicle body
+    ctx.fillStyle = this.color;
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.roundRect(-this.length * SCALE / 2, -this.width * SCALE / 2, this.length * SCALE, this.width * SCALE, 3);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    
+    // Headlights
+    if (this.headlightOn) {
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(this.length * SCALE / 2 - 2, -this.width * SCALE / 4, 2, 0, Math.PI * 2);
+      ctx.arc(this.length * SCALE / 2 - 2, this.width * SCALE / 4, 2, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Light beam
+      ctx.fillStyle = 'rgba(255,255,200,0.1)';
+      ctx.beginPath();
+      ctx.moveTo(this.length * SCALE / 2, -this.width * SCALE / 4);
+      ctx.lineTo(this.length * SCALE / 2 + 30, -this.width * SCALE);
+      ctx.lineTo(this.length * SCALE / 2 + 30, this.width * SCALE);
+      ctx.lineTo(this.length * SCALE / 2, this.width * SCALE / 4);
+      ctx.fill();
+    }
+    
+    // Tail lights
+    if (this.tailLightOn) {
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(-this.length * SCALE / 2 + 2, -this.width * SCALE / 4, 2, 0, Math.PI * 2);
+      ctx.arc(-this.length * SCALE / 2 + 2, this.width * SCALE / 4, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    // Windows for bus
+    if (this.type === 'bus') {
+      ctx.fillStyle = 'rgba(100,200,255,0.6)';
+      for (let i = -2; i <= 2; i++) {
+        ctx.fillRect(i * 5 * SCALE - 2, -this.width * SCALE / 2 + 1, 4, this.width * SCALE - 2);
+      }
+    }
+    
+    ctx.restore();
+  }
+}
+
+// Create vehicles - moderate traffic (not too many, not too few)
+const vehicles = [];
+const NUM_CARS = 18;
+const NUM_BUSES = 6;
+
+for (let i = 0; i < NUM_CARS; i++) {
+  vehicles.push(new Vehicle('car'));
+}
+for (let i = 0; i < NUM_BUSES; i++) {
+  vehicles.push(new Vehicle('bus'));
+}
+
+// Draw functions
+function drawRoads() {
+  roads.forEach(road => {
+    // Road surface
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(
+      offsetX + road.x * SCALE,
+      offsetY + road.z * SCALE,
+      road.w * SCALE,
+      road.h * SCALE
+    );
+    
+    // Road markings
+    ctx.strokeStyle = '#f1c40f';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([10, 10]);
+    ctx.beginPath();
+    if (road.dir === 'h') {
+      ctx.moveTo(offsetX, offsetY + (road.z + road.h / 2) * SCALE);
+      ctx.lineTo(offsetX + road.w * SCALE, offsetY + (road.z + road.h / 2) * SCALE);
+    } else {
+      ctx.moveTo(offsetX + (road.x + road.w / 2) * SCALE, offsetY);
+      ctx.lineTo(offsetX + (road.x + road.w / 2) * SCALE, offsetY + road.h * SCALE);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
+}
+
+function drawPlots() {
+  plots.forEach(plot => {
+    // Plot background
+    ctx.fillStyle = plotColors[plot.type];
+    ctx.fillRect(
+      offsetX + plot.x * SCALE,
+      offsetY + plot.z * SCALE,
+      plot.w * SCALE,
+      plot.h * SCALE
+    );
+    
+    // Details
+    if (plot.type === 'park') {
+      // Trees
+      ctx.fillStyle = '#1a472a';
+      for (let i = 0; i < 5; i++) {
+        const tx = plot.x + 15 + (i % 3) * 30;
+        const tz = plot.z + 20 + Math.floor(i / 3) * 40;
+        ctx.beginPath();
+        ctx.arc(offsetX + tx * SCALE, offsetY + tz * SCALE, 8 * SCALE, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    } else if (plot.type === 'building') {
+      // Buildings
+      ctx.fillStyle = '#5a4a7a';
+      const bx = plot.x + 20;
+      const bz = plot.z + 20;
+      ctx.fillRect(offsetX + bx * SCALE, offsetY + bz * SCALE, 60 * SCALE, 60 * SCALE);
+      
+      // Windows
+      ctx.fillStyle = '#f1c40f';
+      for (let wy = 0; wy < 3; wy++) {
+        for (let wx = 0; wx < 3; wx++) {
+          if (Math.random() > 0.3) {
+            ctx.fillRect(
+              offsetX + (bx + 8 + wx * 18) * SCALE,
+              offsetY + (bz + 8 + wy * 18) * SCALE,
+              10 * SCALE,
+              10 * SCALE
+            );
+          }
+        }
+      }
+    } else if (plot.type === 'port') {
+      // Port cranes
+      ctx.fillStyle = '#8a7a5a';
+      ctx.fillRect(offsetX + (plot.x + 40) * SCALE, offsetY + (plot.z + 10) * SCALE, 8 * SCALE, 80 * SCALE);
+      ctx.fillRect(offsetX + (plot.x + 20) * SCALE, offsetY + (plot.z + 10) * SCALE, 50 * SCALE, 6 * SCALE);
+    }
+  });
+}
+
+function drawBusStops() {
+  // Bus stops at some intersections
+  const busStops = [
+    { x: ROAD_WIDTH + 10, z: ROAD_WIDTH / 2 },
+    { x: ROAD_WIDTH * 2 + PLOT_SIZE + 10, z: ROAD_WIDTH / 2 },
+    { x: ROAD_WIDTH / 2, z: ROAD_WIDTH + 10 },
+    { x: ROAD_WIDTH / 2, z: ROAD_WIDTH * 2 + PLOT_SIZE + 10 },
+  ];
+  
+  busStops.forEach(stop => {
+    ctx.fillStyle = '#4ecdc4';
+    ctx.beginPath();
+    ctx.arc(offsetX + stop.x * SCALE, offsetY + stop.z * SCALE, 6 * SCALE, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // Shelter
+    ctx.fillStyle = 'rgba(78, 205, 196, 0.3)';
+    ctx.fillRect(
+      offsetX + (stop.x - 10) * SCALE,
+      offsetY + (stop.z - 15) * SCALE,
+      20 * SCALE,
+      30 * SCALE
+    );
+  });
+}
+
+// HUD update
+function updateHUD() {
+  const cars = vehicles.filter(v => v.type === 'car').length;
+  const buses = vehicles.filter(v => v.type === 'bus').length;
+  const avgSpeed = vehicles.reduce((sum, v) => sum + v.speed * 100, 0) / vehicles.length;
+  
+  document.getElementById('carCount').textContent = cars;
+  document.getElementById('busCount').textContent = buses;
+  document.getElementById('avgSpeed').textContent = avgSpeed.toFixed(1);
+  document.getElementById('trafficLevel').textContent = 'Moderate';
+  document.getElementById('trafficLevel').style.color = '#feca57';
+}
+
+// Main loop
+let time = 0;
+function animate() {
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, W, H);
+  
+  // Draw city
+  drawRoads();
+  drawPlots();
+  drawBusStops();
+  
+  // Update and draw vehicles
+  vehicles.forEach(v => v.update());
+  vehicles.forEach(v => v.draw(ctx));
+  
+  // Update HUD every 30 frames
+  if (time % 30 === 0) updateHUD();
+  time++;
+  
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>

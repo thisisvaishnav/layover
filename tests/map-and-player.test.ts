@@ -205,6 +205,10 @@ test("TDD [Player Character 3D]: Generates procedural human with head, body, arm
 
   // Verify character has torso, head, visor, arm pivots, leg pivots, and shadow
   assert.ok(character.group.children.length >= 7, "Must contain all major human body parts");
+  assert.ok(
+    character.group.scale.x >= 2.3 && character.group.scale.x <= 2.6,
+    `Player character should be scaled up 30% more (~2.4x), got scale=${character.group.scale.x}`
+  );
 
   // Verify update works with moving state
   const state = createPlayerState({ x: 5, z: -5, isMoving: true, rotation: 1.2 });
@@ -276,20 +280,79 @@ test("TDD [Map Scale 1.5X Plot]: Map default config provides 1.5x larger plots (
   assert.equal(map.config.plotSize, 72, "Plot size must be 72 units (1.5x larger than 48)");
   assert.equal(map.config.roadWidth, 20, "Road width must be 20 units");
 
-  // 4 * 72 + 5 * 20 = 288 + 100 = 388
-  assert.equal(map.bounds.totalWidth, 388, "Total width must be 388 units");
-  assert.equal(map.bounds.totalDepth, 388, "Total depth must be 388 units");
+  // Default config has parkSizeMultiplier = 2, so column 1 is 144, row 1 is 144.
+  // 3 * 72 + 144 + 5 * 20 = 360 + 100 = 460
+  assert.equal(map.bounds.totalWidth, 460, "Total width must be 460 units with 2x park");
+  assert.equal(map.bounds.totalDepth, 460, "Total depth must be 460 units with 2x park");
 
-  // Each plot has width/depth 72 and area 72 * 72 = 5184 units²
+  // Plots in col 1 have width 144, row 1 have depth 144. Park plot (col 1, row 1) is 144x144.
   for (const plot of map.plots) {
-    assert.equal(plot.width, 72);
-    assert.equal(plot.depth, 72);
+    const expectedWidth = plot.col === 1 ? 144 : 72;
+    const expectedDepth = plot.row === 1 ? 144 : 72;
+    assert.equal(plot.width, expectedWidth);
+    assert.equal(plot.depth, expectedDepth);
   }
 });
 
-test("TDD [Player Speed]: Player speed is comfortable and not excessively fast", () => {
+test("TDD [Player Speed]: Player speed is increased 20% faster (~14.11 units/s)", () => {
   const state = createPlayerState();
-  assert.ok(state.speed >= 4.5 && state.speed <= 6.5, "Speed should be brisk walking pace (4.5 - 6.5 units/s)");
+  assert.ok(state.speed >= 13.5 && state.speed <= 15.0, `Speed should be 20% faster (~14.11 units/s), got ${state.speed}`);
+});
+
+test("TDD [Player Articulated Legs]: Character has knee pivots and articulates legs with dynamic stride and knee bending", () => {
+  const character = createPlayerCharacter();
+  const leftKnee = character.group.getObjectByName("leftKneePivot") as THREE.Group | undefined;
+  const rightKnee = character.group.getObjectByName("rightKneePivot") as THREE.Group | undefined;
+  const leftLeg = character.group.getObjectByName("leftLegPivot") as THREE.Group | undefined;
+  const rightLeg = character.group.getObjectByName("rightLegPivot") as THREE.Group | undefined;
+
+  assert.ok(leftKnee, "Character must have left knee pivot for articulated leg motion");
+  assert.ok(rightKnee, "Character must have right knee pivot for articulated leg motion");
+  assert.ok(leftLeg, "Character must have left leg pivot");
+  assert.ok(rightLeg, "Character must have right leg pivot");
+
+  // Update with isMoving = true across a few frames to advance walk cycle
+  const movingState = createPlayerState({ x: 0, z: 0, isMoving: true, rotation: 0 });
+  let maxHipSwing = 0;
+  let maxKneeFlexion = 0;
+
+  for (let step = 0; step < 30; step++) {
+    character.update(movingState, 0.03);
+    if (leftLeg) {
+      maxHipSwing = Math.max(maxHipSwing, Math.abs(leftLeg.rotation.x));
+    }
+    if (leftKnee && rightKnee) {
+      maxKneeFlexion = Math.max(maxKneeFlexion, leftKnee.rotation.x, rightKnee.rotation.x);
+    }
+  }
+
+  // Hip stride swing should be dynamic (> 0.5 rad = > 28 deg)
+  assert.ok(
+    maxHipSwing >= 0.5,
+    `Hip stride swing should be dynamic (>= 0.5 rad), got ${maxHipSwing.toFixed(2)}`
+  );
+
+  // Knee should flex backwards during the stride cycle (> 0.4 rad = > 22 deg)
+  assert.ok(
+    maxKneeFlexion >= 0.4,
+    `Knee should bend backwards during stride (>= 0.4 rad), got ${maxKneeFlexion.toFixed(2)}`
+  );
+
+  // Idle state returns limbs towards resting position
+  const idleState = createPlayerState({ x: 0, z: 0, isMoving: false, rotation: 0 });
+  for (let step = 0; step < 20; step++) {
+    character.update(idleState, 0.1);
+  }
+  assert.ok(
+    Math.abs(leftLeg!.rotation.x) < 0.05,
+    "Left leg should return to neutral when idle"
+  );
+  assert.ok(
+    Math.abs(leftKnee!.rotation.x) < 0.05,
+    "Left knee should return to straight when idle"
+  );
+
+  character.dispose();
 });
 
 test("TDD [GTA V Camera]: Places camera in third-person chase perspective behind avatar", () => {
@@ -344,19 +407,20 @@ test("TDD [Keyboard Controller]: Left and right keys actively move the player la
   const map = generateMap();
   const initial = createPlayerState({ position: { x: 0, z: 0 }, rotation: 0 });
 
+  // Default fallback camera looks toward +Z, so its screen-left is +X and screen-right is -X
   // Move Left (ArrowLeft or A)
   const leftInput: KeyboardInput = { forward: false, backward: false, left: true, right: false };
   const leftResult = updatePlayerKeyboard(initial, leftInput, 0.1, map.bounds);
   assert.equal(leftResult.isMoving, true);
-  assert.ok(leftResult.position.x < 0, "Left key must move player laterally to the left (-X)");
-  assert.ok(leftResult.rotation < 0, "Left key must turn heading toward left (-X)");
+  assert.ok(leftResult.position.x > 0, "Left key must move player camera-left (+X for the +Z-facing fallback camera)");
+  assert.ok(leftResult.rotation > 0, "Left key must turn heading toward camera-left (+X)");
 
   // Move Right (ArrowRight or D)
   const rightInput: KeyboardInput = { forward: false, backward: false, left: false, right: true };
   const rightResult = updatePlayerKeyboard(initial, rightInput, 0.1, map.bounds);
   assert.equal(rightResult.isMoving, true);
-  assert.ok(rightResult.position.x > 0, "Right key must move player laterally to the right (+X)");
-  assert.ok(rightResult.rotation > 0, "Right key must turn heading toward right (+X)");
+  assert.ok(rightResult.position.x < 0, "Right key must move player camera-right (-X for the +Z-facing fallback camera)");
+  assert.ok(rightResult.rotation < 0, "Right key must turn heading toward camera-right (-X)");
 });
 
 test("TDD [Keyboard Controller]: Normalizes diagonal movement velocity to prevent speed boost", () => {
@@ -417,7 +481,53 @@ test("TDD [Stable Elevated View]: Camera remains positioned in stable elevated p
   controller.rotateOrbit(Math.PI / 2, 0);
   controller.update(playerPos, 0.1);
   assert.ok(controller.camera.position.x < 0, "Manual orbit rotates camera to west");
-});// ==========================================
+});
+
+test("TDD [Behind Character Chase Camera]: Camera tracks playerRotation to always stay behind character's back", () => {
+  const playerPos = { x: 0, z: 0 };
+  const controller = createCameraController(1280, 800, playerPos);
+
+  // 1. Facing North (+Z, rotation = 0): Back is at -Z, camera placed at -Z
+  controller.update(playerPos, 0.5, 0);
+  assert.ok(controller.camera.position.z < -10, "When player faces North (+Z), camera sits at -Z behind character");
+  assert.ok(Math.abs(controller.camera.position.x) < 1.0, "Camera X centered behind player");
+
+  // 2. Facing East (+X, rotation = π/2): Back is at -X, camera placed at -X
+  for (let i = 0; i < 20; i++) {
+    controller.update(playerPos, 0.05, Math.PI / 2);
+  }
+  assert.ok(controller.camera.position.x < -10, "When player faces East (+X), camera sits at -X behind character");
+  assert.ok(Math.abs(controller.camera.position.z) < 1.5, "Camera Z centered behind player");
+
+  // 3. Facing South (-Z, rotation = π): Back is at +Z, camera placed at +Z
+  for (let i = 0; i < 20; i++) {
+    controller.update(playerPos, 0.05, Math.PI);
+  }
+  assert.ok(controller.camera.position.z > 10, "When player faces South (-Z), camera sits at +Z behind character");
+  assert.ok(Math.abs(controller.camera.position.x) < 1.5, "Camera X centered behind player");
+
+  // 4. Facing West (-X, rotation = -π/2): Back is at +X, camera placed at +X
+  for (let i = 0; i < 20; i++) {
+    controller.update(playerPos, 0.05, -Math.PI / 2);
+  }
+  assert.ok(controller.camera.position.x > 10, "When player faces West (-X), camera sits at +X behind character");
+  assert.ok(Math.abs(controller.camera.position.z) < 1.5, "Camera Z centered behind player");
+});
+
+test("TDD [Camera Height Elevation]: Medium distance camera sits at comfortable elevated height (> 9m)", () => {
+  const playerPos = { x: 0, z: 0 };
+  const controller = createCameraController(1280, 800, playerPos);
+  controller.update(playerPos, 0.1, 0);
+
+  // At default medium distance (22m), camera height should be elevated (> 9.0m and <= 11.5m)
+  const camHeight = controller.camera.position.y;
+  assert.ok(
+    camHeight >= 9.0 && camHeight <= 11.5,
+    `Elevated camera height should be between 9.0m and 11.5m, got ${camHeight.toFixed(2)}m`
+  );
+});
+
+// ==========================================
 // 9. CENTRAL PARK, FRAMING BUILDINGS & PORT TESTS
 // ==========================================
 
@@ -457,11 +567,12 @@ test("TDD [Central Park Plot Bounds]: Central park remains strictly inside its p
   assert.ok(parkPlot);
 
   if (parkPlot) {
-    // Park must not span multiple plots: width and depth must equal plotSize
-    assert.equal(parkPlot.width, map.config.plotSize);
-    assert.equal(parkPlot.depth, map.config.plotSize);
-    assert.equal(parkPlot.maxX - parkPlot.minX, map.config.plotSize);
-    assert.equal(parkPlot.maxZ - parkPlot.minZ, map.config.plotSize);
+    // Park width and depth equal plotSize * parkSizeMultiplier (144)
+    const expectedParkSize = map.config.plotSize * (map.config.parkSizeMultiplier ?? 2);
+    assert.equal(parkPlot.width, expectedParkSize);
+    assert.equal(parkPlot.depth, expectedParkSize);
+    assert.equal(parkPlot.maxX - parkPlot.minX, expectedParkSize);
+    assert.equal(parkPlot.maxZ - parkPlot.minZ, expectedParkSize);
 
     // Verify 3D mesh representation strictly stays within plot bounds (no bleed into roads)
     const meshSystem = buildMapMeshes(map);
@@ -563,10 +674,15 @@ test("TDD [Building Coverage & Urban Scale]: Buildings occupy 85% to 95% of plot
     const plotGroup = meshSystem.group.getObjectByName(plot.id);
     assert.ok(plotGroup, `Building plot ${plot.id} group must exist`);
 
-    // Compute bounding box of building structures (excluding the flat ground surface/curb)
+    // Compute bounding box of building structures (excluding the flat ground surface/curb/tactile strips)
     const buildingBox = new THREE.Box3();
     plotGroup.traverse((child) => {
-      if (child instanceof THREE.Mesh && !child.name.endsWith("-surface") && !child.name.endsWith("-curb")) {
+      if (
+        child instanceof THREE.Mesh &&
+        !child.name.endsWith("-surface") &&
+        !child.name.endsWith("-curb") &&
+        !child.name.includes("-tactile-")
+      ) {
         child.updateMatrix();
         child.geometry.computeBoundingBox();
         const meshBox = child.geometry.boundingBox.clone();
@@ -635,17 +751,26 @@ test("TDD [Colored Park Footpath]: Footpath and connectors use distinct warm pav
   const footpathMesh = parkGroup.getObjectByName(`${parkPlot.id}-park-footpath`) as THREE.Mesh;
   assert.ok(footpathMesh, "Park perimeter footpath must exist");
 
-  const footpathMat = footpathMesh.material as THREE.MeshLambertMaterial;
+  const footpathMat = footpathMesh.material as THREE.MeshStandardMaterial;
   assert.ok(footpathMat, "Footpath material must exist");
 
-  // Check color is a warm stone/tan hue (R > G > B and warm brightness)
-  const hex = footpathMat.color.getHex();
-  const r = (hex >> 16) & 255;
-  const g = (hex >> 8) & 255;
-  const b = hex & 255;
+  // The terracotta base hex is baked into the map, so the material tint must stay
+  // neutral (tinting with the same hex again double-darkens the pavement).
+  assert.equal(footpathMat.color.getHex(), 0xffffff, "Footpath material must not re-tint the baked terracotta map");
 
-  assert.ok(r > g && g > b, `Footpath color should be warm tan/sandstone hue (r > g > b), got rgb(${r}, ${g}, ${b})`);
-  assert.ok(r >= 200 && g >= 160 && b >= 130, `Footpath should be light warm paving, got rgb(${r}, ${g}, ${b})`);
+  const footpathTex = footpathMat.map as THREE.DataTexture;
+  assert.ok(footpathTex, "Footpath material must sample the procedural tile map");
+  assert.equal(footpathTex.colorSpace, THREE.SRGBColorSpace, "Terracotta map must be tagged sRGB to render the correct hue");
+
+  // The baked map itself carries the warm terracotta hue (sample a tile-center texel)
+  const pixels = footpathTex.image.data as Uint8Array;
+  const tileIdx = (Math.floor(footpathTex.image.height / 8) * footpathTex.image.width + Math.floor(footpathTex.image.width / 8)) * 4;
+  const r = pixels[tileIdx];
+  const g = pixels[tileIdx + 1];
+  const b = pixels[tileIdx + 2];
+
+  assert.ok(r > g && g > b, `Footpath color should be warm terracotta hue (r > g > b), got rgb(${r}, ${g}, ${b})`);
+  assert.ok(r >= 180 && g >= 65 && b >= 35, `Footpath should be warm terracotta paving, got rgb(${r}, ${g}, ${b})`);
 
   // Check all 4 connector paths share this distinct footpath material
   const connectors = ["n", "s", "e", "w"].map(
@@ -667,8 +792,8 @@ test("TDD [On-Foot Camera Perspective]: Elevated preset sits at comfortable heig
   controller.update(playerPos, 0.1);
   const defaultHeight = controller.camera.position.y;
   assert.ok(
-    defaultHeight >= 14 && defaultHeight <= 26,
-    `Elevated camera height should sit at comfortable overview (~14m to 26m), got ${defaultHeight.toFixed(2)}`
+    defaultHeight >= 6.0 && defaultHeight <= 14.0,
+    `Elevated camera height should sit at comfortable overview (~6m to 14m), got ${defaultHeight.toFixed(2)}`
   );
 
   // 2. Close Preset (zoom factor ~0.55)
