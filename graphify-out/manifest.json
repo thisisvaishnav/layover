@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "src/components/map/WorldCanvas.tsx": {
-    "mtime": 1790625943.5282707,
-    "seen": 1790626199.779136,
-    "ast_hash": "a8a782133f11ee5c28ddbc07f9f1696e",
+    "mtime": 1790626230.4047875,
+    "seen": 1790627969.851373,
+    "ast_hash": "f81e39e6c4e5d5e4362179138417cc14",
     "semantic_hash": ""
   },
   "src/interaction/raycast-handler.ts": {

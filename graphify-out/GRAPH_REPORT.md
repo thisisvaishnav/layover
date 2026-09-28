@@ -1,16 +1,16 @@
 # Graph Report - layover  (2026-09-29)
 
 ## Corpus Check
-- 82 files · ~93,498 words
+- 82 files · ~93,499 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 595 nodes · 1104 edges · 39 communities (27 shown, 12 thin omitted)
+- 595 nodes · 1103 edges · 39 communities (27 shown, 12 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 21 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4eaafcb2`
+- Built from commit: `549ca5e4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -68,10 +68,10 @@
 10. `createSunlightSystem()` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `walkThrough()` --calls--> `resolveCollisions()`  [EXTRACTED]
-  tests/player-world-collision.test.ts → src/player/movement-controller.ts
 - `stepFrame()` --calls--> `selectMovementUpdate()`  [EXTRACTED]
   tests/click-to-move-dispatch.test.ts → src/player/movement-controller.ts
+- `walkThrough()` --calls--> `resolveCollisions()`  [EXTRACTED]
+  tests/player-world-collision.test.ts → src/player/movement-controller.ts
 - `stepFrame()` --calls--> `updatePlayerMovement()`  [EXTRACTED]
   tests/click-to-move-dispatch.test.ts → src/player/movement-controller.ts
 - `stepFrame()` --calls--> `updatePlayerMovementState()`  [EXTRACTED]
@@ -193,7 +193,7 @@ Cohesion: 0.27
 Nodes (7): DISTRICT_PLACES, MapPlacesDirectory(), MapPlacesDirectoryProps, PlacePOI, MinimapHUDProps, RaycastHandler, Vector2D
 
 ## Knowledge Gaps
-- **181 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+176 more)
+- **181 isolated node(s):** `What This Is`, `Tech Stack`, `Build & Run`, `Environment Variables`, `Code Style` (+176 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 281 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -206,7 +206,7 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.018) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `WorldCanvas()` (e.g. with `.addDynamic()` and `.addStatic()`) actually correct?**
   _`WorldCanvas()` has 3 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
+- **What connects `What This Is`, `Tech Stack`, `Build & Run` to the rest of the system?**
   _181 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `compilerOptions` be split into smaller, more focused modules?**
   _Cohesion score 0.06896551724137931 - nodes in this community are weakly interconnected._

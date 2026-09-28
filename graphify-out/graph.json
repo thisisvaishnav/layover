@@ -9874,18 +9874,6 @@
     },
     {
       "source": "src_components_map_worldcanvas",
-      "target": "src_components_map_minimaphud_minimaphud",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "src/components/map/WorldCanvas.tsx",
-      "source_location": "L31",
-      "weight": 1.0
-    },
-    {
-      "source": "src_components_map_worldcanvas",
       "target": "src_components_map_mapplacesdirectory_mapplacesdirectory",
       "relation": "imports",
       "_origin": "ast",
@@ -19865,5 +19853,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "4eaafcb2954da09dffe86b77ce2e2f37ff7f7ba8"
+  "built_at_commit": "549ca5e4ebc877f73b8e09cb3fd55b31b76a82a1"
 }
