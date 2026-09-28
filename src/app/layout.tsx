@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LAYOVER — Voice-Controlled Travel Simulator",
+  title: "LAYOVER — Travel Conversation Simulator",
   description:
-    "Practice real conversations and handle unexpected situations before your trip. Powered by AssemblyAI Voice Agent API.",
+    "Practice real conversations and handle unexpected situations before your trip.",
 };
 
 export default function RootLayout({

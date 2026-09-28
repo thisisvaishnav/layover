@@ -31,11 +31,11 @@ export const DEFAULT_BARBER_SHOP_SCENARIO: BarberShopScenarioConfig = {
   npcName: "Marco",
   npcRole: "Master Barber",
   location: "Vintage Barber Salon",
-  city: "Barcelona",
-  targetLanguage: "Spanish",
-  systemPrompt: `You are Marco, a friendly master barber at the Vintage Barber Salon located in the transit plaza on the plot immediately to the right of Central Park in Barcelona.
-You speak conversational Spanish and help travelers choose a haircut, styling, or traditional shave.`,
-  greeting: "¡Hola! Bienvenido a la barbería. ¿Deseas un corte de pelo o arreglo de barba hoy?",
+  city: "Tokyo",
+  targetLanguage: "Japanese",
+  systemPrompt: `You are Marco, a friendly master barber at the Vintage Barber Salon located in the transit plaza on the plot immediately to the right of Central Park in Tokyo.
+You speak conversational Japanese and help travelers choose a haircut, styling, or traditional shave.`,
+  greeting: "こんにちは！床屋へようこそ。今日はカットかひげそりをされますか？",
   interactionRadius: 12,
   objectives: [
     "Greet the barber in the local language",

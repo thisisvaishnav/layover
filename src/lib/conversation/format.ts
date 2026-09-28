@@ -29,111 +29,27 @@ interface NormalizedForm {
 }
 
 const GLOSSARY: Record<string, GlossEntry[]> = {
-  es: [
-    { variants: ["hola"], meanings: { en: "hello", ja: "こんにちは", fr: "bonjour", it: "ciao", de: "hallo", hi: "नमस्ते" } },
-    { variants: ["gracias"], meanings: { en: "thank you", ja: "ありがとう", fr: "merci", it: "grazie", de: "danke", hi: "धन्यवाद" } },
-    { variants: ["por favor"], meanings: { en: "please", ja: "お願いします", fr: "s'il vous plaît", it: "per favore", de: "bitte", hi: "कृपया" } },
-    { variants: ["café"], meanings: { en: "coffee", ja: "コーヒー", fr: "café", it: "caffè", de: "Kaffee", hi: "कॉफ़ी" } },
-    { variants: ["leche"], meanings: { en: "milk", ja: "牛乳", fr: "lait", it: "latte", de: "Milch", hi: "दूध" } },
-    { variants: ["agua"], meanings: { en: "water", ja: "水", fr: "eau", it: "acqua", de: "Wasser", hi: "पानी" } },
-    { variants: ["cuenta"], meanings: { en: "bill", ja: "お会計", fr: "addition", it: "conto", de: "Rechnung", hi: "बिल" } },
-    { variants: ["autobús"], meanings: { en: "bus", ja: "バス", fr: "bus", it: "autobus", de: "Bus", hi: "बस" } },
-    { variants: ["billete"], meanings: { en: "ticket", ja: "切符", fr: "billet", it: "biglietto", de: "Fahrkarte", hi: "टिकट" } },
-    { variants: ["taxi"], meanings: { en: "taxi", ja: "タクシー", fr: "taxi", it: "taxi", de: "Taxi", hi: "टैक्सी" } },
-    { variants: ["parada"], meanings: { en: "stop", ja: "停留所", fr: "arrêt", it: "fermata", de: "Haltestelle" } },
-    { variants: ["dónde"], meanings: { en: "where", ja: "どこ", fr: "où", it: "dove", de: "wo", hi: "कहाँ" } },
-    { variants: ["aquí"], meanings: { en: "here", ja: "ここ", fr: "ici", it: "qui", de: "hier", hi: "यहाँ" } },
-    { variants: ["quiero"], meanings: { en: "I want", ja: "欲しい", fr: "je veux", it: "voglio", de: "ich möchte", hi: "चाहिए" } },
-    { variants: ["adiós"], meanings: { en: "goodbye", ja: "さようなら", fr: "au revoir", it: "arrivederci", de: "auf Wiedersehen", hi: "अलविदा" } },
-    { variants: ["pelo"], meanings: { en: "hair", ja: "髪", fr: "cheveux", it: "capelli", de: "Haare", hi: "बाल" } },
-  ],
-  fr: [
-    { variants: ["bonjour"], meanings: { en: "hello", ja: "こんにちは", es: "hola", it: "ciao", de: "hallo", hi: "नमस्ते" } },
-    { variants: ["merci"], meanings: { en: "thank you", ja: "ありがとう", es: "gracias", it: "grazie", de: "danke", hi: "धन्यवाद" } },
-    { variants: ["s'il vous plaît"], meanings: { en: "please", ja: "お願いします", es: "por favor", it: "per favore", de: "bitte", hi: "कृपया" } },
-    { variants: ["café"], meanings: { en: "coffee", ja: "コーヒー", es: "café", it: "caffè", de: "Kaffee", hi: "कॉफ़ी" } },
-    { variants: ["lait"], meanings: { en: "milk", ja: "牛乳", es: "leche", it: "latte", de: "Milch", hi: "दूध" } },
-    { variants: ["eau"], meanings: { en: "water", ja: "水", es: "agua", it: "acqua", de: "Wasser", hi: "पानी" } },
-    { variants: ["addition"], meanings: { en: "bill", ja: "お会計", es: "cuenta", it: "conto", de: "Rechnung" } },
-    { variants: ["bus"], meanings: { en: "bus", ja: "バス", es: "autobús", it: "autobus", de: "Bus", hi: "बस" } },
-    { variants: ["billet"], meanings: { en: "ticket", ja: "切符", es: "billete", it: "biglietto", de: "Fahrkarte", hi: "टिकट" } },
-    { variants: ["taxi"], meanings: { en: "taxi", ja: "タクシー", es: "taxi", it: "taxi", de: "Taxi", hi: "टैक्सी" } },
-    { variants: ["arrêt"], meanings: { en: "stop", ja: "停留所", es: "parada", it: "fermata", de: "Haltestelle" } },
-    { variants: ["où"], meanings: { en: "where", ja: "どこ", es: "dónde", it: "dove", de: "wo", hi: "कहाँ" } },
-    { variants: ["ici"], meanings: { en: "here", ja: "ここ", es: "aquí", it: "qui", de: "hier", hi: "यहाँ" } },
-    { variants: ["cheveux"], meanings: { en: "hair", ja: "髪", es: "pelo", it: "capelli", de: "Haare", hi: "बाल" } },
-    { variants: ["au revoir"], meanings: { en: "goodbye", ja: "さようなら", es: "adiós", it: "arrivederci", de: "auf Wiedersehen", hi: "अलविदा" } },
-  ],
-  it: [
-    { variants: ["ciao"], meanings: { en: "hello", ja: "こんにちは", es: "hola", fr: "bonjour", de: "hallo", hi: "नमस्ते" } },
-    { variants: ["buongiorno"], meanings: { en: "good morning", ja: "おはようございます", es: "buenos días", fr: "bonjour", de: "guten Morgen", hi: "सुप्रभात" } },
-    { variants: ["grazie"], meanings: { en: "thank you", ja: "ありがとう", es: "gracias", fr: "merci", de: "danke", hi: "धन्यवाद" } },
-    { variants: ["per favore"], meanings: { en: "please", ja: "お願いします", es: "por favor", fr: "s'il vous plaît", de: "bitte", hi: "कृपया" } },
-    { variants: ["caffè"], meanings: { en: "coffee", ja: "コーヒー", es: "café", fr: "café", de: "Kaffee", hi: "कॉफ़ी" } },
-    { variants: ["latte"], meanings: { en: "milk", ja: "牛乳", es: "leche", fr: "lait", de: "Milch", hi: "दूध" } },
-    { variants: ["acqua"], meanings: { en: "water", ja: "水", es: "agua", fr: "eau", de: "Wasser", hi: "पानी" } },
-    { variants: ["conto"], meanings: { en: "bill", ja: "お会計", es: "cuenta", fr: "addition", de: "Rechnung" } },
-    { variants: ["autobus"], meanings: { en: "bus", ja: "バス", es: "autobús", fr: "bus", de: "Bus", hi: "बस" } },
-    { variants: ["biglietto"], meanings: { en: "ticket", ja: "切符", es: "billete", fr: "billet", de: "Fahrkarte", hi: "टिकट" } },
-    { variants: ["fermata"], meanings: { en: "stop", ja: "停留所", es: "parada", fr: "arrêt", de: "Haltestelle" } },
-    { variants: ["dove"], meanings: { en: "where", ja: "どこ", es: "dónde", fr: "où", de: "wo", hi: "कहाँ" } },
-    { variants: ["qui"], meanings: { en: "here", ja: "ここ", es: "aquí", fr: "ici", de: "hier", hi: "यहाँ" } },
-    { variants: ["voglio"], meanings: { en: "I want", ja: "欲しい", es: "quiero", fr: "je veux", de: "ich möchte", hi: "चाहिए" } },
-    { variants: ["arrivederci"], meanings: { en: "goodbye", ja: "さようなら", es: "adiós", fr: "au revoir", de: "auf Wiedersehen", hi: "अलविदा" } },
-    { variants: ["capelli"], meanings: { en: "hair", ja: "髪", es: "pelo", fr: "cheveux", de: "Haare", hi: "बाल" } },
-  ],
-  hi: [
-    { variants: ["नमस्ते", "namaste"], meanings: { en: "hello", ja: "こんにちは", es: "hola", fr: "bonjour", it: "ciao", de: "hallo" } },
-    { variants: ["धन्यवाद", "dhanyavaad", "dhanyawad"], meanings: { en: "thank you", ja: "ありがとう", es: "gracias", fr: "merci", it: "grazie", de: "danke" } },
-    { variants: ["कृपया", "kripya"], meanings: { en: "please", ja: "お願いします", es: "por favor", fr: "s'il vous plaît", it: "per favore", de: "bitte" } },
-    { variants: ["चाय", "chai"], meanings: { en: "tea", ja: "紅茶", es: "té", fr: "thé", it: "tè", de: "Tee" } },
-    { variants: ["पानी", "paani"], meanings: { en: "water", ja: "水", es: "agua", fr: "eau", it: "acqua", de: "Wasser" } },
-    { variants: ["बिल", "bill"], meanings: { en: "bill", ja: "お会計", es: "cuenta", fr: "addition", it: "conto", de: "Rechnung" } },
-    { variants: ["बस", "bus"], meanings: { en: "bus", ja: "バス", es: "autobús", fr: "bus", it: "autobus", de: "Bus" } },
-    { variants: ["टिकट", "ticket"], meanings: { en: "ticket", ja: "切符", es: "billete", fr: "billet", it: "biglietto", de: "Fahrkarte" } },
-    { variants: ["टैक्सी", "taxi"], meanings: { en: "taxi", ja: "タクシー", es: "taxi", fr: "taxi", it: "taxi", de: "Taxi" } },
-    { variants: ["कहाँ", "kahan"], meanings: { en: "where", ja: "どこ", es: "dónde", fr: "où", it: "dove", de: "wo" } },
-    { variants: ["यहाँ", "yahan"], meanings: { en: "here", ja: "ここ", es: "aquí", fr: "ici", it: "qui", de: "hier" } },
-    { variants: ["चाहिए", "chahiye"], meanings: { en: "want", ja: "欲しい", es: "quiero", fr: "je veux", it: "voglio", de: "ich möchte" } },
-    { variants: ["अलविदा", "alvida"], meanings: { en: "goodbye", ja: "さようなら", es: "adiós", fr: "au revoir", it: "arrivederci", de: "auf Wiedersehen" } },
-    { variants: ["बाल", "baal"], meanings: { en: "hair", ja: "髪", es: "pelo", fr: "cheveux", it: "capelli", de: "Haare" } },
-  ],
   ja: [
-    { variants: ["こんにちは", "konnichiwa"], meanings: { en: "hello", es: "hola", fr: "bonjour", it: "ciao", de: "hallo", hi: "नमस्ते" } },
-    { variants: ["ありがとう", "arigatou", "arigato"], meanings: { en: "thank you", es: "gracias", fr: "merci", it: "grazie", de: "danke", hi: "धन्यवाद" } },
-    { variants: ["お願いします", "onegaishimasu"], meanings: { en: "please", es: "por favor", fr: "s'il vous plaît", it: "per favore", de: "bitte", hi: "कृपया" } },
-    { variants: ["カフェ", "kafe"], meanings: { en: "coffee", es: "café", fr: "café", it: "caffè", de: "Kaffee", hi: "कॉफ़ी" } },
-    { variants: ["水", "mizu"], meanings: { en: "water", es: "agua", fr: "eau", it: "acqua", de: "Wasser", hi: "पानी" } },
-    { variants: ["お会計", "okaikei"], meanings: { en: "bill", es: "cuenta", fr: "addition", it: "conto", de: "Rechnung" } },
-    { variants: ["バス", "basu"], meanings: { en: "bus", es: "autobús", fr: "bus", it: "autobus", de: "Bus", hi: "बस" } },
-    { variants: ["切符", "kippu"], meanings: { en: "ticket", es: "billete", fr: "billet", it: "biglietto", de: "Fahrkarte", hi: "टिकट" } },
-    { variants: ["タクシー", "takushii"], meanings: { en: "taxi", es: "taxi", fr: "taxi", it: "taxi", de: "Taxi", hi: "टैक्सी" } },
-    { variants: ["停留所", "teiryuujo"], meanings: { en: "bus stop", es: "parada", fr: "arrêt", it: "fermata", de: "Haltestelle" } },
-    { variants: ["どこ", "doko"], meanings: { en: "where", es: "dónde", fr: "où", it: "dove", de: "wo", hi: "कहाँ" } },
-    { variants: ["ここ", "koko"], meanings: { en: "here", es: "aquí", fr: "ici", it: "qui", de: "hier", hi: "यहाँ" } },
-    { variants: ["いらっしゃいませ", "irasshaimase"], meanings: { en: "welcome", es: "bienvenido", fr: "bienvenue", it: "benvenuto", de: "willkommen", hi: "स्वागत है" } },
-    { variants: ["髪", "kami"], meanings: { en: "hair", es: "pelo", fr: "cheveux", it: "capelli", de: "Haare", hi: "बाल" } },
-    { variants: ["ご注文", "gochuumon"], meanings: { en: "order", es: "pedido", fr: "commande", it: "ordine", de: "Bestellung" } },
-    { variants: ["さようなら", "sayounara"], meanings: { en: "goodbye", es: "adiós", fr: "au revoir", it: "arrivederci", de: "auf Wiedersehen", hi: "अलविदा" } },
-  ],
-  te: [
-    { variants: ["నమస్కారం", "namaskaram"], meanings: { en: "hello", ja: "こんにちは", es: "hola", fr: "bonjour", it: "ciao", de: "hallo", hi: "नमस्ते" } },
-    { variants: ["ధన్యవాదాలు", "dhanyavaadaalu"], meanings: { en: "thank you", ja: "ありがとう", es: "gracias", fr: "merci", it: "grazie", de: "danke", hi: "धन्यवाद" } },
-    { variants: ["దయచేసి", "dayachesi"], meanings: { en: "please", ja: "お願いします", es: "por favor", fr: "s'il vous plaît", it: "per favore", de: "bitte", hi: "कृपया" } },
-    { variants: ["చాయ్", "chaay"], meanings: { en: "tea", ja: "紅茶", es: "té", fr: "thé", it: "tè", de: "Tee", hi: "चाय" } },
-    { variants: ["నీరు", "neeru"], meanings: { en: "water", ja: "水", es: "agua", fr: "eau", it: "acqua", de: "Wasser", hi: "पानी" } },
-    { variants: ["బిల్లు", "billu"], meanings: { en: "bill", ja: "お会計", es: "cuenta", fr: "addition", it: "conto", de: "Rechnung" } },
-    { variants: ["బస్సు", "bassu"], meanings: { en: "bus", ja: "バス", es: "autobús", fr: "bus", it: "autobus", de: "Bus", hi: "बस" } },
-    { variants: ["టికెట్", "tiket"], meanings: { en: "ticket", ja: "切符", es: "billete", fr: "billet", it: "biglietto", de: "Fahrkarte", hi: "टिकट" } },
-    { variants: ["టాక్సీ", "taksee"], meanings: { en: "taxi", ja: "タクシー", es: "taxi", fr: "taxi", it: "taxi", de: "Taxi", hi: "टैक्सी" } },
-    { variants: ["ఎక్కడ", "ekkada"], meanings: { en: "where", ja: "どこ", es: "dónde", fr: "où", it: "dove", de: "wo", hi: "कहाँ" } },
-    { variants: ["ఇక్కడ", "ikkada"], meanings: { en: "here", ja: "ここ", es: "aquí", fr: "ici", it: "qui", de: "hier", hi: "यहाँ" } },
-    { variants: ["కావాలి", "kaavaali"], meanings: { en: "want", ja: "欲しい", es: "quiero", fr: "je veux", it: "voglio", de: "ich möchte", hi: "चाहिए" } },
-    { variants: ["జుట్టు", "juttu"], meanings: { en: "hair", ja: "髪", es: "pelo", fr: "cheveux", it: "capelli", de: "Haare", hi: "बाल" } },
+    { variants: ["こんにちは", "konnichiwa"], meanings: { ja: "昼間のあいさつ" } },
+    { variants: ["ありがとう", "arigatou", "arigato"], meanings: { ja: "感謝を伝えるあいさつ" } },
+    { variants: ["お願いします", "onegaishimasu"], meanings: { ja: "頼む・願うときの言葉" } },
+    { variants: ["カフェ", "kafe"], meanings: { ja: "コーヒーを飲む店" } },
+    { variants: ["水", "mizu"], meanings: { ja: "みず" } },
+    { variants: ["お会計", "okaikei"], meanings: { ja: "勘定・請求" } },
+    { variants: ["バス", "basu"], meanings: { ja: "大型の乗合乗り物" } },
+    { variants: ["切符", "kippu"], meanings: { ja: "乗車券" } },
+    { variants: ["タクシー", "takushii"], meanings: { ja: "屋根付きの営業用クルマ" } },
+    { variants: ["停留所", "teiryuujo"], meanings: { ja: "バス停" } },
+    { variants: ["どこ", "doko"], meanings: { ja: "場所を尋ねる疑問詞" } },
+    { variants: ["ここ", "koko"], meanings: { ja: "自分のいる場所" } },
+    { variants: ["いらっしゃいませ", "irasshaimase"], meanings: { ja: "店での客あいさつ" } },
+    { variants: ["髪", "kami"], meanings: { ja: "かみ" } },
+    { variants: ["ご注文", "gochuumon"], meanings: { ja: "注文" } },
+    { variants: ["さようなら", "sayounara"], meanings: { ja: "別れのあいさつ" } },
   ],
 };
 
-function normalizeForm(input: string): NormalizedForm {
+export function normalizeForm(input: string): NormalizedForm {
   const chars: string[] = [];
   const starts: number[] = [];
   const ends: number[] = [];
@@ -246,7 +162,7 @@ function findGloss(text: string, targetLang: string, nativeLang: string): string
     const to = form.ends[at + candidate.norm.length - 1];
     const matched = text.slice(from, to).replace(/\s+/g, " ");
     if (!matched) continue;
-    const meaning = nativeLang in candidate.meanings ? candidate.meanings[nativeLang] : candidate.meanings.en;
+    const meaning = nativeLang in candidate.meanings ? candidate.meanings[nativeLang] : candidate.meanings.ja;
     if (!meaning) continue;
     return `${matched} = ${meaning}`;
   }
@@ -262,7 +178,7 @@ function normalizeZone(zone: string): string {
 
 function pickTranslation(translations: Record<string, string>, nativeLang: string): string {
   if (nativeLang in translations) return translations[nativeLang];
-  if ("en" in translations) return translations.en;
+  if ("ja" in translations) return translations.ja;
   return Object.values(translations)[0] ?? "";
 }
 

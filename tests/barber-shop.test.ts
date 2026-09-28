@@ -224,12 +224,13 @@ test("TDD [Barber Proximity Range]: isWithinBarberShopRange computes player dist
 });
 
 test("TDD [Barber Shop Scenario]: getMultilingualScenario produces complete barber dialogue configuration", () => {
-  const scenario = getMultilingualScenario("es", "en", "barber");
+  const scenario = getMultilingualScenario("ja", "ja", "barber");
   assert.equal(scenario.npcName, "Marco");
   assert.equal(scenario.npcRole, "Master Barber");
   assert.equal(scenario.location, "Vintage Barber Salon");
-  assert.equal(scenario.city, "Barcelona");
-  assert.ok(scenario.greeting.includes("barbería") || scenario.greeting.includes("pelo"));
+  assert.equal(scenario.city, "Tokyo");
+  assert.equal(scenario.targetLanguage, "Japanese");
+  assert.ok(scenario.greeting.includes("床屋"), "Greeting must be in Japanese");
   assert.ok(scenario.objectives.length >= 2, "Must contain haircut objectives");
 });
 
@@ -289,34 +290,24 @@ test("TDD [Barber Shop Expanded Dimensions]: Barber shop is significantly bigger
 });
 
 test("TDD [Barber Saloon Country Headings]: Heading correctly features Saloon and country-specific variants", () => {
-  // India (hi / in) must specifically feature "SALOON"
-  assert.equal(getBarberSalonHeading("hi"), "ROYAL HAIR SALOON");
-  assert.equal(getBarberSalonHeading("in"), "ROYAL HAIR SALOON");
-  assert.ok(getBarberSalonHeading("hi").includes("SALOON"), "India heading must contain SALOON");
-
-  // Spain (es)
-  assert.equal(getBarberSalonHeading("es"), "SALÓN DE BARBERÍA");
-
-  // France (fr)
-  assert.equal(getBarberSalonHeading("fr"), "SALON DE BARBIER");
-
-  // Italy (it)
-  assert.equal(getBarberSalonHeading("it"), "SALONE BARBIERE");
-
-  // Japan (ja)
+  // Japan (ja) is the only localized heading
   assert.equal(getBarberSalonHeading("ja"), "BARBER SALON");
+  assert.ok(getBarberSalonHeading("ja").includes("SALON"), "Japan heading must contain SALON");
 
-  // Default / English
+  // Every other code — including the default — keeps the English saloon heading
   assert.equal(getBarberSalonHeading("en"), "VINTAGE BARBER SALOON");
+  assert.equal(getBarberSalonHeading("es"), "VINTAGE BARBER SALOON");
+  assert.equal(getBarberSalonHeading("hi"), "VINTAGE BARBER SALOON");
+  assert.equal(getBarberSalonHeading("fr"), "VINTAGE BARBER SALOON");
+  assert.equal(getBarberSalonHeading("it"), "VINTAGE BARBER SALOON");
   assert.equal(getBarberSalonHeading(), "VINTAGE BARBER SALOON");
   assert.ok(getBarberSalonHeading("en").includes("SALOON"), "Default heading must contain SALOON");
 
   // Sub-headings
-  assert.ok(getBarberSalonSubHeading("hi").length > 0);
-  assert.ok(getBarberSalonSubHeading("es").length > 0);
-  assert.ok(getBarberSalonSubHeading("fr").length > 0);
-  assert.ok(getBarberSalonSubHeading("it").length > 0);
   assert.ok(getBarberSalonSubHeading("ja").length > 0);
+  assert.ok(getBarberSalonSubHeading("es").length > 0);
+  assert.ok(getBarberSalonSubHeading("en").length > 0);
+  assert.equal(getBarberSalonSubHeading(), "HAIRCUT & HOT TOWEL SHAVE");
 });
 
 test("TDD [Barber Saloon Marquee Texture]: createBarberSignTexture generates valid texture with border in headless Node", () => {
@@ -335,19 +326,19 @@ test("TDD [Barber Saloon Marquee Texture]: createBarberSignTexture generates val
 });
 
 test("TDD [Barber Saloon Sign Mesh]: Barber shop sign contains plaque with localized heading metadata and texture", () => {
-  const indiaShop = createBarberShop(0, 0, { countryCode: "hi" });
-  const sign = indiaShop.group.getObjectByName("BarberShopSign");
+  const japanShop = createBarberShop(0, 0, { countryCode: "ja" });
+  const sign = japanShop.group.getObjectByName("BarberShopSign");
   assert.ok(sign, "BarberShopSign must exist");
-  assert.equal(sign.userData.heading, "ROYAL HAIR SALOON", "India sign heading must be ROYAL HAIR SALOON");
+  assert.equal(sign.userData.heading, "BARBER SALON", "Japan sign heading must be BARBER SALON");
 
-  const plaque = indiaShop.group.getObjectByName("BarberShopSignPlaque") as THREE.Mesh;
+  const plaque = japanShop.group.getObjectByName("BarberShopSignPlaque") as THREE.Mesh;
   assert.ok(plaque, "BarberShopSignPlaque must exist");
-  assert.equal(plaque.userData.heading, "ROYAL HAIR SALOON");
-  indiaShop.dispose();
+  assert.equal(plaque.userData.heading, "BARBER SALON");
+  japanShop.dispose();
 
   const spainShop = createBarberShop(0, 0, { countryCode: "es" });
   const spainSign = spainShop.group.getObjectByName("BarberShopSign");
-  assert.equal(spainSign?.userData.heading, "SALÓN DE BARBERÍA");
+  assert.equal(spainSign?.userData.heading, "VINTAGE BARBER SALOON");
   spainShop.dispose();
 });
 

@@ -1,54 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { splitAgentUtterance } from "../src/lib/voice-agent/agent-text";
-import { getBilingualDialogue, getMultilingualScenario, getPlaceInfo } from "../src/scenarios/multilingual";
+import { getBilingualDialogue, getPlaceInfo } from "../src/scenarios/multilingual";
 
 const TARGET_LANGS = ["hi", "te", "es", "ja", "fr", "it"] as const;
 const ZONES = ["cafe", "bus_stop", "taxi", "barber"] as const;
-
-test("TDD [Bilingual Reply]: agent reply is split into shop line and helper meaning", () => {
-  const twoLines = splitAgentUtterance("¡Hola! Bienvenido.\nHello! Welcome.");
-  assert.equal(twoLines.text, "¡Hola! Bienvenido.");
-  assert.equal(twoLines.meaning, "Hello! Welcome.");
-
-  // Some models still prefix the helper line — strip it.
-  const prefixed = splitAgentUtterance("いらっしゃいませ。\nEN: Welcome.");
-  assert.equal(prefixed.text, "いらっしゃいませ。");
-  assert.equal(prefixed.meaning, "Welcome.");
-
-  // One-line replies (no meaning) stay intact instead of being mangled.
-  const single = splitAgentUtterance("नमस्ते! कैसे हैं आप?");
-  assert.equal(single.text, "नमस्ते! कैसे हैं आप?");
-  assert.equal(single.meaning, undefined);
-
-  assert.equal(splitAgentUtterance("   ").text, "");
-});
-
-test("TDD [Bilingual Reply]: spoken greeting = shop line + its meaning, in every language and place", () => {
-  for (const targetLang of TARGET_LANGS) {
-    for (const zone of ZONES) {
-      const scenario = getMultilingualScenario(targetLang, "en", zone);
-      const where = `${targetLang}/${zone}`;
-
-      assert.equal(
-        scenario.greeting,
-        `${scenario.dialogue.npcTargetText}\n${scenario.dialogue.npcNativeTranslation}`,
-        `${where}: greeting must be the visible NPC line plus its meaning, so TTS reads both`
-      );
-
-      // The client splits on the newline — it must survive a round trip.
-      const split = splitAgentUtterance(scenario.greeting);
-      assert.equal(split.text, scenario.dialogue.npcTargetText, `${where}: shop line must be line 1`);
-      assert.equal(split.meaning, scenario.dialogue.npcNativeTranslation, `${where}: meaning must be line 2`);
-
-      // The agent is told to keep answering in that same two-line format.
-      assert.ok(
-        scenario.systemPrompt.includes("Line 1:") && scenario.systemPrompt.includes("Line 2:"),
-        `${where}: system prompt must instruct the two-line reply format`
-      );
-    }
-  }
-});
 
 test("TDD [Bilingual Reply]: every place announces itself in English and in the target language", () => {
   for (const zone of ZONES) {

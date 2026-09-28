@@ -12,16 +12,16 @@ const REQUIRED_KEYS = [
   "you",
   "npc",
   "learning",
-  "micHint",
-  "listening",
-  "connecting",
   "thinking",
-  "speaking",
   "complete",
   "retry",
   "send",
   "empty",
-  "youSaid",
+  "speak",
+  "tryAgain",
+  "youSaidWrong",
+  "shouldSay",
+  "attemptLeft",
 ] as const;
 
 test("TDD [ConversationUI]: every learner language ships a complete UI string set", () => {
@@ -40,15 +40,26 @@ test("TDD [ConversationUI]: every learner language ships a complete UI string se
   }
 });
 
-test("TDD [ConversationUI]: unknown native languages fall back to English strings", () => {
-  assert.deepEqual(getConversationUiStrings("xx"), CONVERSATION_UI_STRINGS.en);
-  assert.deepEqual(getConversationUiStrings(undefined), CONVERSATION_UI_STRINGS.en);
-  assert.equal(getConversationUiStrings("hi").objective, "उद्देश्य");
+test("TDD [ConversationUI]: attemptLeft keeps the {n} placeholder in every language", () => {
+  for (const lang of SUPPORTED_LEARNER_LANGUAGES) {
+    const strings = CONVERSATION_UI_STRINGS[lang.code];
+    assert.ok(strings, `missing UI strings for native language "${lang.code}"`);
+    assert.ok(
+      strings.attemptLeft.includes("{n}"),
+      `${lang.code}.attemptLeft must keep the {n} placeholder`
+    );
+  }
+});
+
+test("TDD [ConversationUI]: unknown native languages fall back to Japanese strings", () => {
+  assert.deepEqual(getConversationUiStrings("xx"), CONVERSATION_UI_STRINGS.ja);
+  assert.deepEqual(getConversationUiStrings(undefined), CONVERSATION_UI_STRINGS.ja);
+  assert.equal(getConversationUiStrings("ja").objective, "目的");
 });
 
 test("TDD [ConversationUI]: learning label interpolates the target language", () => {
-  const strings = getConversationUiStrings("en");
-  assert.equal(strings.learning.replace("{lang}", "Spanish"), "Learning Spanish");
+  const strings = getConversationUiStrings("ja");
+  assert.equal(strings.learning.replace("{lang}", "日本語"), "日本語 を勉強中");
 });
 
 test("TDD [ConversationUI]: openConversation stores the NPC role shown in the header", () => {

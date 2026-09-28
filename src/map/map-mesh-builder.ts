@@ -156,7 +156,7 @@ export function buildMapMeshes(
   );
 
   // Country-Tailored Building Materials
-  const countryCode = options?.countryCode ?? "es";
+  const countryCode = options?.countryCode ?? "ja";
   const buildingPalette = getCountryBuildingPalette(countryCode);
 
   const matFacadePrimary = regMat(new THREE.MeshLambertMaterial({ color: buildingPalette.facadePrimary }));
@@ -563,7 +563,7 @@ export function buildMapMeshes(
 
     // 4. Diverse Trees, Amenities (Picnic Tables, Benches, Planters), and Country Memorial
     buildParkFeatures(plot, parent, {
-      countryCode: options?.countryCode ?? "es",
+      countryCode: options?.countryCode ?? "ja",
       regGeo,
       regMat,
       clickableObjects,

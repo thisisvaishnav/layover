@@ -5,75 +5,64 @@ import path from "node:path";
 import { getBilingualDialogue, SUPPORTED_LEARNER_LANGUAGES } from "../src/scenarios/multilingual";
 import { ONBOARDING_COUNTRIES, DEFAULT_STARTING_PLACE } from "../src/scenarios/catalog";
 
-test("TDD [Supported Learner Languages]: Provides core scaffolding languages including Hindi and English", () => {
+test("TDD [Supported Learner Languages]: Japanese is the only learner language", () => {
   const codes = SUPPORTED_LEARNER_LANGUAGES.map((l) => l.code);
-  assert.ok(codes.includes("en"), "English must be supported");
-  assert.ok(codes.includes("hi"), "Hindi must be supported as comfortable language");
-  assert.ok(codes.includes("ja"), "Japanese must be supported");
+  assert.deepEqual(codes, ["ja"], "Japanese must be the only supported learner language");
 });
 
-test("TDD [Onboarding Countries]: Provides country selection with Hindi instead of Telugu", () => {
-  // Must have countries defined
+test("TDD [Onboarding Countries]: Provides Japan as the only destination country", () => {
   assert.ok(Array.isArray(ONBOARDING_COUNTRIES), "ONBOARDING_COUNTRIES must be an array");
-  assert.ok(ONBOARDING_COUNTRIES.length >= 4, "Must offer multiple destination countries");
+  assert.equal(ONBOARDING_COUNTRIES.length, 1, "Only Japan must be offered as a destination");
 
-  // Verify India is present with Hindi (not Telugu)
-  const india = ONBOARDING_COUNTRIES.find((c) => c.country.toLowerCase() === "india");
-  assert.ok(india, "India must be available in country selection");
-  assert.equal(india.code, "hi", "India must map to Hindi language code 'hi'");
-  assert.equal(india.language, "Hindi", "Language for India must be Hindi");
-  assert.equal(india.nativeName, "हिन्दी", "Native name must be हिन्दी");
+  const japan = ONBOARDING_COUNTRIES[0];
+  assert.equal(japan.country, "Japan", "Destination country must be Japan");
+  assert.equal(japan.code, "ja", "Japan must map to language code 'ja'");
+  assert.equal(japan.language, "Japanese", "Language for Japan must be Japanese");
+  assert.equal(japan.nativeName, "日本語", "Native name must be 日本語");
 
-  // Verify Telugu is not in the country options
-  const telugu = ONBOARDING_COUNTRIES.find(
-    (c) => c.code === "te" || c.language.toLowerCase().includes("telugu")
+  // No other language may remain selectable
+  const others = ONBOARDING_COUNTRIES.filter(
+    (c) => c.code !== "ja" || c.language.toLowerCase() !== "japanese"
   );
-  assert.equal(telugu, undefined, "Telugu must be replaced and not present in onboarding countries");
-
-  // Verify other core countries are present
-  const countryNames = ONBOARDING_COUNTRIES.map((c) => c.country.toLowerCase());
-  assert.ok(countryNames.includes("spain"), "Spain must be present");
-  assert.ok(countryNames.includes("japan"), "Japan must be present");
-  assert.ok(countryNames.includes("france"), "France must be present");
-  assert.ok(countryNames.includes("italy"), "Italy must be present");
+  assert.equal(others.length, 0, "No non-Japanese country may be present in onboarding");
 });
 
 test("TDD [Onboarding Map]: Defaults to single map starting place without forced place selection", () => {
   assert.equal(DEFAULT_STARTING_PLACE, "cafe", "Single map starting place should default to 'cafe'");
 });
 
-test("TDD [Multilingual Hindi Support]: Scenario dialogues exist for Hindi target language in all zones", () => {
-  // 1. Cafe zone in Hindi taught to English speaker
-  const hindiCafe = getBilingualDialogue({
-    targetLang: "hi",
-    nativeLang: "en",
+test("TDD [Japanese Support]: Scenario dialogues exist for the Japanese target language in all zones", () => {
+  // 1. Cafe zone in Japanese
+  const cafe = getBilingualDialogue({
+    targetLang: "ja",
+    nativeLang: "ja",
     zone: "cafe",
     stepIndex: 0,
   });
-  assert.equal(hindiCafe.targetLangName, "हिन्दी");
-  assert.ok(hindiCafe.npcTargetText.length > 0, "Hindi cafe NPC dialogue must exist");
-  assert.ok(hindiCafe.npcPhonetics.length > 0, "Hindi cafe phonetics must exist");
-  assert.ok(hindiCafe.npcNativeTranslation.length > 0, "Hindi cafe translation must exist");
+  assert.equal(cafe.targetLangName, "日本語");
+  assert.ok(cafe.npcTargetText.length > 0, "Japanese cafe NPC dialogue must exist");
+  assert.ok(cafe.npcPhonetics.length > 0, "Japanese cafe phonetics must exist");
+  assert.ok(cafe.npcNativeTranslation.length > 0, "Japanese cafe translation must exist");
 
-  // 2. Bus stop zone in Hindi
-  const hindiBus = getBilingualDialogue({
-    targetLang: "hi",
-    nativeLang: "en",
+  // 2. Bus stop zone in Japanese
+  const bus = getBilingualDialogue({
+    targetLang: "ja",
+    nativeLang: "ja",
     zone: "bus_stop",
     stepIndex: 0,
   });
-  assert.equal(hindiBus.targetLangName, "हिन्दी");
-  assert.ok(hindiBus.npcTargetText.length > 0, "Hindi bus stop NPC dialogue must exist");
+  assert.equal(bus.targetLangName, "日本語");
+  assert.ok(bus.npcTargetText.length > 0, "Japanese bus stop NPC dialogue must exist");
 
-  // 3. Airport zone in Hindi
-  const hindiAirport = getBilingualDialogue({
-    targetLang: "hi",
-    nativeLang: "en",
+  // 3. Airport zone in Japanese
+  const airport = getBilingualDialogue({
+    targetLang: "ja",
+    nativeLang: "ja",
     zone: "airport",
     stepIndex: 0,
   });
-  assert.equal(hindiAirport.targetLangName, "हिन्दी");
-  assert.ok(hindiAirport.npcTargetText.length > 0, "Hindi airport NPC dialogue must exist");
+  assert.equal(airport.targetLangName, "日本語");
+  assert.ok(airport.npcTargetText.length > 0, "Japanese airport NPC dialogue must exist");
 });
 
 test("TDD [Onboarding Page Content]: Removes clutter and adheres to simple two-color layout contract", () => {

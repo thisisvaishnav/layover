@@ -64,13 +64,13 @@ export default function OnboardingPage() {
   // Persisted selections: server snapshot falls back to the defaults so hydration matches.
   const targetLang = useSyncExternalStore(
     subscribePrefs,
-    () => readStoredPref(TARGET_KEY, (c) => ONBOARDING_COUNTRIES.some((o) => o.code === c), "es"),
-    () => "es"
+    () => readStoredPref(TARGET_KEY, (c) => ONBOARDING_COUNTRIES.some((o) => o.code === c), "ja"),
+    () => "ja"
   );
   const nativeLang = useSyncExternalStore(
     subscribePrefs,
-    () => readStoredPref(NATIVE_KEY, (c) => SUPPORTED_LEARNER_LANGUAGES.some((l) => l.code === c), "en"),
-    () => "en"
+    () => readStoredPref(NATIVE_KEY, (c) => SUPPORTED_LEARNER_LANGUAGES.some((l) => l.code === c), "ja"),
+    () => "ja"
   );
 
   const selectTarget = (code: string) => {
@@ -131,13 +131,13 @@ export default function OnboardingPage() {
           <span className="text-[#00D084]">♢</span>
           <span>TWO VIEWS · ONE SAFE JOURNEY</span>
           <span className="text-[#FF5722]">♢</span>
-          <span>REAL AI VOICE COMPANION</span>
+          <span>REAL NPC CONVERSATIONS</span>
           <span className="text-[#FFB800]">♢</span>
           <span>SPAIN · INDIA · JAPAN · FRANCE · ITALY</span>
           <span className="text-[#00D084]">♢</span>
           <span>WALK THE 3D DISTRICT</span>
           <span className="text-[#FF5722]">♢</span>
-          <span>SPEAK LIVE BEFORE YOUR FLIGHT</span>
+          <span>PRACTICE BEFORE YOUR FLIGHT</span>
           <span className="text-[#FFB800]">♢</span>
           <span>THE FIRST WORDS YOU NEED</span>
           <span className="text-[#FF5722]">♢</span>
@@ -147,7 +147,7 @@ export default function OnboardingPage() {
           <span className="text-[#00D084]">♢</span>
           <span>TWO VIEWS · ONE SAFE JOURNEY</span>
           <span className="text-[#FF5722]">♢</span>
-          <span>REAL AI VOICE COMPANION</span>
+          <span>REAL NPC CONVERSATIONS</span>
           <span className="text-[#FFB800]">♢</span>
           <span>SPAIN · INDIA · JAPAN · FRANCE · ITALY</span>
           <span className="text-[#00D084]">♢</span>
@@ -397,7 +397,7 @@ export default function OnboardingPage() {
                     </h3>
                     <p className="text-xs text-black/75 font-medium leading-relaxed">
                       Choose your arrival country and start a session. All 3D landmarks, local signs,
-                      and voices configure instantly.
+                      and NPCs configure instantly.
                     </p>
                   </div>
                 </div>
@@ -459,7 +459,7 @@ export default function OnboardingPage() {
                       EVACUATE, THEN DEBRIEF
                     </h3>
                     <p className="text-xs text-black/75 font-medium leading-relaxed">
-                      Speak real replies into your microphone. Clear speaking objectives, reach the
+                      Give real replies at every stop. Clear speaking objectives, reach the
                       exit, and complete your run.
                     </p>
                   </div>
@@ -610,8 +610,8 @@ export default function OnboardingPage() {
                   </h3>
                   <p className="text-xs sm:text-sm text-black/80 font-medium leading-relaxed">
                     You are inside the district with no script. You walk up to counters, read authentic
-                    signs, order coffee, and hail cabs. You must trust what you hear and speak clearly
-                    into your mic to get through.
+                    signs, order coffee, and hail cabs. You must trust what you hear and answer
+                    clearly to get through.
                   </p>
                 </div>
 

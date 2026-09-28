@@ -14,9 +14,17 @@ import { ONBOARDING_COUNTRIES } from "../src/scenarios/catalog";
 // 1. COUNTRY PALETTE & CONFIGURATION TESTS
 // ==========================================
 
-test("TDD [Country Building Palettes]: Defines distinct authentic architectural palettes for all onboarding countries", () => {
-  const supportedCodes = ONBOARDING_COUNTRIES.map((c) => c.code);
+test("TDD [Country Building Palettes]: Defines distinct authentic architectural palettes for every cataloged country", () => {
+  const supportedCodes = Object.keys(COUNTRY_BUILDING_PALETTES);
   assert.ok(supportedCodes.length >= 5, "Must support at least 5 countries");
+
+  // Japan is the only onboarding country and must resolve to a real palette
+  for (const country of ONBOARDING_COUNTRIES) {
+    assert.ok(
+      supportedCodes.includes(country.code),
+      `Onboarding country '${country.code}' must have a palette`
+    );
+  }
 
   for (const code of supportedCodes) {
     const palette = getCountryBuildingPalette(code);

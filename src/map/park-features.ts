@@ -27,7 +27,7 @@ export function buildParkFeatures(
   parent: THREE.Group,
   options: ParkFeaturesOptions
 ): void {
-  const { countryCode = "es", regGeo, regMat, clickableObjects, obstacleObjects } = options;
+  const { countryCode = "ja", regGeo, regMat, clickableObjects, obstacleObjects } = options;
 
   // ----------------------------------------------------
   // 1. Shared Materials for Park Features

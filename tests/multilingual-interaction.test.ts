@@ -7,7 +7,6 @@ import {
 } from "../src/scenarios/multilingual";
 import { ONBOARDING_COUNTRIES } from "../src/scenarios/catalog";
 import { useConversationStore } from "../src/lib/conversation/store";
-import { createVoiceAgentClient } from "../src/lib/voice-agent/voice-agent-client";
 
 // Reset store helper
 function resetStore(): void {
@@ -21,31 +20,25 @@ function resetStore(): void {
     isInRange: false,
     isOpen: false,
     errorMessage: null,
-    partialUserTranscript: "",
-    targetLang: "es",
-    nativeLang: "en",
+    targetLang: "ja",
+    nativeLang: "ja",
     zone: "cafe",
     suggestedTarget: "",
     suggestedPhonetics: "",
     suggestedNative: "",
-    isMicRecording: false,
   });
 }
 
-test("TDD [Multilingual Coverage]: All onboarding countries have cafe and bus_stop scenarios", () => {
-  assert.ok(SUPPORTED_LEARNER_LANGUAGES.length >= 5, "Must have supported learner languages");
+test("TDD [Multilingual Coverage]: Japanese is the only onboarding country and has cafe and bus_stop scenarios", () => {
+  assert.equal(SUPPORTED_LEARNER_LANGUAGES.length, 1, "Only one learner language must be supported");
   const targetCodes = ONBOARDING_COUNTRIES.map((c) => c.code);
-  assert.ok(targetCodes.includes("es"), "Spain (es) must be present");
-  assert.ok(targetCodes.includes("hi"), "India (hi) must be present");
-  assert.ok(targetCodes.includes("ja"), "Japan (ja) must be present");
-  assert.ok(targetCodes.includes("fr"), "France (fr) must be present");
-  assert.ok(targetCodes.includes("it"), "Italy (it) must be present");
+  assert.deepEqual(targetCodes, ["ja"], "Japan (ja) must be the only onboarding country");
 
   for (const code of targetCodes) {
     // 1. Cafe check
     const cafeDialogue = getBilingualDialogue({
       targetLang: code,
-      nativeLang: "en",
+      nativeLang: "ja",
       zone: "cafe",
       stepIndex: 0,
     });
@@ -60,7 +53,7 @@ test("TDD [Multilingual Coverage]: All onboarding countries have cafe and bus_st
     // 2. Bus stop check
     const busDialogue = getBilingualDialogue({
       targetLang: code,
-      nativeLang: "en",
+      nativeLang: "ja",
       zone: "bus_stop",
       stepIndex: 0,
     });
@@ -75,42 +68,41 @@ test("TDD [Multilingual Coverage]: All onboarding countries have cafe and bus_st
 });
 
 test("TDD [Multilingual Scenarios]: getMultilingualScenario produces complete agent configuration", () => {
-  // Test French Cafe
-  const frCafe = getMultilingualScenario("fr", "en", "cafe");
-  assert.equal(frCafe.npcName, "Pierre");
-  assert.equal(frCafe.targetLanguage, "French");
-  assert.equal(frCafe.city, "Paris");
-  assert.ok(frCafe.systemPrompt.includes("Pierre"), "System prompt must mention Pierre");
-  assert.ok(frCafe.systemPrompt.includes("French"), "System prompt must mention French");
-  assert.ok(frCafe.greeting.includes("Bonjour"), "Greeting must be in French");
-  assert.ok(frCafe.objectives.length >= 1, "Must have objectives");
-
-  // Test Italian Bus Stop
-  const itBus = getMultilingualScenario("it", "en", "bus_stop");
-  assert.equal(itBus.npcName, "Giovanni");
-  assert.equal(itBus.targetLanguage, "Italian");
-  assert.equal(itBus.city, "Rome");
-  assert.ok(itBus.systemPrompt.includes("Giovanni"), "System prompt must mention Giovanni");
-  assert.ok(itBus.greeting.includes("Salve") || itBus.greeting.includes("autobus"), "Greeting must be in Italian");
-
-  // Test Spanish Cafe
-  const esCafe = getMultilingualScenario("es", "en", "cafe");
-  assert.equal(esCafe.npcName, "Mateo");
-  assert.equal(esCafe.targetLanguage, "Spanish");
-  assert.ok(esCafe.greeting.includes("Qué te pongo") || esCafe.greeting.includes("amigo"));
+  // Test Japanese Cafe
+  const jaCafe = getMultilingualScenario("ja", "ja", "cafe");
+  assert.equal(jaCafe.npcName, "Kenji");
+  assert.equal(jaCafe.targetLanguage, "Japanese");
+  assert.equal(jaCafe.city, "Tokyo");
+  assert.ok(jaCafe.systemPrompt.includes("Kenji"), "System prompt must mention Kenji");
+  assert.ok(jaCafe.systemPrompt.includes("Japanese"), "System prompt must mention Japanese");
+  assert.ok(jaCafe.greeting.includes("いらっしゃいませ"), "Greeting must be in Japanese");
+  assert.ok(jaCafe.objectives.length >= 1, "Must have objectives");
 
   // Test Japanese Bus Stop
-  const jaBus = getMultilingualScenario("ja", "en", "bus_stop");
+  const jaBus = getMultilingualScenario("ja", "ja", "bus_stop");
   assert.equal(jaBus.npcName, "Tanaka");
   assert.equal(jaBus.targetLanguage, "Japanese");
-  assert.ok(jaBus.greeting.includes("どちらまで"));
+  assert.equal(jaBus.city, "Tokyo");
+  assert.ok(jaBus.systemPrompt.includes("Tanaka"), "System prompt must mention Tanaka");
+  assert.ok(jaBus.greeting.includes("どちらまで"), "Greeting must be in Japanese");
+
+  // Test Japanese Taxi
+  const jaTaxi = getMultilingualScenario("ja", "ja", "taxi");
+  assert.equal(jaTaxi.npcName, "Kenji");
+  assert.equal(jaTaxi.targetLanguage, "Japanese");
+  assert.ok(jaTaxi.greeting.includes("どちらまで"), "Greeting must be in Japanese");
+
+  // Unknown languages fall back to the Japanese scenario instead of breaking
+  const fallback = getMultilingualScenario("es", "en", "cafe");
+  assert.equal(fallback.targetLanguage, "Japanese");
+  assert.equal(fallback.npcName, "Kenji");
 });
 
-test("TDD [Conversation Store Multilingual]: Stores suggested reply and updates on advanceStep", () => {
+test("TDD [Conversation Store Multilingual]: Stores suggested reply and stays clamped on advanceStep", () => {
   resetStore();
   const dialogue = getBilingualDialogue({
-    targetLang: "es",
-    nativeLang: "en",
+    targetLang: "ja",
+    nativeLang: "ja",
     zone: "cafe",
     stepIndex: 0,
   });
@@ -120,8 +112,8 @@ test("TDD [Conversation Store Multilingual]: Stores suggested reply and updates 
     dialogue.objective,
     dialogue.totalSteps,
     {
-      targetLang: "es",
-      nativeLang: "en",
+      targetLang: "ja",
+      nativeLang: "ja",
       zone: "cafe",
       suggestedTarget: dialogue.userSuggestedTarget,
       suggestedPhonetics: dialogue.userSuggestedPhonetics,
@@ -137,49 +129,16 @@ test("TDD [Conversation Store Multilingual]: Stores suggested reply and updates 
 
   const state1 = useConversationStore.getState();
   assert.equal(state1.isOpen, true);
-  assert.equal(state1.currentNpcName, "Mateo");
-  assert.equal(state1.targetLang, "es");
+  assert.equal(state1.currentNpcName, "Kenji");
+  assert.equal(state1.targetLang, "ja");
   assert.equal(state1.messages.length, 1, "Initial NPC message must be present");
   assert.equal(state1.messages[0].text, dialogue.npcTargetText);
-  assert.equal(state1.suggestedTarget, "Un café con leche, por favor.");
+  assert.equal(state1.suggestedTarget, "アイス抹茶ラテをお願いします。");
 
-  // Advance to step 2
+  // The Japanese scenario has a single step, so advancing clamps instead of overshooting
   useConversationStore.getState().advanceStep();
   const state2 = useConversationStore.getState();
-  assert.equal(state2.currentStep, 2);
+  assert.equal(state2.currentStep, state1.currentStep, "Step must never exceed totalSteps");
   assert.ok((state2.suggestedTarget ?? "").length > 0);
-  assert.notEqual(state2.suggestedTarget, state1.suggestedTarget, "Step 2 suggested reply must differ from Step 1");
-});
-
-test("TDD [Voice Client Recording Interface]: Provides startRecording and stopRecording controls", async () => {
-  const client = createVoiceAgentClient({
-    onPartialTranscript() {},
-    onFinalTranscript() {},
-    onNpcTurnStart() {},
-    onNpcMessage() {},
-    onNpcTurnEnd() {},
-    onConnected() {},
-    onError() {},
-    onSessionEnded() {},
-  });
-
-  assert.equal(typeof client.startRecording, "function", "startRecording must be a function");
-  assert.equal(typeof client.stopRecording, "function", "stopRecording must be a function");
-  assert.equal(typeof client.sendTextMessage, "function", "sendTextMessage must be a function");
-  assert.equal(client.isRecording, false, "Initial recording state should be false before connect");
-
-  // Calling stopRecording when idle should not throw
-  assert.doesNotThrow(() => client.stopRecording());
-});
-
-test("TDD [Mic Recording State in Store]: setIsMicRecording updates store flag", () => {
-  resetStore();
-  const store = useConversationStore.getState();
-  assert.equal(store.isMicRecording, false);
-
-  store.setIsMicRecording(true);
-  assert.equal(useConversationStore.getState().isMicRecording, true);
-
-  store.setIsMicRecording(false);
-  assert.equal(useConversationStore.getState().isMicRecording, false);
+  assert.equal(state2.suggestedTarget, state1.suggestedTarget);
 });

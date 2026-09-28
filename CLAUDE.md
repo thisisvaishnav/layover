@@ -1,14 +1,13 @@
 # LAYOVER — Project Instructions
 
 ## What This Is
-A voice-controlled travel language simulator for the AssemblyAI Voice Agent Hackathon (Sept 2026).
-Users practice Spanish conversations in a 3D café using AssemblyAI's Voice Agent API.
+A travel language simulator: a walkable 3D district where learners approach NPCs and
+practice conversations before a trip. Interaction starts from the "Talk to NPC — press E" prompt.
 
 ## Tech Stack
 - **Language:** TypeScript (strict mode)
 - **Framework:** Next.js 14+ (App Router)
 - **3D:** React Three Fiber + Drei (Phase 3 only)
-- **Voice:** AssemblyAI Voice Agent API (single WebSocket)
 - **State:** Zustand
 - **Styling:** Tailwind CSS
 - **Deploy:** Vercel
@@ -23,39 +22,34 @@ npm test             # tsx --test (Node test runner)
 ```
 
 ## Environment Variables
-```bash
-ASSEMBLYAI_API_KEY=  # Required. Get from https://www.assemblyai.com/dashboard
-```
+None — the app runs with no server-side secrets.
 
 ## Code Style
 - File naming: kebab-case for directories, PascalCase for components, camelCase for utils
 - Prefer `async/await` over raw promises
 - Zustand stores: immutable updates, typed selectors
-- WebSocket events: typed via `src/lib/voice-agent/events.ts`
 - No `any` types without explicit justification comment
 
 ## Project Structure
 ```
-src/app/          → Next.js pages and API routes
-src/components/   → React components (voice/, scene/, hud/, ui/)
-src/lib/          → Core logic (voice-agent/, game/, utils/)
-src/scenarios/    → Scenario definitions (prompts, tools, objectives)
+src/app/          → Next.js pages
+src/components/   → React components (conversation/, map/, character/)
+src/lib/          → Core logic (conversation/, audio/)
+src/scenarios/    → Scenario definitions (prompts, objectives, dialogue)
 public/models/    → GLTF 3D assets
 public/audio/     → Sound effects
-tests/            → Vitest test files
+tests/            → Node test runner files (tsx --test)
 ```
 
 ## Key Patterns
-- **Voice agent client** wraps the WebSocket; components consume via hooks
-- **Tool calls** from AssemblyAI map to game state changes via `tool-handler.ts`
+- **Interaction prompt** (`InteractionPrompt`) gates NPC contact; `E` is the interact key
+- **Conversation store** (Zustand) holds proximity, dialogue steps, and reply feedback
 - **Scenario engine** is a state machine; one scenario per file in `src/scenarios/`
-- **3D scene** reads Zustand store; tool calls never touch Three.js directly
-- **Audio capture** uses AudioContext with PCM16 encoding at 24kHz mono
+- **3D scene** reads the Zustand store for proximity only
 
 ## Critical Rules
-- Never commit `.env.local` (contains API key)
-- Push-to-talk must be implemented before any voice testing
-- Barge-in events must use transactional state rollback
+- Never commit `.env.local`
+- The conversation overlay is intentionally removed — only the press-E prompt remains
 - 3D is optional — 2D fallback must always work
 
 ## Conventions

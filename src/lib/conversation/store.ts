@@ -1,11 +1,30 @@
 import { create } from "zustand";
 import type { ConversationState, ConversationActions, ConversationMessage } from "./types";
+import { evaluateReply, mustRetry } from "./feedback";
 import { getBilingualDialogue } from "@/scenarios/multilingual";
 
 type ConversationStore = ConversationState & ConversationActions;
 
 function makeId(): string {
   return Math.random().toString(36).slice(2, 10);
+}
+
+/** Loose text comparison for duplicate-turn detection. */
+function normalizeTurnText(text: string): string {
+  return text.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+/**
+ * The same turn can be redelivered right after the send path already sent it —
+ * as the same text, or as a shorter variant of the fuller final. Either way
+ * inside the guard window we must never double-append or burn an attempt.
+ */
+function isDuplicateTurn(previous: string, incoming: string, previousAt: number): boolean {
+  if (Date.now() - previousAt >= 8000) return false;
+  const a = normalizeTurnText(previous);
+  const b = normalizeTurnText(incoming);
+  if (!a || !b) return false;
+  return a === b || a.includes(b) || b.includes(a);
 }
 
 export const useConversationStore = create<ConversationStore>()((set, get) => ({
@@ -19,15 +38,14 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
   isInRange: false,
   isOpen: false,
   errorMessage: null,
-  partialUserTranscript: "",
-  targetLang: "es",
-  nativeLang: "en",
+  targetLang: "ja",
+  nativeLang: "ja",
   zone: "cafe",
   suggestedTarget: "",
   suggestedPhonetics: "",
   suggestedNative: "",
-  isMicRecording: false,
-  sessionVersion: 0,
+  replyFeedback: null,
+  attemptCount: 0,
 
   // Actions
   setStatus(status) {
@@ -48,39 +66,38 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
       });
     }
 
-    set((prev) => ({
+    set({
       isOpen: true,
-      status: "CONNECTING",
+      status: "LISTENING",
       currentNpcName: npcName,
       currentObjective: objective,
       currentStep: 1,
       totalSteps,
       messages: initialMsgs,
       errorMessage: null,
-      partialUserTranscript: "",
-      targetLang: meta?.targetLang ?? "es",
-      nativeLang: meta?.nativeLang ?? "en",
+      targetLang: meta?.targetLang ?? "ja",
+      nativeLang: meta?.nativeLang ?? "ja",
       zone: meta?.zone ?? "cafe",
       npcRole: meta?.npcRole,
       suggestedTarget: meta?.suggestedTarget ?? "",
       suggestedPhonetics: meta?.suggestedPhonetics ?? "",
       suggestedNative: meta?.suggestedNative ?? "",
-      isMicRecording: false,
-      sessionVersion: (prev.sessionVersion ?? 0) + 1,
-    }));
+      replyFeedback: null,
+      attemptCount: 0,
+    });
   },
 
   closeConversation() {
     set({
       isOpen: false,
       status: "CLOSED",
-      partialUserTranscript: "",
-      isMicRecording: false,
+      replyFeedback: null,
+      attemptCount: 0,
     });
   },
 
-  setIsMicRecording(recording) {
-    set({ isMicRecording: recording });
+  setReplyFeedback(fb) {
+    set({ replyFeedback: fb });
   },
 
   updateSuggestedReply(target, phonetics, native) {
@@ -100,28 +117,53 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
     set((state) => ({ messages: [...state.messages, full] }));
   },
 
-  updatePartialTranscript(text) {
-    set({ partialUserTranscript: text });
-  },
-
   finalizeUserTurn(text) {
-    set({ partialUserTranscript: "", isMicRecording: false });
     if (!text.trim()) return;
+
+    const state = get();
+    const last = state.messages[state.messages.length - 1];
+    if (last && last.speaker === "USER" && isDuplicateTurn(last.text, text, last.timestamp)) {
+      // The same turn can be redelivered right after the send path already
+      // sent it — never double-append or burn an attempt on a repeat.
+      return;
+    }
+
     const msg: ConversationMessage = {
       id: makeId(),
       speaker: "USER",
       text,
       timestamp: Date.now(),
     };
-    set((state) => ({
-      messages: [...state.messages, msg],
-      partialUserTranscript: "",
-      status: "PROCESSING",
-    }));
+
+    const target = state.suggestedTarget ?? "";
+    if (target) {
+      const fb = evaluateReply({
+        expected: target,
+        expectedPhonetic: state.suggestedPhonetics || undefined,
+        said: text,
+        attempt: state.attemptCount + 1,
+      });
+      set((prev) => ({
+        messages: [...prev.messages, msg],
+        replyFeedback: fb,
+        attemptCount: fb.attempt,
+        status: "PROCESSING",
+      }));
+    } else {
+      set((prev) => ({
+        messages: [...prev.messages, msg],
+        replyFeedback: null,
+        status: "PROCESSING",
+      }));
+    }
   },
 
   advanceStep() {
     const state = get();
+    if (mustRetry(state.replyFeedback, state.attemptCount)) {
+      // Wrong reply with attempts left — the learner must retry this step.
+      return;
+    }
     const nextStep = Math.min(state.currentStep + 1, state.totalSteps);
     let nextSuggested = {
       target: state.suggestedTarget ?? "",
@@ -133,7 +175,7 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
     if (state.targetLang && state.zone) {
       const dialogue = getBilingualDialogue({
         targetLang: state.targetLang,
-        nativeLang: state.nativeLang ?? "en",
+        nativeLang: state.nativeLang ?? "ja",
         zone: state.zone,
         stepIndex: nextStep - 1,
       });
@@ -151,6 +193,8 @@ export const useConversationStore = create<ConversationStore>()((set, get) => ({
       suggestedTarget: nextSuggested.target,
       suggestedPhonetics: nextSuggested.phonetics,
       suggestedNative: nextSuggested.native,
+      replyFeedback: null,
+      attemptCount: 0,
     });
   },
 

@@ -1,11 +1,9 @@
+import type { ReplyFeedback } from "./feedback";
+
 export type ConversationStatus =
   | "CLOSED"
-  | "CONNECTING"
-  | "CONNECTED"
   | "LISTENING"
-  | "USER_SPEAKING"
   | "PROCESSING"
-  | "NPC_SPEAKING"
   | "ERROR"
   | "COMPLETED";
 
@@ -30,7 +28,6 @@ export interface ConversationState {
   isInRange: boolean;       // Player within interaction radius
   isOpen: boolean;          // UI is currently visible
   errorMessage: string | null;
-  partialUserTranscript: string; // Streaming transcript while speaking
   /** Role of the current NPC (e.g. "Barista", "Master Barber") */
   npcRole?: string;
   targetLang?: string;
@@ -39,9 +36,10 @@ export interface ConversationState {
   suggestedTarget?: string;
   suggestedPhonetics?: string;
   suggestedNative?: string;
-  isMicRecording?: boolean;
-  /** Incremented on every openConversation so listeners can key off re-opens */
-  sessionVersion?: number;
+  /** Latest spoken-reply evaluation; non-null while the learner must retry */
+  replyFeedback: ReplyFeedback | null;
+  /** How many attempts the learner has used on the current step */
+  attemptCount: number;
 }
 
 export interface ConversationActions {
@@ -64,10 +62,9 @@ export interface ConversationActions {
   ): void;
   closeConversation(): void;
   addMessage(msg: Omit<ConversationMessage, "id" | "timestamp">): void;
-  updatePartialTranscript(text: string): void;
   finalizeUserTurn(text: string): void;
   advanceStep(): void;
-  setIsMicRecording(recording: boolean): void;
+  setReplyFeedback(fb: ReplyFeedback | null): void;
   updateSuggestedReply(target: string, phonetics: string, native: string): void;
   setError(message: string): void;
   clearError(): void;

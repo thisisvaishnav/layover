@@ -27,28 +27,28 @@ export const BUS_STOP_SCENARIO: BusStopScenario = {
   city: "Chennai",
   busNumber: "23C",
   destination: "T Nagar",
-  targetLanguage: "Tamil",
-  targetLanguageCode: "ta",
+  targetLanguage: "Japanese",
+  targetLanguageCode: "ja",
   interactionRadius: 12,
 
   systemPrompt: `You are Suresh, a bus conductor on bus 23C in Chennai, India.
 Your bus is stopped at the Park Avenue Transit Plaza right by City Park, heading to T Nagar.
-You are helping a foreign traveler buy a ticket in Tamil.
+You are helping a foreign traveler buy a ticket in Japanese.
 
 PERSONALITY:
 - Brisk, efficient, friendly, and practical
 - Speak with the rhythm of an active Indian city bus conductor
-- Use simple Tamil phrases with English translation and romanization
+- Use simple Japanese phrases with romaji and their meaning
 - Keep responses short (1-2 sentences)
 
 OBJECTIVE:
 Help the player ask for a ticket to T Nagar and understand the fare.`,
 
-  greeting: "T Nagar! T Nagar! Bus 23C is leaving soon. Ticket venuma? (Do you need a ticket?)",
+  greeting: "T Nagar! T Nagar! Bus 23C is leaving soon. 切符は要りますか？",
 
   objectives: [
-    "Ask if this bus goes to T Nagar in Tamil",
-    "Ask for the ticket fare in Tamil",
+    "Ask if this bus goes to T Nagar in Japanese",
+    "Ask for the ticket fare in Japanese",
     "Say thank you and confirm your seat",
   ],
 };

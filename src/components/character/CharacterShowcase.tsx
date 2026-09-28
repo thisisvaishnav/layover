@@ -26,37 +26,17 @@ const COUNTRY_GREETINGS: Record<
   string,
   { phrase: string; phonetic: string; translation: string }
 > = {
-  es: {
-    phrase: "¡Dos cafés, por favor! ☕",
-    phonetic: "Dohs kah-FES, por fah-VOR!",
-    translation: "Two coffees, please!",
-  },
-  hi: {
-    phrase: "एक कप मसाला चाय, कृपया! ☕",
-    phonetic: "Ek cup masala chai, kripya!",
-    translation: "One cup of masala chai, please!",
-  },
   ja: {
     phrase: "こんにちは！カフェラテをください ☕",
     phonetic: "Konnichiwa! Kafe rate o kudasai",
-    translation: "Hello! A cafe latte please",
-  },
-  fr: {
-    phrase: "Deux cafés, s'il vous plaît ! ☕",
-    phonetic: "Duh ka-FAY, seel voo play!",
-    translation: "Two coffees, please!",
-  },
-  it: {
-    phrase: "Due caffè, per favore! ☕",
-    phonetic: "DOO-eh kahf-FEH, pehr fah-VOH-reh!",
-    translation: "Two coffees, please!",
+    translation: "こんにちは！カフェラテをください",
   },
 };
 
 export default function CharacterShowcase({
-  selectedCountryCode = "es",
-  selectedCountryName = "Spain",
-  selectedCountryFlag = "🇪🇸",
+  selectedCountryCode = "ja",
+  selectedCountryName = "Japan",
+  selectedCountryFlag = "🇯🇵",
   mode = "hero",
   className = "",
   onInteract,
@@ -89,7 +69,7 @@ export default function CharacterShowcase({
   }, [animMode]);
 
   // Greeting information based on selected country
-  const greeting = COUNTRY_GREETINGS[selectedCountryCode] || COUNTRY_GREETINGS.es;
+  const greeting = COUNTRY_GREETINGS[selectedCountryCode] || COUNTRY_GREETINGS.ja;
 
   // Trigger temporary wave greeting
   const triggerWave = useCallback(() => {

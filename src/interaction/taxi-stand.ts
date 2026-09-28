@@ -35,7 +35,7 @@ export function createTaxiStand(
   worldZ: number,
   options?: TaxiStandOptions
 ): TaxiStandSystem {
-  const countryCode = options?.countryCode || "es";
+  const countryCode = options?.countryCode || "ja";
   const rotationY = options?.rotation ?? 0;
   const STAND_SCALE = 2.0; // 2x size of taxi stand
   const group = new THREE.Group();

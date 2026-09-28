@@ -17,25 +17,11 @@ export interface BarberShopOptions {
 
 /**
  * Returns the localized marquee heading for the Barber Saloon based on target country.
- * Specifically features "SALOON" for India and English, and country-appropriate salon terms.
+ * Japanese districts get the Japanese salon wording, everything else the default English sign.
  */
 export function getBarberSalonHeading(countryCode?: string): string {
   const code = (countryCode || "").toLowerCase();
-  switch (code) {
-    case "hi":
-    case "in":
-      return "ROYAL HAIR SALOON";
-    case "es":
-      return "SALÓN DE BARBERÍA";
-    case "fr":
-      return "SALON DE BARBIER";
-    case "it":
-      return "SALONE BARBIERE";
-    case "ja":
-      return "BARBER SALON";
-    default:
-      return "VINTAGE BARBER SALOON";
-  }
+  return code === "ja" ? "BARBER SALON" : "VINTAGE BARBER SALOON";
 }
 
 /**
@@ -43,21 +29,7 @@ export function getBarberSalonHeading(countryCode?: string): string {
  */
 export function getBarberSalonSubHeading(countryCode?: string): string {
   const code = (countryCode || "").toLowerCase();
-  switch (code) {
-    case "hi":
-    case "in":
-      return "HAIR STYLING & SHAVE · DELHI";
-    case "es":
-      return "CORTE & AFEITADO CLÁSICO · BARCELONA";
-    case "fr":
-      return "COIFFURE HOMME & BARBE · PARIS";
-    case "it":
-      return "TAGLIO & RASATURA CLASSICA · ROMA";
-    case "ja":
-      return "理容サロン · HAIRCUT & SHAVE · TOKYO";
-    default:
-      return "HAIRCUT & HOT TOWEL SHAVE";
-  }
+  return code === "ja" ? "理容サロン · HAIRCUT & SHAVE · TOKYO" : "HAIRCUT & HOT TOWEL SHAVE";
 }
 
 /**

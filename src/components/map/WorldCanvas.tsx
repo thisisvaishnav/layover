@@ -35,22 +35,17 @@ import { createBusStop, isWithinBusStopRange, type BusStopSystem } from "../../i
 import { createTaxiStand, isWithinTaxiStandRange, type TaxiStandSystem } from "../../interaction/taxi-stand";
 import { createBarberShop, isWithinBarberShopRange, type BarberShopSystem } from "../../interaction/barber-shop";
 import { useConversationStore } from "../../lib/conversation/store";
-import { matchScriptedNpcLine } from "../../lib/conversation/format";
-import { createVoiceAgentClient, type VoiceAgentClient } from "../../lib/voice-agent/voice-agent-client";
-import { warmUpAudioContext } from "../../lib/voice-agent/audio-capture";
 import { COFFEE_SHOP_WORLD_POSITION, COFFEE_SHOP_ROTATION } from "../../scenarios/coffee-shop-scenario";
 import { BUS_STOP_WORLD_POSITION } from "../../scenarios/bus-stop-scenario";
 import { TAXI_STAND_WORLD_POSITION, TAXI_STAND_ROTATION } from "../../scenarios/taxi-stand-scenario";
 import { BARBER_SHOP_WORLD_POSITION } from "../../scenarios/barber-shop-scenario";
 import {
-  getBilingualDialogue,
   getMultilingualScenario,
   type MultilingualScenarioConfig,
   SUPPORTED_LEARNER_LANGUAGES,
 } from "../../scenarios/multilingual";
 import { ONBOARDING_COUNTRIES } from "../../scenarios/catalog";
 import { InteractionPrompt } from "../conversation/InteractionPrompt";
-import { ConversationUI } from "../conversation/ConversationUI";
 
 interface WorldCanvasProps {
   onBackToOnboarding?: () => void;
@@ -71,7 +66,7 @@ export default function WorldCanvas({ onBackToOnboarding, targetLang, nativeLang
       const stored = localStorage.getItem("layover_target_lang");
       if (stored) return stored;
     }
-    return "es";
+    return "ja";
   }, [targetLang]);
 
   const resolvedNativeLang = useMemo(() => {
@@ -83,7 +78,7 @@ export default function WorldCanvas({ onBackToOnboarding, targetLang, nativeLang
       const stored = localStorage.getItem("layover_native_lang");
       if (stored) return stored;
     }
-    return "en";
+    return "ja";
   }, [nativeLang]);
 
   const targetCountry = useMemo(
@@ -150,7 +145,6 @@ export default function WorldCanvas({ onBackToOnboarding, targetLang, nativeLang
   const busStopRef = useRef<BusStopSystem | null>(null);
   const taxiStandRef = useRef<TaxiStandSystem | null>(null);
   const barberShopRef = useRef<BarberShopSystem | null>(null);
-  const voiceClientRef = useRef<VoiceAgentClient | null>(null);
   const [showControls, setShowControls] = useState(false);
   const navigateToTargetRef = useRef<Vector2D | null>(null);
 
@@ -181,188 +175,8 @@ export default function WorldCanvas({ onBackToOnboarding, targetLang, nativeLang
     setActiveScenario(updated);
   }, [resolvedTargetLang, resolvedNativeLang]);
 
-  // Synchronous trigger to open conversation with proper bilingual dialogue
-  const triggerOpenConversation = useCallback(() => {
-    warmUpAudioContext();
-    const currentTarget = targetLangRef.current;
-    const currentNative = nativeLangRef.current;
-    const scenario = activeScenarioRef.current;
-    const isBus = scenario.id.includes("bus");
-    const isTaxi = scenario.id.includes("taxi");
-    const currentZone: "cafe" | "bus_stop" | "taxi" = isTaxi ? "taxi" : (isBus ? "bus_stop" : "cafe");
-    const dialogue = getBilingualDialogue({
-      targetLang: currentTarget,
-      nativeLang: currentNative,
-      zone: currentZone,
-      stepIndex: 0,
-    });
-
-    useConversationStore.getState().openConversation(
-      scenario.npcName,
-      dialogue.objective,
-      dialogue.totalSteps,
-      {
-        targetLang: currentTarget,
-        nativeLang: currentNative,
-        zone: currentZone,
-        npcRole: scenario.npcRole,
-        suggestedTarget: dialogue.userSuggestedTarget,
-        suggestedPhonetics: dialogue.userSuggestedPhonetics,
-        suggestedNative: dialogue.userSuggestedNative,
-        initialNpcMessage: {
-          speaker: "NPC",
-          text: dialogue.npcTargetText,
-          phonetic: dialogue.npcPhonetics,
-          translation: dialogue.npcNativeTranslation,
-        },
-      }
-    );
-  }, []);
-
-  const triggerOpenConversationRef = useRef(triggerOpenConversation);
-  useEffect(() => {
-    triggerOpenConversationRef.current = triggerOpenConversation;
-  }, [triggerOpenConversation]);
-
-  // Audio recording handlers for AssemblyAI integration
-  const handleStartRecording = useCallback(async () => {
-    warmUpAudioContext();
-    const client = voiceClientRef.current;
-    if (!client) {
-      // No live voice session — never claim the mic is open
-      return false;
-    }
-    const ok = await client.startRecording();
-    useConversationStore.getState().setIsMicRecording(ok);
-    if (ok) {
-      useConversationStore.getState().setStatus("USER_SPEAKING");
-    }
-    return ok;
-  }, []);
-
-  const handleStopRecording = useCallback(() => {
-    if (voiceClientRef.current) {
-      voiceClientRef.current.stopRecording();
-    }
-    useConversationStore.getState().setIsMicRecording(false);
-  }, []);
-
-  const handleSendTextMessage = useCallback((text: string) => {
-    if (voiceClientRef.current) {
-      voiceClientRef.current.sendTextMessage(text);
-    }
-  }, []);
-
   // Conversation state: read from Zustand so JSX can react to changes
-  const conversationOpen = useConversationStore((s) => s.isOpen);
   const conversationInRange = useConversationStore((s) => s.isInRange);
-  // Bumped on every openConversation (initial open, Retry) so a reconnect only
-  // ever happens from an explicit user gesture — never from a bare remount.
-  const sessionVersion = useConversationStore((s) => s.sessionVersion);
-
-  const handleCloseConversation = useCallback(() => {
-    useConversationStore.getState().closeConversation();
-  }, []);
-
-  // Voice agent lifecycle — connect when conversation opens, clean up on close
-  useEffect(() => {
-    if (!conversationOpen) {
-      voiceClientRef.current?.disconnect();
-      voiceClientRef.current = null;
-      return;
-    }
-
-    const currentScenario = activeScenarioRef.current;
-    const client = createVoiceAgentClient({
-      agentId: currentScenario.id,
-      systemPrompt: currentScenario.systemPrompt,
-      greeting: currentScenario.greeting,
-      onPartialTranscript(text) {
-        const store = useConversationStore.getState();
-        store.setStatus("USER_SPEAKING");
-        store.updatePartialTranscript(text);
-      },
-      onFinalTranscript(text) {
-        useConversationStore.getState().finalizeUserTurn(text);
-      },
-      onNpcTurnStart() {
-        useConversationStore.getState().setStatus("NPC_SPEAKING");
-      },
-      onNpcMessage(msg) {
-        const store = useConversationStore.getState();
-        const norm = (s: string) => s.trim().replace(/\s+/g, " ").toLowerCase();
-
-        // The opening greeting was already shown when E was pressed and is what
-        // the agent just read back out. Re-appending it would duplicate the card
-        // and burn the learner's first reply on an NPC line.
-        if (!store.messages.some((m) => m.speaker === "USER")) {
-          let lastNpc: { text?: string } | undefined;
-          for (let i = store.messages.length - 1; i >= 0; i--) {
-            const m = store.messages[i];
-            if (m.speaker === "NPC") { lastNpc = m; break; }
-          }
-          if (lastNpc?.text && norm(lastNpc.text) === norm(msg.text)) return;
-          store.addMessage(msg);
-          return;
-        }
-
-        const match = matchScriptedNpcLine({
-          text: msg.text,
-          targetLang: store.targetLang ?? "es",
-          nativeLang: store.nativeLang ?? "en",
-          zone: store.zone ?? "cafe",
-        });
-        store.addMessage(match ? { ...msg, phonetic: match.phonetic, translation: match.translation } : msg);
-        store.advanceStep();
-      },
-      onNpcTurnEnd() {
-        useConversationStore.getState().setStatus("LISTENING");
-      },
-      onConnected() {
-        useConversationStore.getState().setStatus("CONNECTED");
-        console.log("[Conversation] Voice agent connected for", currentScenario.npcName);
-      },
-      onError(message) {
-        useConversationStore.getState().setError(message);
-        console.error("[Conversation] Voice agent error:", message);
-      },
-      onSessionEnded() {
-        console.log("[Conversation] Voice session ended for", currentScenario.npcName);
-        // The session is dead: release the mic/socket immediately instead of
-        // leaving a hot microphone behind a stale client.
-        if (voiceClientRef.current === client) {
-          client.disconnect();
-          voiceClientRef.current = null;
-        }
-        const store = useConversationStore.getState();
-        store.setIsMicRecording(false);
-        if (store.isOpen && store.status !== "ERROR") {
-          store.setError("Voice session ended. Tap Retry to reconnect.");
-        }
-      },
-    });
-
-    voiceClientRef.current = client;
-    void client.connect();
-
-    return () => {
-      client.disconnect();
-      voiceClientRef.current = null;
-    };
-  }, [conversationOpen, sessionVersion]);
-
-  // The conversation store survives unmount (it is module-scoped), so without
-  // this an unmount/remount would reconnect — and reopen the mic — with no user
-  // gesture behind it. Ending the conversation here forces the next open to come
-  // from a real gesture (E key / prompt click / Retry).
-  useEffect(() => {
-    return () => {
-      const store = useConversationStore.getState();
-      if (store.isOpen) {
-        store.closeConversation();
-      }
-    };
-  }, []);
 
   const handleZoom = useCallback((deltaDist: number) => {
     if (cameraControllerRef.current) {
@@ -580,11 +394,7 @@ export default function WorldCanvas({ onBackToOnboarding, targetLang, nativeLang
       }
 
       const isCanvas = event.target === renderer.domElement;
-      if (
-        !isCanvas ||
-        (event.target as HTMLElement).closest("button") ||
-        useConversationStore.getState().isOpen
-      ) {
+      if (!isCanvas || (event.target as HTMLElement).closest("button")) {
         isDragging = false;
         isRightDrag = false;
         return;
@@ -677,9 +487,10 @@ export default function WorldCanvas({ onBackToOnboarding, targetLang, nativeLang
           break;
 
         case "KeyE": {
+          // The conversation overlay was removed — E is still the interact key,
+          // so it only holds the player in place while the prompt is on screen.
           const convState = useConversationStore.getState();
           if (convState.isInRange && !convState.isOpen) {
-            triggerOpenConversationRef.current();
             keyboardInput.forward = false;
             keyboardInput.backward = false;
             keyboardInput.left = false;
@@ -1092,22 +903,9 @@ export default function WorldCanvas({ onBackToOnboarding, targetLang, nativeLang
 
       {/* NPC Interaction Prompt — appears when player is in range */}
       <InteractionPrompt
-        isVisible={conversationInRange && !conversationOpen}
+        isVisible={conversationInRange}
         npcName={activeScenario.npcName}
         interactKey="E"
-        onInteract={() => {
-          if (conversationInRange && !conversationOpen) {
-            triggerOpenConversationRef.current();
-          }
-        }}
-      />
-
-      {/* NPC Conversation Overlay — bottom 50% of screen */}
-      <ConversationUI
-        onClose={handleCloseConversation}
-        onStartRecording={handleStartRecording}
-        onStopRecording={handleStopRecording}
-        onSendTextMessage={handleSendTextMessage}
       />
 
       {/* Top Header Overlay */}

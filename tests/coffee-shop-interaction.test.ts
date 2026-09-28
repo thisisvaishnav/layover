@@ -6,7 +6,7 @@
  *  - Conversation Zustand store state machine
  *  - Scenario configuration data integrity
  *  - Coffee shop 3D creation (Three.js procedural mesh)
- *  - Security: no ASSEMBLYAI_API_KEY in client bundle
+ *  - Security: secrets stay out of the repo
  */
 
 import test from "node:test";
@@ -74,7 +74,6 @@ function resetStore(): void {
     isInRange: false,
     isOpen: false,
     errorMessage: null,
-    partialUserTranscript: "",
   });
 }
 
@@ -95,12 +94,12 @@ test("TDD [Store]: setInRange updates proximity flag without opening UI", () => 
   assert.equal(s.isOpen, false, "Setting in-range should NOT open the conversation");
 });
 
-test("TDD [Store]: openConversation transitions to CONNECTING and sets metadata", () => {
+test("TDD [Store]: openConversation transitions to LISTENING and sets metadata", () => {
   resetStore();
   useConversationStore.getState().openConversation("Murugan", "Ask for directions", 3);
   const s = useConversationStore.getState();
   assert.equal(s.isOpen, true);
-  assert.equal(s.status, "CONNECTING");
+  assert.equal(s.status, "LISTENING");
   assert.equal(s.currentNpcName, "Murugan");
   assert.equal(s.currentObjective, "Ask for directions");
   assert.equal(s.totalSteps, 3);
@@ -116,7 +115,7 @@ test("TDD [Store]: cannot open conversation twice (idempotent open)", () => {
   const s = useConversationStore.getState();
   // The second call resets state — currentObjective is the last call's value
   assert.equal(s.isOpen, true);
-  assert.equal(s.status, "CONNECTING");
+  assert.equal(s.status, "LISTENING");
 });
 
 test("TDD [Store]: addMessage appends to messages with generated id and timestamp", () => {
@@ -150,20 +149,10 @@ test("TDD [Store]: messages have unique IDs", () => {
   assert.notEqual(messages[0].id, messages[1].id, "Each message must have a unique ID");
 });
 
-test("TDD [Store]: updatePartialTranscript updates live transcript without adding message", () => {
+test("TDD [Store]: finalizeUserTurn creates USER message", () => {
   resetStore();
-  useConversationStore.getState().updatePartialTranscript("T Nag...");
-  const s = useConversationStore.getState();
-  assert.equal(s.partialUserTranscript, "T Nag...");
-  assert.equal(s.messages.length, 0, "Partial transcript must NOT create a message yet");
-});
-
-test("TDD [Store]: finalizeUserTurn creates USER message and clears partial transcript", () => {
-  resetStore();
-  useConversationStore.getState().updatePartialTranscript("T Nagar");
   useConversationStore.getState().finalizeUserTurn("T Nagar");
   const s = useConversationStore.getState();
-  assert.equal(s.partialUserTranscript, "", "Partial transcript cleared after finalization");
   assert.equal(s.messages.length, 1);
   assert.equal(s.messages[0].speaker, "USER");
   assert.equal(s.messages[0].text, "T Nagar");
@@ -183,7 +172,6 @@ test("TDD [Store]: closeConversation resets isOpen and status to CLOSED", () => 
   const s = useConversationStore.getState();
   assert.equal(s.isOpen, false);
   assert.equal(s.status, "CLOSED");
-  assert.equal(s.partialUserTranscript, "");
 });
 
 test("TDD [Store]: closing conversation restores player control signal", () => {
@@ -207,10 +195,10 @@ test("TDD [Store]: advanceStep increments currentStep and does not exceed totalS
 
 test("TDD [Store]: setError transitions to ERROR state with message", () => {
   resetStore();
-  useConversationStore.getState().setError("Microphone denied");
+  useConversationStore.getState().setError("Conversation failed");
   const s = useConversationStore.getState();
   assert.equal(s.status, "ERROR");
-  assert.equal(s.errorMessage, "Microphone denied");
+  assert.equal(s.errorMessage, "Conversation failed");
 });
 
 test("TDD [Store]: clearError returns to CLOSED with no error message", () => {
@@ -222,10 +210,10 @@ test("TDD [Store]: clearError returns to CLOSED with no error message", () => {
   assert.equal(s.errorMessage, null);
 });
 
-test("TDD [Store]: setStatus can set NPC_SPEAKING state", () => {
+test("TDD [Store]: setStatus can set PROCESSING state", () => {
   resetStore();
-  useConversationStore.getState().setStatus("NPC_SPEAKING");
-  assert.equal(useConversationStore.getState().status, "NPC_SPEAKING");
+  useConversationStore.getState().setStatus("PROCESSING");
+  assert.equal(useConversationStore.getState().status, "PROCESSING");
 });
 
 test("TDD [Store]: conversation message ordering is preserved", () => {
@@ -439,38 +427,10 @@ test("TDD [CoffeeShop3D]: npcWorldPosition is near but distinct from stall posit
 });
 
 // ─────────────────────────────────────────────────────────────────
-// 5. SECURITY: API KEY MUST NOT APPEAR IN CLIENT-SIDE CODE PATHS
+// 5. SECURITY: SECRETS MUST NOT APPEAR IN THE REPO
 // ─────────────────────────────────────────────────────────────────
 import fs from "node:fs";
 import path from "node:path";
-
-test("TDD [Security]: client-side voice agent file does not contain ASSEMBLYAI_API_KEY", () => {
-  const clientFile = path.join(
-    import.meta.dirname ?? __dirname,
-    "../src/lib/voice-agent/voice-agent-client.ts"
-  );
-  const content = fs.readFileSync(clientFile, "utf8");
-  assert.ok(
-    !content.includes("ASSEMBLYAI_API_KEY"),
-    "Voice agent client must not reference the raw API key environment variable"
-  );
-  assert.ok(
-    !content.includes("process.env.ASSEMBLYAI"),
-    "Voice agent client must not directly access the API key env var"
-  );
-});
-
-test("TDD [Security]: API route file uses process.env.ASSEMBLYAI_API_KEY (server-only)", () => {
-  const routeFile = path.join(
-    import.meta.dirname ?? __dirname,
-    "../src/app/api/voice-token/route.ts"
-  );
-  const content = fs.readFileSync(routeFile, "utf8");
-  assert.ok(
-    content.includes("process.env.ASSEMBLYAI_API_KEY"),
-    "Token API route must read the API key from server-side env vars"
-  );
-});
 
 test("TDD [Security]: .env.local is gitignored", () => {
   const gitignoreFile = path.join(
@@ -481,77 +441,6 @@ test("TDD [Security]: .env.local is gitignored", () => {
   assert.ok(
     content.includes(".env.local") || content.includes("*.local") || content.includes(".env*"),
     ".env.local must be covered by .gitignore (via .env.local, *.local, or .env*)"
-  );
-});
-
-test("TDD [Security]: audio capture does not reference API keys", () => {
-  const captureFile = path.join(
-    import.meta.dirname ?? __dirname,
-    "../src/lib/voice-agent/audio-capture.ts"
-  );
-  const content = fs.readFileSync(captureFile, "utf8");
-  assert.ok(
-    !content.includes("API_KEY"),
-    "Audio capture must not reference API keys"
-  );
-});
-
-// ─────────────────────────────────────────────────────────────────
-// 6. VOICE AGENT CLIENT: connection lifecycle types
-// ─────────────────────────────────────────────────────────────────
-
-import { createVoiceAgentClient } from "../src/lib/voice-agent/voice-agent-client";
-
-test("TDD [VoiceClient]: createVoiceAgentClient returns required interface", () => {
-  const client = createVoiceAgentClient({
-    onPartialTranscript() {},
-    onFinalTranscript() {},
-    onNpcTurnStart() {},
-    onNpcMessage() {},
-    onNpcTurnEnd() {},
-    onConnected() {},
-    onError() {},
-    onSessionEnded() {},
-  });
-  assert.ok(typeof client.connect === "function", "connect must be a function");
-  assert.ok(typeof client.disconnect === "function", "disconnect must be a function");
-  assert.equal(client.status, "idle");
-});
-
-test("TDD [VoiceClient]: accepts systemPrompt and greeting in options", () => {
-  const client = createVoiceAgentClient({
-    systemPrompt: "You are Murugan",
-    greeting: "Vanakkam!",
-    onPartialTranscript() {},
-    onFinalTranscript() {},
-    onNpcTurnStart() {},
-    onNpcMessage() {},
-    onNpcTurnEnd() {},
-    onConnected() {},
-    onError() {},
-    onSessionEnded() {},
-  });
-  assert.equal(client.status, "idle");
-  assert.doesNotThrow(() => client.disconnect());
-});
-
-test("TDD [TokenRoute]: API route uses GET request and valid expires_in_seconds range (1-600)", () => {
-  const routeFile = path.join(
-    import.meta.dirname ?? __dirname,
-    "../src/app/api/voice-token/route.ts"
-  );
-  const content = fs.readFileSync(routeFile, "utf8");
-  assert.ok(
-    content.includes('method: "GET"'),
-    "Token API route must use GET method against AssemblyAI"
-  );
-  assert.ok(
-    content.includes("expires_in_seconds"),
-    "Token API route must specify expires_in_seconds"
-  );
-  assert.ok(
-    content.includes("300"),
-    "Token API route should use valid expires_in_seconds (<= 600s)"
   );
 });
 

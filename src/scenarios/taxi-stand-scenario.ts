@@ -37,11 +37,11 @@ export const DEFAULT_TAXI_STAND_SCENARIO: TaxiStandScenarioConfig = {
   npcName: "Javier",
   npcRole: "Taxi Driver",
   location: "City Central Taxi Stand",
-  city: "Barcelona",
-  targetLanguage: "Spanish",
-  systemPrompt: `You are Javier, a friendly local taxi driver stationed at the City Central Taxi Stand next to the multi-story parking building in Barcelona.
-You speak conversational Spanish and help travelers get to their destination safely.`,
-  greeting: "¡Hola! Buenas tardes. ¿A dónde le llevo hoy?",
+  city: "Tokyo",
+  targetLanguage: "Japanese",
+  systemPrompt: `You are Javier, a friendly local taxi driver stationed at the City Central Taxi Stand next to the multi-story parking building in Tokyo.
+You speak conversational Japanese and help travelers get to their destination safely.`,
+  greeting: "こんにちは！今日はどちらまでお連れしましょうか？",
   interactionRadius: 12,
   objectives: [
     "Greet the taxi driver in the local language",
